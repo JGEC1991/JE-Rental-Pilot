@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../supabaseClient'
+import Modal from '../components/Modal'
 
 function Drivers() {
   const [driversLicense, setDriversLicense] = useState(null)
@@ -137,6 +138,10 @@ function Drivers() {
     setShowAddForm(true)
   }
 
+  const handleCloseModal = () => {
+    setShowAddForm(false)
+  }
+
   return (
     <div className="page">
       <h1>Drivers</h1>
@@ -184,23 +189,19 @@ function Drivers() {
           </tbody>
         </table>
       </div>
-      {!showAddForm && (
-        <div>
-          <button onClick={handleAddClick}>Add Driver</button>
-        </div>
-      )}
-      {showAddForm && (
-        <div>
-          <h2>Add New Driver</h2>
-          <label htmlFor="full_name">Full Name</label>
-          <input type="text" id="full_name" name="full_name" value={newDriver.full_name} onChange={handleInputChange} />
-          <label htmlFor="address">Address</label>
-          <input type="text" id="address" name="address" value={newDriver.address} onChange={handleInputChange} />
-          <label htmlFor="phone">Phone</label>
-          <input type="text" id="phone" name="phone" value={newDriver.phone} onChange={handleInputChange} />
-          <button onClick={handleAddDriver}>Add Driver</button>
-        </div>
-      )}
+      <div>
+        <button onClick={handleAddClick}>Add Driver</button>
+      </div>
+      <Modal isOpen={showAddForm} onClose={handleCloseModal}>
+        <h2>Add New Driver</h2>
+        <label htmlFor="full_name">Full Name</label>
+        <input type="text" id="full_name" name="full_name" value={newDriver.full_name} onChange={handleInputChange} />
+        <label htmlFor="address">Address</label>
+        <input type="text" id="address" name="address" value={newDriver.address} onChange={handleInputChange} />
+        <label htmlFor="phone">Phone</label>
+        <input type="text" id="phone" name="phone" value={newDriver.phone} onChange={handleInputChange} />
+        <button onClick={handleAddDriver}>Add Driver</button>
+      </Modal>
     </div>
   )
 }

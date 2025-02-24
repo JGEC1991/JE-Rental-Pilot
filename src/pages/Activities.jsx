@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../supabaseClient'
+import Modal from '../components/Modal'
 
 function Activities() {
   const [attachments, setAttachments] = useState([])
@@ -153,6 +154,10 @@ function Activities() {
     setShowAddForm(true)
   }
 
+  const handleCloseModal = () => {
+    setShowAddForm(false)
+  }
+
   return (
     <div className="page">
       <h1>Activities</h1>
@@ -166,35 +171,31 @@ function Activities() {
           ))}
         </div>
       </div>
-      {!showAddForm && (
-        <div>
-          <button onClick={handleAddClick}>Add Activity</button>
-        </div>
-      )}
-      {showAddForm && (
-        <div>
-          <h2>Add New Activity</h2>
-          <label htmlFor="vehicle_id">Vehicle</label>
-          <select id="vehicle_id" name="vehicle_id" value={newActivity.vehicle_id} onChange={handleInputChange}>
-            <option value="">Select Vehicle</option>
-            {vehicles.map((vehicle) => (
-              <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model}</option>
-            ))}
-          </select>
-          <label htmlFor="driver_id">Driver</label>
-          <select id="driver_id" name="driver_id" value={newActivity.driver_id} onChange={handleInputChange}>
-            <option value="">Select Driver</option>
-            {drivers.map((driver) => (
-              <option key={driver.id} value={driver.id}>{driver.full_name}</option>
-            ))}
-          </select>
-          <label htmlFor="activity_type">Activity Type</label>
-          <input type="text" id="activity_type" name="activity_type" value={newActivity.activity_type} onChange={handleInputChange} />
-          <label htmlFor="description">Description</label>
-          <textarea id="description" name="description" value={newActivity.description} onChange={handleInputChange} />
-          <button onClick={handleAddActivity}>Add Activity</button>
-        </div>
-      )}
+      <div>
+        <button onClick={handleAddClick}>Add Activity</button>
+      </div>
+      <Modal isOpen={showAddForm} onClose={handleCloseModal}>
+        <h2>Add New Activity</h2>
+        <label htmlFor="vehicle_id">Vehicle</label>
+        <select id="vehicle_id" name="vehicle_id" value={newActivity.vehicle_id} onChange={handleInputChange}>
+          <option value="">Select Vehicle</option>
+          {vehicles.map((vehicle) => (
+            <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model}</option>
+          ))}
+        </select>
+        <label htmlFor="driver_id">Driver</label>
+        <select id="driver_id" name="driver_id" value={newActivity.driver_id} onChange={handleInputChange}>
+          <option value="">Select Driver</option>
+          {drivers.map((driver) => (
+            <option key={driver.id} value={driver.id}>{driver.full_name}</option>
+          ))}
+        </select>
+        <label htmlFor="activity_type">Activity Type</label>
+        <input type="text" id="activity_type" name="activity_type" value={newActivity.activity_type} onChange={handleInputChange} />
+        <label htmlFor="description">Description</label>
+        <textarea id="description" name="description" value={newActivity.description} onChange={handleInputChange} />
+        <button onClick={handleAddActivity}>Add Activity</button>
+      </Modal>
       <div>
         <h2>Activities List</h2>
         <table>

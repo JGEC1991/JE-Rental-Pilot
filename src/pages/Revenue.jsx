@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../supabaseClient'
+import Modal from '../components/Modal'
 
 function Revenue() {
   const [vehicles, setVehicles] = useState([])
@@ -77,7 +78,7 @@ function Revenue() {
     }
   }
 
-  const handleInputChange = (e) => {
+  const handleInputChange = async (e) => {
     setNewRevenue({ ...newRevenue, [e.target.name]: e.target.value })
   }
 
@@ -113,41 +114,41 @@ function Revenue() {
     setShowAddForm(true)
   }
 
+  const handleCloseModal = () => {
+    setShowAddForm(false)
+  }
+
   return (
     <div className="page">
       <h1>Revenue</h1>
       <p>Manage Revenue</p>
-      {!showAddForm && (
-        <div>
-          <button onClick={handleAddClick}>Add Revenue</button>
-        </div>
-      )}
-      {showAddForm && (
-        <div>
-          <h2>Add New Revenue</h2>
-          <label htmlFor="vehicle_id">Vehicle</label>
-          <select id="vehicle_id" name="vehicle_id" value={newRevenue.vehicle_id} onChange={handleInputChange}>
-            <option value="">Select Vehicle</option>
-            {vehicles.map((vehicle) => (
-              <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model}</option>
-            ))}
-          </select>
-          <label htmlFor="driver_id">Driver</label>
-          <select id="driver_id" name="driver_id" value={newRevenue.driver_id} onChange={handleInputChange}>
-            <option value="">Select Driver</option>
-            {drivers.map((driver) => (
-              <option key={driver.id} value={driver.id}>{driver.full_name}</option>
-            ))}
-          </select>
-          <label htmlFor="amount">Amount</label>
-          <input type="number" id="amount" name="amount" value={newRevenue.amount} onChange={handleInputChange} />
-          <label htmlFor="date">Date</label>
-          <input type="date" id="date" name="date" value={newRevenue.date} onChange={handleInputChange} />
-          <label htmlFor="description">Description</label>
-          <textarea id="description" name="description" value={newRevenue.description} onChange={handleInputChange} />
-          <button onClick={handleAddRevenue}>Add Revenue</button>
-        </div>
-      )}
+      <div>
+        <button onClick={handleAddClick}>Add Revenue</button>
+      </div>
+      <Modal isOpen={showAddForm} onClose={handleCloseModal}>
+        <h2>Add New Revenue</h2>
+        <label htmlFor="vehicle_id">Vehicle</label>
+        <select id="vehicle_id" name="vehicle_id" value={newRevenue.vehicle_id} onChange={handleInputChange}>
+          <option value="">Select Vehicle</option>
+          {vehicles.map((vehicle) => (
+            <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model}</option>
+          ))}
+        </select>
+        <label htmlFor="driver_id">Driver</label>
+        <select id="driver_id" name="driver_id" value={newRevenue.driver_id} onChange={handleInputChange}>
+          <option value="">Select Driver</option>
+          {drivers.map((driver) => (
+            <option key={driver.id} value={driver.id}>{driver.full_name}</option>
+          ))}
+        </select>
+        <label htmlFor="amount">Amount</label>
+        <input type="number" id="amount" name="amount" value={newRevenue.amount} onChange={handleInputChange} />
+        <label htmlFor="date">Date</label>
+        <input type="date" id="date" name="date" value={newRevenue.date} onChange={handleInputChange} />
+        <label htmlFor="description">Description</label>
+        <textarea id="description" name="description" value={newRevenue.description} onChange={handleInputChange} />
+        <button onClick={handleAddRevenue}>Add Revenue</button>
+      </Modal>
       <div>
         <h2>Revenue List</h2>
         <table>

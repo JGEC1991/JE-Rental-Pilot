@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../supabaseClient'
+import Modal from '../components/Modal'
 
 function Vehicles() {
   const [image, setImage] = useState(null)
@@ -102,6 +103,10 @@ function Vehicles() {
     setShowAddForm(true)
   }
 
+  const handleCloseModal = () => {
+    setShowAddForm(false)
+  }
+
   return (
     <div className="page">
       <h1>Vehicles</h1>
@@ -136,27 +141,23 @@ function Vehicles() {
           </tbody>
         </table>
       </div>
-      {!showAddForm && (
-        <div>
-          <button onClick={handleAddClick}>Add Vehicle</button>
-        </div>
-      )}
-      {showAddForm && (
-        <div>
-          <h2>Add New Vehicle</h2>
-          <label htmlFor="make">Make</label>
-          <input type="text" id="make" name="make" value={newVehicle.make} onChange={handleInputChange} />
-          <label htmlFor="model">Model</label>
-          <input type="text" id="model" name="model" value={newVehicle.model} onChange={handleInputChange} />
-          <label htmlFor="year">Year</label>
-          <input type="number" id="year" name="year" value={newVehicle.year} onChange={handleInputChange} />
-          <label htmlFor="license_plate">License Plate</label>
-          <input type="text" id="license_plate" name="license_plate" value={newVehicle.license_plate} onChange={handleInputChange} />
-          <label htmlFor="vin">VIN</label>
-          <input type="text" id="vin" name="vin" value={newVehicle.vin} onChange={handleInputChange} />
-          <button onClick={handleAddVehicle}>Add Vehicle</button>
-        </div>
-      )}
+      <div>
+        <button onClick={handleAddClick}>Add Vehicle</button>
+      </div>
+      <Modal isOpen={showAddForm} onClose={handleCloseModal}>
+        <h2>Add New Vehicle</h2>
+        <label htmlFor="make">Make</label>
+        <input type="text" id="make" name="make" value={newVehicle.make} onChange={handleInputChange} />
+        <label htmlFor="model">Model</label>
+        <input type="text" id="model" name="model" value={newVehicle.model} onChange={handleInputChange} />
+        <label htmlFor="year">Year</label>
+        <input type="number" id="year" name="year" value={newVehicle.year} onChange={handleInputChange} />
+        <label htmlFor="license_plate">License Plate</label>
+        <input type="text" id="license_plate" name="license_plate" value={newVehicle.license_plate} onChange={handleInputChange} />
+        <label htmlFor="vin">VIN</label>
+        <input type="text" id="vin" name="vin" value={newVehicle.vin} onChange={handleInputChange} />
+        <button onClick={handleAddVehicle}>Add Vehicle</button>
+      </Modal>
     </div>
   )
 }

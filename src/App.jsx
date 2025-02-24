@@ -12,6 +12,7 @@ import Signup from './pages/Signup'
 import Drivers from './pages/Drivers'
 import Revenue from './pages/Revenue'
 import { supabase } from '../supabaseClient'
+import './styles.css' // Import the CSS file
 
 function App() {
   const [session, setSession] = useState(null)
