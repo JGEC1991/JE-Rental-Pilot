@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
 import Home from './pages/Home'
 import Profile from './pages/Profile'
@@ -11,20 +11,28 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Drivers from './pages/Drivers'
 import Revenue from './pages/Revenue'
+import { supabase } from '../supabaseClient'
 
 function App() {
+  const [session, setSession] = useState(null)
+
+  useEffect(() => {
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        setSession(session)
+      })
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+  }, [])
+
   return (
     <Router>
       <nav>
         <ul>
           <li>
             <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/login">Login</Link>
-          </li>
-          <li>
-            <Link to="/signup">Signup</Link>
           </li>
           <li>
             <Link to="/profile">Profile</Link>
@@ -55,7 +63,6 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/vehicles" element={<Vehicles />} />
         <Route path="/drivers" element={<Drivers />} />

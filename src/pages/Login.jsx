@@ -29,6 +29,8 @@ function Login() {
     }
   }
 
+  console.log('Login component rendered') // Add this line
+
   return (
     <div className="page">
       <h1>Login</h1>
