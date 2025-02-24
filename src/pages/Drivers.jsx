@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../supabaseClient'
+import styles from './Drivers.module.css'
+import Modal from '../../src/components/Modal'
 
 function Drivers() {
   const [driversLicense, setDriversLicense] = useState(null)
@@ -16,6 +18,7 @@ function Drivers() {
   })
   const [editingDriver, setEditingDriver] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     fetchDrivers()
@@ -206,9 +209,17 @@ function Drivers() {
     )
   })
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
+
   return (
-    <div className="page">
-      <h1>Drivers</h1>
+    <div className={styles.container}>
+      <h1 className={styles.heading}>Drivers</h1>
       <p>Manage Drivers</p>
       <div>
         <h2>Upload Driver's License</h2>
@@ -224,7 +235,7 @@ function Drivers() {
         <h2>Drivers List</h2>
         <label htmlFor="search">Search:</label>
         <input type="text" id="search" name="search" value={searchQuery} onChange={handleSearch} />
-        <table>
+        <table className={styles.listTable}>
           <thead>
             <tr>
               <th>Full Name</th>
@@ -261,16 +272,12 @@ function Drivers() {
         </table>
       </div>
       <div>
-        <h2>{editingDriver ? 'Edit Driver' : 'Add New Driver'}</h2>
-        <label htmlFor="full_name">Full Name</label>
-        <input type="text" id="full_name" name="full_name" value={newDriver.full_name} onChange={handleInputChange} />
-        <label htmlFor="address">Address</label>
-        <input type="text" id="address" name="address" value={newDriver.address} onChange={handleInputChange} />
-        <label htmlFor="phone">Phone</label>
-        <input type="text" id="phone" name="phone" value={newDriver.phone} onChange={handleInputChange} />
-        <button onClick={handleAddDriver}>Add Driver</button>
-        {editingDriver && <button onClick={handleUpdateDriver}>Update Driver</button>}
+        <button onClick={handleOpenModal} className={styles.formButton}>Add New Record</button>
       </div>
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+        <h2>Add New Record</h2>
+        <p>Select the type of record you want to add:</p>
+      </Modal>
     </div>
   )
 }
