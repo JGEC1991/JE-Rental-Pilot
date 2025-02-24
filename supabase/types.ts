@@ -9,33 +9,207 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      frameworks: {
+      activities: {
         Row: {
-          description: string;
+          attachments: string[] | null;
           created_at: string;
-          url: string;
+          description: string | null;
+          driver_id: string | null;
           id: string;
-          logo: string;
-          name: string;
-          likes: number;
+          activity_type: string | null;
+          vehicle_id: string | null;
         };
         Insert: {
-          description: string;
+          attachments?: string[] | null;
           created_at?: string;
-          url: string;
+          description?: string | null;
+          driver_id?: string | null;
           id?: string;
-          logo: string;
-          name: string;
-          likes?: number;
+          activity_type?: string | null;
+          vehicle_id?: string | null;
         };
         Update: {
-          description?: string;
+          attachments?: string[] | null;
           created_at?: string;
-          url?: string;
+          description?: string | null;
+          driver_id?: string | null;
           id?: string;
+          activity_type?: string | null;
+          vehicle_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "activities_driver_id_fkey";
+            columns: ["driver_id"];
+            isOne: true;
+            referencedRelation: "drivers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "activities_vehicle_id_fkey";
+            columns: ["vehicle_id"];
+            isOne: true;
+            referencedRelation: "vehicles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      drivers: {
+        Row: {
+          address: string | null;
+          created_at: string;
+          drivers_license_photo: string | null;
+          full_name: string | null;
+          id: string;
+          phone: string | null;
+          police_records_photo: string | null;
+        };
+        Insert: {
+          address?: string | null;
+          created_at?: string;
+          drivers_license_photo?: string | null;
+          full_name?: string | null;
+          id?: string;
+          phone?: string | null;
+          police_records_photo?: string | null;
+        };
+        Update: {
+          address?: string | null;
+          created_at?: string;
+          drivers_license_photo?: string | null;
+          full_name?: string | null;
+          id?: string;
+          phone?: string | null;
+          police_records_photo?: string | null;
+        };
+        Relationships: [];
+      };
+      frameworks: {
+        Row: {
+          created_at: string;
+          description: string;
+          id: string;
+          likes: number;
+          logo: string;
+          name: string;
+          url: string;
+        };
+        Insert: {
+          created_at?: string;
+          description: string;
+          id?: string;
+          likes?: number;
+          logo: string;
+          name: string;
+          url: string;
+        };
+        Update: {
+          created_at?: string;
+          description?: string;
+          id?: string;
+          likes?: number;
           logo?: string;
           name?: string;
-          likes?: number;
+          url?: string;
+        };
+        Relationships: [];
+      };
+      invitations: {
+        Row: {
+          created_at: string;
+          email: string | null;
+          id: string;
+          token: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          email?: string | null;
+          id?: string;
+          token?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          email?: string | null;
+          id?: string;
+          token?: string | null;
+        };
+        Relationships: [];
+      };
+      revenue: {
+        Row: {
+          amount: number | null;
+          created_at: string;
+          date: string | null;
+          description: string | null;
+          driver_id: string | null;
+          id: string;
+          status: "Canceled" | "Completed" | "Incomplete" | "Past Due" | "Pending" | null;
+          vehicle_id: string | null;
+        };
+        Insert: {
+          amount?: number | null;
+          created_at?: string;
+          date?: string | null;
+          description?: string | null;
+          driver_id?: string | null;
+          id?: string;
+          status?: "Canceled" | "Completed" | "Incomplete" | "Past Due" | "Pending" | null;
+          vehicle_id?: string | null;
+        };
+        Update: {
+          amount?: number | null;
+          created_at?: string;
+          date?: string | null;
+          description?: string | null;
+          driver_id?: string | null;
+          id?: string;
+          status?: "Canceled" | "Completed" | "Incomplete" | "Past Due" | "Pending" | null;
+          vehicle_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "revenue_driver_id_fkey";
+            columns: ["driver_id"];
+            isOne: true;
+            referencedRelation: "drivers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "revenue_vehicle_id_fkey";
+            columns: ["vehicle_id"];
+            isOne: true;
+            referencedRelation: "vehicles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      vehicles: {
+        Row: {
+          created_at: string;
+          id: string;
+          license_plate: string | null;
+          make: string | null;
+          model: string | null;
+          vin: string | null;
+          year: number | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          license_plate?: string | null;
+          make?: string | null;
+          model?: string | null;
+          vin?: string | null;
+          year?: number | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          license_plate?: string | null;
+          make?: string | null;
+          model?: string | null;
+          vin?: string | null;
+          year?: number | null;
         };
         Relationships: [];
       };
@@ -47,7 +221,7 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      [_ in never]: never;
+      payment_status: "Canceled" | "Completed" | "Incomplete" | "Past Due" | "Pending";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -134,5 +308,5 @@ export type Enums<
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    ? PublicSchema["Enums"][PublicTableNameOrOptions]
     : never;
