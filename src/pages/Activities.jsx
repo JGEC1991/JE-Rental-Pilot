@@ -65,7 +65,14 @@ function Activities() {
     try {
       const { data, error } = await supabase
         .from('activities')
-        .select('*')
+        .select(`
+          id,
+          activity_type,
+          description,
+          attachments,
+          vehicles (make, model, license_plate),
+          drivers (full_name)
+        `)
 
       if (error) {
         console.error('Error fetching activities:', error)
@@ -221,8 +228,10 @@ function Activities() {
           <tbody>
             {activities.map((activity) => (
               <tr key={activity.id}>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{activity.vehicle_id}</td>
-                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{activity.driver_id}</td>
+                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                  {activity.vehicles?.make} {activity.vehicles?.model} ({activity.vehicles?.license_plate})
+                </td>
+                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{activity.drivers?.full_name}</td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{activity.activity_type}</td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{activity.description}</td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">

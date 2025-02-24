@@ -13,44 +13,24 @@ function Dashboard() {
     Incomplete: 0,
     Canceled: 0,
   })
-  const [timePeriod, setTimePeriod] = useState('All Time')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     fetchDashboardData()
-  }, [timePeriod])
+  }, [startDate, endDate])
 
   const fetchDashboardData = async () => {
     setLoading(true)
     try {
       let query = supabase
         .from('revenue')
-        .select('amount, status, date')
+        .select('amount, status')
 
-      // Apply time period filter
-      const today = new Date();
-      let startDate;
-
-      switch (timePeriod) {
-        case 'Week':
-          startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
-          break;
-        case 'Month':
-          startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 30);
-          break;
-        case 'Quarter':
-          startDate = new Date(today.getFullYear(), today.getMonth() - 3, today.getDate());
-          break;
-        case 'Year':
-          startDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
-          break;
-        default:
-          startDate = null;
-          break;
-      }
-
-      if (startDate) {
-        query = query.gte('date', startDate.toISOString().split('T')[0]);
+      // Apply date range filter
+      if (startDate && endDate) {
+        query = query.gte('date', startDate).lte('date', endDate)
       }
 
       const { data: revenueData, error: revenueError } = await query
@@ -124,24 +104,24 @@ function Dashboard() {
     }
   }
 
-  const handleTimePeriodChange = (e) => {
-    setTimePeriod(e.target.value)
+  const handleStartDateChange = (e) => {
+    setStartDate(e.target.value)
+  }
+
+  const handleEndDateChange = (e) => {
+    setEndDate(e.target.value)
   }
 
   return (
     <div className="page">
       <h1 className="text-3xl font-semibold mb-4">Dashboard</h1>
       <p className="text-gray-700">System Dashboard</p>
-      {/* Time Period Selector */}
+      {/* Date Range Filter */}
       <div className="mb-4">
-        <label htmlFor="timePeriod" className="block text-gray-700 text-sm font-bold mb-2">Time Period</label>
-        <select id="timePeriod" name="timePeriod" value={timePeriod} onChange={handleTimePeriodChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-          <option value="All Time">All Time</option>
-          <option value="Week">Last Week</option>
-          <option value="Month">Last Month</option>
-          <option value="Quarter">Last Quarter</option>
-          <option value="Year">Last Year</option>
-        </select>
+        <label htmlFor="startDate" className="block text-gray-700 text-sm font-bold mb-2">Start Date</label>
+        <input type="date" id="startDate" name="startDate" value={startDate} onChange={handleStartDateChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+        <label htmlFor="endDate" className="block text-gray-700 text-sm font-bold mb-2">End Date</label>
+        <input type="date" id="endDate" name="endDate" value={endDate} onChange={handleEndDateChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
       </div>
       {loading ? (
         <p>Loading...</p>
