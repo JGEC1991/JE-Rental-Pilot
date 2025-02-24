@@ -10,6 +10,7 @@ import Admin from './pages/Admin'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Drivers from './pages/Drivers'
+import Revenue from './pages/Revenue'
 
 function App() {
   return (
@@ -38,6 +39,9 @@ function App() {
             <Link to="/activities">Activities</Link>
           </li>
           <li>
+            <Link to="/revenue">Revenue</Link>
+          </li>
+          <li>
             <Link to="/dashboard">Dashboard</Link>
           </li>
           <li>
@@ -56,6 +60,7 @@ function App() {
         <Route path="/vehicles" element={<Vehicles />} />
         <Route path="/drivers" element={<Drivers />} />
         <Route path="/activities" element={<Activities />} />
+        <Route path="/revenue" element={<Revenue />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/admin" element={<Admin />} />

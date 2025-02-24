@@ -6,6 +6,7 @@ function Activities() {
   const [attachmentUrls, setAttachmentUrls] = useState([])
   const [vehicles, setVehicles] = useState([])
   const [drivers, setDrivers] = useState([])
+  const [activities, setActivities] = useState([])
   const [newActivity, setNewActivity] = useState({
     vehicle_id: '',
     driver_id: '',
@@ -17,6 +18,7 @@ function Activities() {
   useEffect(() => {
     fetchVehicles()
     fetchDrivers()
+    fetchActivities()
   }, [])
 
   const fetchVehicles = async () => {
@@ -53,6 +55,25 @@ function Activities() {
       }
     } catch (error) {
       console.error('Error fetching drivers:', error.message)
+      alert(error.message)
+    }
+  }
+
+  const fetchActivities = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('activities')
+        .select('*')
+
+      if (error) {
+        console.error('Error fetching activities:', error)
+        alert(error.message)
+      } else {
+        console.log('Activities:', data)
+        setActivities(data)
+      }
+    } catch (error) {
+      console.error('Error fetching activities:', error.message)
       alert(error.message)
     }
   }
@@ -108,7 +129,7 @@ function Activities() {
       } else {
         console.log('Activity added:', data)
         alert('Activity added successfully!')
-        //fetchActivities() // Implement fetchActivities
+        fetchActivities()
         setNewActivity({
           vehicle_id: '',
           driver_id: '',
@@ -158,6 +179,35 @@ function Activities() {
         <label htmlFor="description">Description</label>
         <textarea id="description" name="description" value={newActivity.description} onChange={handleInputChange} />
         <button onClick={handleAddActivity}>Add Activity</button>
+      </div>
+      <div>
+        <h2>Activities List</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Vehicle</th>
+              <th>Driver</th>
+              <th>Activity Type</th>
+              <th>Description</th>
+              <th>Attachments</th>
+            </tr>
+          </thead>
+          <tbody>
+            {activities.map((activity) => (
+              <tr key={activity.id}>
+                <td>{activity.vehicle_id}</td>
+                <td>{activity.driver_id}</td>
+                <td>{activity.activity_type}</td>
+                <td>{activity.description}</td>
+                <td>
+                  {activity.attachments && activity.attachments.map((url, index) => (
+                    <img key={index} src={url} alt={`Attachment ${index + 1}`} style={{ width: '100px', margin: '5px' }} />
+                  ))}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )
