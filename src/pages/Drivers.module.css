@@ -1,0 +1,56 @@
+.container {
+  padding: 20px;
+}
+
+.heading {
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.listTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.listTable th,
+.listTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.listTable th {
+  background-color: #f2f2f2;
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+}
+
+.formLabel {
+  margin-top: 10px;
+}
+
+.formInput {
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.formButton {
+  padding: 10px;
+  background-color: #5cb85c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.formButton:hover {
+  background-color: #4cae4c;
+}
