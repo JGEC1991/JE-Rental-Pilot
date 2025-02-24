@@ -12,7 +12,6 @@ function Drivers() {
     address: '',
     phone: '',
     drivers_license_photo: '',
-    drivers_license_expiry: '',
     police_records_photo: '',
   })
 
@@ -49,8 +48,6 @@ function Drivers() {
         .upload(`${file.name}`, file, {
           cacheControl: '3600',
           upsert: false,
-          public: true,
-          contentType: file.type,
         })
 
       if (error) {
@@ -59,8 +56,8 @@ function Drivers() {
       } else {
         console.log('Drivers license uploaded:', data)
         const driversLicenseUrl = supabase.storage.from('driver-licenses').getPublicUrl(`${file.name}`).data.publicUrl
-        setDriversLicenseUrl(driversLicenseUrl)
         setNewDriver({ ...newDriver, drivers_license_photo: driversLicenseUrl })
+        setDriversLicenseUrl(driversLicenseUrl)
         alert('Drivers license uploaded successfully!')
       }
     } catch (error) {
@@ -79,8 +76,6 @@ function Drivers() {
         .upload(`${file.name}`, file, {
           cacheControl: '3600',
           upsert: false,
-          public: true,
-          contentType: file.type,
         })
 
       if (error) {
@@ -89,8 +84,8 @@ function Drivers() {
       } else {
         console.log('Police record uploaded:', data)
         const policeRecordUrl = supabase.storage.from('police-records').getPublicUrl(`${file.name}`).data.publicUrl
-        setPoliceRecordUrl(policeRecordUrl)
         setNewDriver({ ...newDriver, police_records_photo: policeRecordUrl })
+        setPoliceRecordUrl(policeRecordUrl)
         alert('Police record uploaded successfully!')
       }
     } catch (error) {
@@ -121,7 +116,6 @@ function Drivers() {
           address: '',
           phone: '',
           drivers_license_photo: '',
-          drivers_license_expiry: '',
           police_records_photo: '',
         })
         setDriversLicenseUrl(null)
@@ -188,14 +182,6 @@ function Drivers() {
         <input type="text" id="address" name="address" value={newDriver.address} onChange={handleInputChange} />
         <label htmlFor="phone">Phone</label>
         <input type="text" id="phone" name="phone" value={newDriver.phone} onChange={handleInputChange} />
-        <label htmlFor="drivers_license_expiry">Driver's License Expiry</label>
-        <input
-          type="date"
-          id="drivers_license_expiry"
-          name="drivers_license_expiry"
-          value={newDriver.drivers_license_expiry}
-          onChange={handleInputChange}
-        />
         <button onClick={handleAddDriver}>Add Driver</button>
       </div>
     </div>
