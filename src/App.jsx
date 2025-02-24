@@ -12,7 +12,7 @@ import Signup from './pages/Signup'
 import Drivers from './pages/Drivers'
 import Revenue from './pages/Revenue'
 import { supabase } from '../supabaseClient'
-import './styles.css' // Import the CSS file
+import './index.css' // Import the CSS file
 
 function App() {
   const [session, setSession] = useState(null)
@@ -30,34 +30,34 @@ function App() {
 
   return (
     <Router>
-      <nav>
-        <ul>
+      <nav className="bg-gray-800 p-4">
+        <ul className="flex justify-around">
           <li>
-            <Link to="/">Home</Link>
+            <Link to="/" className="text-white hover:text-gray-300">Home</Link>
           </li>
           <li>
-            <Link to="/profile">Profile</Link>
+            <Link to="/profile" className="text-white hover:text-gray-300">Profile</Link>
           </li>
           <li>
-            <Link to="/vehicles">Vehicles</Link>
+            <Link to="/vehicles" className="text-white hover:text-gray-300">Vehicles</Link>
+          </li>
+           <li>
+            <Link to="/drivers" className="text-white hover:text-gray-300">Drivers</Link>
           </li>
           <li>
-            <Link to="/drivers">Drivers</Link>
+            <Link to="/activities" className="text-white hover:text-gray-300">Activities</Link>
           </li>
           <li>
-            <Link to="/activities">Activities</Link>
+            <Link to="/revenue" className="text-white hover:text-gray-300">Revenue</Link>
           </li>
           <li>
-            <Link to="/revenue">Revenue</Link>
+            <Link to="/dashboard" className="text-white hover:text-gray-300">Dashboard</Link>
           </li>
           <li>
-            <Link to="/dashboard">Dashboard</Link>
+            <Link to="/settings" className="text-white hover:text-gray-300">Settings</Link>
           </li>
           <li>
-            <Link to="/settings">Settings</Link>
-          </li>
-          <li>
-            <Link to="/admin">Admin</Link>
+            <Link to="/admin" className="text-white hover:text-gray-300">Admin</Link>
           </li>
         </ul>
       </nav>

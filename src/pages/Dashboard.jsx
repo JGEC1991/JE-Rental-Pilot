@@ -70,23 +70,25 @@ function Dashboard() {
 
   return (
     <div className="page">
-      <h1>Dashboard</h1>
-      <p>System Dashboard</p>
-      <div>
-        <h2>Total Revenue</h2>
-        <p>${totalRevenue}</p>
-      </div>
-      <div>
-        <h2>Vehicle Count</h2>
-        <p>{vehicleCount}</p>
-      </div>
-      <div>
-        <h2>Driver Count</h2>
-        <p>{driverCount}</p>
-      </div>
-      <div>
-        <h2>Activity Count</h2>
-        <p>{activityCount}</p>
+      <h1 className="text-3xl font-semibold mb-4">Dashboard</h1>
+      <p className="text-gray-700">System Dashboard</p>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white shadow-md rounded-lg p-4">
+          <h2 className="text-xl font-semibold mb-2">Total Revenue</h2>
+          <p className="text-gray-700">${totalRevenue}</p>
+        </div>
+        <div className="bg-white shadow-md rounded-lg p-4">
+          <h2 className="text-xl font-semibold mb-2">Vehicle Count</h2>
+          <p className="text-gray-700">{vehicleCount}</p>
+        </div>
+        <div className="bg-white shadow-md rounded-lg p-4">
+          <h2 className="text-xl font-semibold mb-2">Driver Count</h2>
+          <p className="text-gray-700">{driverCount}</p>
+        </div>
+        <div className="bg-white shadow-md rounded-lg p-4">
+          <h2 className="text-xl font-semibold mb-2">Activity Count</h2>
+          <p className="text-gray-700">{activityCount}</p>
+        </div>
       </div>
     </div>
   )

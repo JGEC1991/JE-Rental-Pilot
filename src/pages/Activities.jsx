@@ -145,7 +145,7 @@ function Activities() {
         setShowAddForm(false)
       }
     } catch (error) {
-      console.error('Error adding activity:', error.message)
+      console.error('Error addingactivity:', error.message)
       alert(error.message)
     }
   }
@@ -160,62 +160,72 @@ function Activities() {
 
   return (
     <div className="page">
-      <h1>Activities</h1>
-      <p>Activity Logs</p>
-      <div>
-        <h2>Upload Activity Attachments</h2>
-        <input type="file" accept="image/*,application/pdf" multiple onChange={handleAttachmentUpload} />
-        <div>
+      <h1 className="text-3xl font-semibold mb-4">Activities</h1>
+      <p className="text-gray-700">Activity Logs</p>
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold mb-2">Upload Activity Attachments</h2>
+        <input type="file" accept="image/*,application/pdf" multiple onChange={handleAttachmentUpload} className="mb-2" />
+        <div className="flex">
           {attachmentUrls.map((url, index) => (
             <img key={index} src={url} alt={`Attachment ${index + 1}`} style={{ width: '200px', margin: '10px' }} />
           ))}
         </div>
       </div>
       <div>
-        <button onClick={handleAddClick}>Add Activity</button>
+        <button
+          onClick={handleAddClick}
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Add Activity
+        </button>
       </div>
       <Modal isOpen={showAddForm} onClose={handleCloseModal}>
-        <h2>Add New Activity</h2>
-        <label htmlFor="vehicle_id">Vehicle</label>
-        <select id="vehicle_id" name="vehicle_id" value={newActivity.vehicle_id} onChange={handleInputChange}>
+        <h2 className="text-2xl font-semibold mb-4">Add New Activity</h2>
+        <label htmlFor="vehicle_id" className="block text-gray-700 text-sm font-bold mb-2">Vehicle</label>
+        <select id="vehicle_id" name="vehicle_id" value={newActivity.vehicle_id} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
           <option value="">Select Vehicle</option>
           {vehicles.map((vehicle) => (
             <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model}</option>
           ))}
         </select>
-        <label htmlFor="driver_id">Driver</label>
-        <select id="driver_id" name="driver_id" value={newActivity.driver_id} onChange={handleInputChange}>
+        <label htmlFor="driver_id" className="block text-gray-700 text-sm font-bold mb-2">Driver</label>
+        <select id="driver_id" name="driver_id" value={newActivity.driver_id} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
           <option value="">Select Driver</option>
           {drivers.map((driver) => (
             <option key={driver.id} value={driver.id}>{driver.full_name}</option>
           ))}
         </select>
-        <label htmlFor="activity_type">Activity Type</label>
-        <input type="text" id="activity_type" name="activity_type" value={newActivity.activity_type} onChange={handleInputChange} />
-        <label htmlFor="description">Description</label>
-        <textarea id="description" name="description" value={newActivity.description} onChange={handleInputChange} />
-        <button onClick={handleAddActivity}>Add Activity</button>
+        <label htmlFor="activity_type" className="block text-gray-700 text-sm font-bold mb-2">Activity Type</label>
+        <input type="text" id="activity_type" name="activity_type" value={newActivity.activity_type} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+        <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">Description</label>
+        <textarea id="description" name="description" value={newActivity.description} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+        <button
+          onClick={handleAddActivity}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Add Activity
+        </button>
       </Modal>
       <div>
-        <h2>Activities List</h2>
-        <table>
+        <h2 className="text-xl font-semibold mb-2">Activities List</h2>
+        <table className="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
           <thead>
             <tr>
-              <th>Vehicle</th>
-              <th>Driver</th>
-              <th>Activity Type</th>
-              <th>Description</th>
-              <th>Attachments</th>
+              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Vehicle</th>
+              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Driver</th>
+              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Activity Type</th>
+              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Description</th>
+              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Attachments</th>
             </tr>
           </thead>
           <tbody>
             {activities.map((activity) => (
               <tr key={activity.id}>
-                <td>{activity.vehicle_id}</td>
-                <td>{activity.driver_id}</td>
-                <td>{activity.activity_type}</td>
-                <td>{activity.description}</td>
-                <td>
+                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{activity.vehicle_id}</td>
+                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{activity.driver_id}</td>
+                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{activity.activity_type}</td>
+                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{activity.description}</td>
+                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                   {activity.attachments && activity.attachments.map((url, index) => (
                     <img key={index} src={url} alt={`Attachment ${index + 1}`} style={{ width: '100px', margin: '5px' }} />
                   ))}
