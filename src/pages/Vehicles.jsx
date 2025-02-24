@@ -5,6 +5,7 @@ function Vehicles() {
   const [image, setImage] = useState(null)
   const [imageUrl, setImageUrl] = useState(null)
   const [vehicles, setVehicles] = useState([])
+  const [showAddForm, setShowAddForm] = useState(false)
   const [newVehicle, setNewVehicle] = useState({
     make: '',
     model: '',
@@ -12,22 +13,16 @@ function Vehicles() {
     license_plate: '',
     vin: '',
   })
-  const [editingVehicle, setEditingVehicle] = useState(null)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [filterMake, setFilterMake] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(5)
 
   useEffect(() => {
     fetchVehicles()
-  }, [currentPage, itemsPerPage])
+  }, [])
 
   const fetchVehicles = async () => {
     try {
       const { data, error } = await supabase
         .from('vehicles')
         .select('*')
-        .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1)
 
       if (error) {
         console.error('Error fetching vehicles:', error)
@@ -95,6 +90,7 @@ function Vehicles() {
           license_plate: '',
           vin: '',
         })
+        setShowAddForm(false)
       }
     } catch (error) {
       console.error('Error adding vehicle:', error.message)
@@ -102,94 +98,9 @@ function Vehicles() {
     }
   }
 
-  const handleEditVehicle = (vehicle) => {
-    setEditingVehicle(vehicle)
-    setNewVehicle(vehicle)
+  const handleAddClick = () => {
+    setShowAddForm(true)
   }
-
-  const handleUpdateVehicle = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('vehicles')
-        .update([newVehicle])
-        .eq('id', editingVehicle.id)
-
-      if (error) {
-        console.error('Error updating vehicle:', error)
-        alert(error.message)
-      } else {
-        console.log('Vehicle updated:', data)
-        alert('Vehicle updated successfully!')
-        fetchVehicles()
-        setEditingVehicle(null)
-        setNewVehicle({
-          make: '',
-          model: '',
-          year: '',
-          license_plate: '',
-          vin: '',
-        })
-      }
-    } catch (error) {
-      console.error('Error updating vehicle:', error.message)
-      alert(error.message)
-    }
-  }
-
-  const handleDeleteVehicle = async (id) => {
-    if (window.confirm('Are you sure you want to delete this vehicle?')) {
-      try {
-        const { data, error } = await supabase
-          .from('vehicles')
-          .delete()
-          .eq('id', id)
-
-        if (error) {
-          console.error('Error deleting vehicle:', error)
-          alert(error.message)
-        } else {
-          console.log('Vehicle deleted:', data)
-          alert('Vehicle deleted successfully!')
-          fetchVehicles()
-        }
-      } catch (error) {
-        console.error('Error deleting vehicle:', error.message)
-        alert(error.message)
-      }
-    }
-  }
-
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value)
-  }
-
-  const handleFilterMake = (e) => {
-    setFilterMake(e.target.value)
-  }
-
-  const filteredVehicles = vehicles.filter((vehicle) => {
-    return (
-      vehicle.make.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      (filterMake === '' || vehicle.make === filterMake)
-    )
-  })
-
-  const totalPages = Math.ceil(filteredVehicles.length / itemsPerPage)
-
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-
-  const currentVehicles = filteredVehicles.slice(startIndex, endIndex)
-
-  const handlePreviousPage = () => {
-    setCurrentPage(currentPage - 1)
-  }
-
-  const handleNextPage = () => {
-    setCurrentPage(currentPage + 1)
-  }
-
-  const uniqueMakes = [...new Set(vehicles.map((vehicle) => vehicle.make))]
 
   return (
     <div className="page">
@@ -202,15 +113,6 @@ function Vehicles() {
       </div>
       <div>
         <h2>Vehicles List</h2>
-        <label htmlFor="search">Search:</label>
-        <input type="text" id="search" name="search" value={searchQuery} onChange={handleSearch} />
-        <label htmlFor="filterMake">Filter by Make:</label>
-        <select id="filterMake" name="filterMake" value={filterMake} onChange={handleFilterMake}>
-          <option value="">All Makes</option>
-          {uniqueMakes.map((make) => (
-            <option key={make} value={make}>{make}</option>
-          ))}
-        </select>
         <table>
           <thead>
             <tr>
@@ -219,55 +121,42 @@ function Vehicles() {
               <th>Year</th>
               <th>License Plate</th>
               <th>VIN</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {currentVehicles.map((vehicle) => (
+            {vehicles.map((vehicle) => (
               <tr key={vehicle.id}>
                 <td>{vehicle.make}</td>
                 <td>{vehicle.model}</td>
                 <td>{vehicle.year}</td>
                 <td>{vehicle.license_plate}</td>
                 <td>{vehicle.vin}</td>
-                <td>
-                  <button onClick={() => handleEditVehicle(vehicle)}>Edit</button>
-                  <button onClick={() => handleDeleteVehicle(vehicle.id)}>Delete</button>
-                </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+      {!showAddForm && (
         <div>
-          <button onClick={handlePreviousPage} disabled={currentPage === 1}>
-            Previous
-          </button>
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
-          <button onClick={handleNextPage} disabled={currentPage === totalPages}>
-            Next
-          </button>
+          <button onClick={handleAddClick}>Add Vehicle</button>
         </div>
-      </div>
-      <div>
-        <h2>{editingVehicle ? 'Edit Vehicle' : 'Add New Vehicle'}</h2>
-        <label htmlFor="make">Make</label>
-        <input type="text" id="make" name="make" value={newVehicle.make} onChange={handleInputChange} />
-        <label htmlFor="model">Model</label>
-        <input type="text" id="model" name="model" value={newVehicle.model} onChange={handleInputChange} />
-        <label htmlFor="year">Year</label>
-        <input type="number" id="year" name="year" value={newVehicle.year} onChange={handleInputChange} />
-        <label htmlFor="license_plate">License Plate</label>
-        <input type="text" id="license_plate" name="license_plate" value={newVehicle.license_plate} onChange={handleInputChange} />
-        <label htmlFor="vin">VIN</label>
-        <input type="text" id="vin" name="vin" value={newVehicle.vin} onChange={handleInputChange} />
-        {editingVehicle ? (
-          <button onClick={handleUpdateVehicle}>Update Vehicle</button>
-        ) : (
+      )}
+      {showAddForm && (
+        <div>
+          <h2>Add New Vehicle</h2>
+          <label htmlFor="make">Make</label>
+          <input type="text" id="make" name="make" value={newVehicle.make} onChange={handleInputChange} />
+          <label htmlFor="model">Model</label>
+          <input type="text" id="model" name="model" value={newVehicle.model} onChange={handleInputChange} />
+          <label htmlFor="year">Year</label>
+          <input type="number" id="year" name="year" value={newVehicle.year} onChange={handleInputChange} />
+          <label htmlFor="license_plate">License Plate</label>
+          <input type="text" id="license_plate" name="license_plate" value={newVehicle.license_plate} onChange={handleInputChange} />
+          <label htmlFor="vin">VIN</label>
+          <input type="text" id="vin" name="vin" value={newVehicle.vin} onChange={handleInputChange} />
           <button onClick={handleAddVehicle}>Add Vehicle</button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

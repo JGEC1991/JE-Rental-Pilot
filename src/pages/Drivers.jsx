@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../supabaseClient'
-import styles from './Drivers.module.css'
-import Modal from '../../src/components/Modal'
 
 function Drivers() {
   const [driversLicense, setDriversLicense] = useState(null)
@@ -9,6 +7,7 @@ function Drivers() {
   const [driversLicenseUrl, setDriversLicenseUrl] = useState(null)
   const [policeRecordUrl, setPoliceRecordUrl] = useState(null)
   const [drivers, setDrivers] = useState([])
+  const [showAddForm, setShowAddForm] = useState(false)
   const [newDriver, setNewDriver] = useState({
     full_name: '',
     address: '',
@@ -16,9 +15,6 @@ function Drivers() {
     drivers_license_photo: '',
     police_records_photo: '',
   })
-  const [editingDriver, setEditingDriver] = useState(null)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     fetchDrivers()
@@ -129,6 +125,7 @@ function Drivers() {
         })
         setDriversLicenseUrl(null)
         setPoliceRecordUrl(null)
+        setShowAddForm(false)
       }
     } catch (error) {
       console.error('Error adding driver:', error.message)
@@ -136,90 +133,13 @@ function Drivers() {
     }
   }
 
-  const handleEditDriver = (driver) => {
-    setEditingDriver(driver)
-    setNewDriver(driver)
-    setDriversLicenseUrl(driver.drivers_license_photo)
-    setPoliceRecordUrl(driver.police_records_photo)
-  }
-
-  const handleUpdateDriver = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('drivers')
-        .update([newDriver])
-        .eq('id', editingDriver.id)
-
-      if (error) {
-        console.error('Error updating driver:', error)
-        alert(error.message)
-      } else {
-        console.log('Driver updated:', data)
-        alert('Driver updated successfully!')
-        fetchDrivers()
-        setEditingDriver(null)
-        setNewDriver({
-          full_name: '',
-          address: '',
-          phone: '',
-          drivers_license_photo: '',
-          police_records_photo: '',
-        })
-        setDriversLicenseUrl(null)
-        setPoliceRecordUrl(null)
-      }
-    } catch (error) {
-      console.error('Error updating driver:', error.message)
-      alert(error.message)
-    }
-  }
-
-  const handleDeleteDriver = async (id) => {
-    if (window.confirm('Are you sure you want to delete this driver?')) {
-      try {
-        const { data, error } = await supabase
-          .from('drivers')
-          .delete()
-          .eq('id', id)
-
-        if (error) {
-          console.error('Error deleting driver:', error)
-          alert(error.message)
-        } else {
-          console.log('Driver deleted:', data)
-          alert('Driver deleted successfully!')
-          fetchDrivers()
-        }
-      } catch (error) {
-        console.error('Error deleting driver:', error.message)
-        alert(error.message)
-      }
-    }
-  }
-
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value)
-  }
-
-  const filteredDrivers = drivers.filter((driver) => {
-    return (
-      driver.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      driver.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      driver.phone.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  })
-
-  const handleOpenModal = () => {
-    setIsModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false)
+  const handleAddClick = () => {
+    setShowAddForm(true)
   }
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.heading}>Drivers</h1>
+    <div className="page">
+      <h1>Drivers</h1>
       <p>Manage Drivers</p>
       <div>
         <h2>Upload Driver's License</h2>
@@ -233,9 +153,7 @@ function Drivers() {
       </div>
       <div>
         <h2>Drivers List</h2>
-        <label htmlFor="search">Search:</label>
-        <input type="text" id="search" name="search" value={searchQuery} onChange={handleSearch} />
-        <table className={styles.listTable}>
+        <table>
           <thead>
             <tr>
               <th>Full Name</th>
@@ -243,11 +161,10 @@ function Drivers() {
               <th>Phone</th>
               <th>Driver's License</th>
               <th>Police Record</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredDrivers.map((driver) => (
+            {drivers.map((driver) => (
               <tr key={driver.id}>
                 <td>{driver.full_name}</td>
                 <td>{driver.address}</td>
@@ -262,22 +179,28 @@ function Drivers() {
                     <img src={driver.police_records_photo} alt="Police Record" style={{ width: '100px' }} />
                   )}
                 </td>
-                <td>
-                  <button onClick={() => handleEditDriver(driver)}>Edit</button>
-                  <button onClick={() => handleDeleteDriver(driver.id)}>Delete</button>
-                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <div>
-        <button onClick={handleOpenModal} className={styles.formButton}>Add New Record</button>
-      </div>
-      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-        <h2>Add New Record</h2>
-        <p>Select the type of record you want to add:</p>
-      </Modal>
+      {!showAddForm && (
+        <div>
+          <button onClick={handleAddClick}>Add Driver</button>
+        </div>
+      )}
+      {showAddForm && (
+        <div>
+          <h2>Add New Driver</h2>
+          <label htmlFor="full_name">Full Name</label>
+          <input type="text" id="full_name" name="full_name" value={newDriver.full_name} onChange={handleInputChange} />
+          <label htmlFor="address">Address</label>
+          <input type="text" id="address" name="address" value={newDriver.address} onChange={handleInputChange} />
+          <label htmlFor="phone">Phone</label>
+          <input type="text" id="phone" name="phone" value={newDriver.phone} onChange={handleInputChange} />
+          <button onClick={handleAddDriver}>Add Driver</button>
+        </div>
+      )}
     </div>
   )
 }
