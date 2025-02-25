@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react'
     // Reusable Table Header Component
     function TableHeader({ children }) {
       return (
-        <th className="px-4 py-2 border-b border-gray-300 bg-blue-50 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+        <th className="px-4 py-2 border-b-2 border-gray-300 bg-blue-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
           {children}
         </th>
       )
@@ -30,7 +30,9 @@ import React, { useState, useEffect } from 'react'
         year: '',
         license_plate: '',
         vin: '',
-        mileage: '', // Add mileage to newVehicle state
+        mileage: '',
+        status: 'available', // Default status
+        observations: '', // Add observations
       })
       const [selectedVehicle, setSelectedVehicle] = useState(null)
       const [showVehicleDetails, setShowVehicleDetails] = useState(false)
@@ -81,7 +83,9 @@ import React, { useState, useEffect } from 'react'
               year: '',
               license_plate: '',
               vin: '',
-              mileage: '', // Reset mileage
+              mileage: '',
+              status: 'available', // Reset status
+              observations: '', // Reset observations
             })
             setShowAddForm(false)
           }
@@ -149,6 +153,14 @@ import React, { useState, useEffect } from 'react'
               <input type="text" id="vin" name="vin" value={newVehicle.vin} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
               <label htmlFor="mileage" className="block text-gray-700 text-sm font-bold mb-2">Mileage</label>
               <input type="number" id="mileage" name="mileage" value={newVehicle.mileage} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+              <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">Status</label>
+              <select id="status" name="status" value={newVehicle.status} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
+                <option value="available">Available</option>
+                <option value="in_maintenance">In Maintenance</option>
+                <option value="rented">Rented</option>
+              </select>
+              <label htmlFor="observations" className="block text-gray-700 text-sm font-bold mb-2">Observations</label>
+              <textarea id="observations" name="observations" value={newVehicle.observations} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
               <button
                 onClick={handleAddVehicle}
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -172,6 +184,8 @@ import React, { useState, useEffect } from 'react'
                     <TableHeader>License Plate</TableHeader>
                     <TableHeader>VIN</TableHeader>
                     <TableHeader>Mileage</TableHeader>
+                    <TableHeader>Status</TableHeader>
+                    <TableHeader>Observations</TableHeader>
                     <TableHeader>Actions</TableHeader>
                   </tr>
                 </thead>
@@ -184,6 +198,8 @@ import React, { useState, useEffect } from 'react'
                       <TableData>{vehicle.license_plate}</TableData>
                       <TableData>{vehicle.vin}</TableData>
                       <TableData>{vehicle.mileage}</TableData>
+                      <TableData>{vehicle.status}</TableData>
+                      <TableData>{vehicle.observations}</TableData>
                       <TableData>
                         <button onClick={() => handleViewDetails(vehicle.id)} className="text-blue-500 hover:text-blue-700">View Details</button>
                       </TableData>
