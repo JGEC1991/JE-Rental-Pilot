@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom'
 import Home from './pages/Home'
 import Profile from './pages/Profile'
 import Vehicles from './pages/Vehicles'
@@ -35,43 +35,48 @@ function App() {
           <li>
             <Link to="/" className="text-white hover:text-gray-300">Home</Link>
           </li>
-          <li>
-            <Link to="/profile" className="text-white hover:text-gray-300">Profile</Link>
-          </li>
-          <li>
-            <Link to="/vehicles" className="text-white hover:text-gray-300">Vehicles</Link>
-          </li>
-           <li>
-            <Link to="/drivers" className="text-white hover:text-gray-300">Drivers</Link>
-          </li>
-          <li>
-            <Link to="/activities" className="text-white hover:text-gray-300">Activities</Link>
-          </li>
-          <li>
-            <Link to="/revenue" className="text-white hover:text-gray-300">Revenue</Link>
-          </li>
-          <li>
-            <Link to="/dashboard" className="text-white hover:text-gray-300">Dashboard</Link>
-          </li>
-          <li>
-            <Link to="/settings" className="text-white hover:text-gray-300">Settings</Link>
-          </li>
-          <li>
-            <Link to="/admin" className="text-white hover:text-gray-300">Admin</Link>
-          </li>
+          {session ? (
+            <>
+              <li>
+                <Link to="/profile" className="text-white hover:text-gray-300">Profile</Link>
+              </li>
+              <li>
+                <Link to="/vehicles" className="text-white hover:text-gray-300">Vehicles</Link>
+              </li>
+              <li>
+                <Link to="/drivers" className="text-white hover:text-gray-300">Drivers</Link>
+              </li>
+              <li>
+                <Link to="/activities" className="text-white hover:text-gray-300">Activities</Link>
+              </li>
+              <li>
+                <Link to="/revenue" className="text-white hover:text-gray-300">Revenue</Link>
+              </li>
+              <li>
+                <Link to="/dashboard" className="text-white hover:text-gray-300">Dashboard</Link>
+              </li>
+              <li>
+                <Link to="/settings" className="text-white hover:text-gray-300">Settings</Link>
+              </li>
+              <li>
+                <Link to="/admin" className="text-white hover:text-gray-300">Admin</Link>
+              </li>
+            </>
+          ) : null}
         </ul>
       </nav>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/vehicles" element={<Vehicles />} />
-        <Route path="/drivers" element={<Drivers />} />
-        <Route path="/activities" element={<Activities />} />
-        <Route path="/revenue" element={<Revenue />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/profile" element={session ? <Profile /> : <Navigate to="/login" />} />
+        <Route path="/vehicles" element={session ? <Vehicles /> : <Navigate to="/login" />} />
+        <Route path="/drivers" element={session ? <Drivers /> : <Navigate to="/login" />} />
+        <Route path="/activities" element={session ? <Activities /> : <Navigate to="/login" />} />
+        <Route path="/revenue" element={session ? <Revenue /> : <Navigate to="/login" />} />
+        <Route path="/dashboard" element={session ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route path="/settings" element={session ? <Settings /> : <Navigate to="/login" />} />
+        <Route path="/admin" element={session ? <Admin /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   )
