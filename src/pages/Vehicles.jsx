@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
     import { supabase } from '../../supabaseClient'
     import Modal from '../components/Modal'
-    import { Link } from 'react-router-dom'
+    import VehicleRecordCard from '../components/VehicleRecordCard'
 
     function Vehicles() {
       const [vehicles, setVehicles] = useState([])
@@ -13,6 +13,8 @@ import React, { useState, useEffect } from 'react'
         license_plate: '',
         vin: '',
       })
+      const [selectedVehicle, setSelectedVehicle] = useState(null)
+      const [showVehicleDetails, setShowVehicleDetails] = useState(false)
 
       useEffect(() => {
         fetchVehicles()
@@ -75,6 +77,29 @@ import React, { useState, useEffect } from 'react'
 
       const handleCloseModal = () => {
         setShowAddForm(false)
+        setShowVehicleDetails(false)
+      }
+
+      const handleViewDetails = async (id) => {
+        try {
+          const { data, error } = await supabase
+            .from('vehicles')
+            .select('*')
+            .eq('id', id)
+            .single()
+
+          if (error) {
+            console.error('Error fetching vehicle:', error)
+            alert(error.message)
+          } else {
+            console.log('Vehicle:', data)
+            setSelectedVehicle(data)
+            setShowVehicleDetails(true)
+          }
+        } catch (error) {
+          console.error('Error fetching vehicle:', error.message)
+          alert(error.message)
+        }
       }
 
       return (
@@ -104,7 +129,7 @@ import React, { useState, useEffect } from 'react'
                       <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{vehicle.license_plate}</td>
                       <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{vehicle.vin}</td>
                       <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                        <Link to={`/vehicles/${vehicle.id}`} className="text-blue-500 hover:text-blue-700">View Details</Link>
+                        <button onClick={() => handleViewDetails(vehicle.id)} className="text-blue-500 hover:text-blue-700">View Details</button>
                       </td>
                     </tr>
                   ))}
@@ -137,6 +162,9 @@ import React, { useState, useEffect } from 'react'
               >
                 Add Vehicle
               </button>
+            </Modal>
+            <Modal isOpen={showVehicleDetails} onClose={handleCloseModal}>
+              {selectedVehicle && <VehicleRecordCard vehicle={selectedVehicle} />}
             </Modal>
           </div>
         </>

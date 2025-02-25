@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react'
     import Home from './pages/Home'
     import Profile from './pages/Profile'
     import Vehicles from './pages/Vehicles'
-    import VehicleRecord from './pages/Vehicles/[id]' // Import VehicleRecord
     import Activities from './pages/Activities'
     import Dashboard from './pages/Dashboard'
     import Settings from './pages/Settings'
@@ -72,7 +71,7 @@ import React, { useState, useEffect } from 'react'
             <Route path="/signup" element={<Signup />} />
             <Route path="/profile" element={session ? <Profile /> : <Navigate to="/login" />} />
             <Route path="/vehicles" element={session ? <Vehicles /> : <Navigate to="/login" />} />
-            <Route path="/vehicles/:id" element={session ? <VehicleRecord /> : <Navigate to="/login" />} /> {/* Define the route with the parameter */}
+            {/* REMOVED: <Route path="/vehicles/:id" element={session ? <VehicleRecord /> : <Navigate to="/login" />} /> */}
             <Route path="/drivers" element={session ? <Drivers /> : <Navigate to="/login" />} />
             <Route path="/activities" element={session ? <Activities /> : <Navigate to="/login" />} />
             <Route path="/revenue" element={session ? <Revenue /> : <Navigate to="/login" />} />
