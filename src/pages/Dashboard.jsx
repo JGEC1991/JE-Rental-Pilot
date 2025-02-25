@@ -177,13 +177,15 @@ import React, { useState, useEffect } from 'react'
         const width = 400
         const height = 200
         const padding = 20
+
         const amounts = data.map(item => item.amount || 0)
         const maxAmount = Math.max(...amounts)
+        const minAmount = Math.min(...amounts)
 
         // Calculate points for the line graph
         const points = data.map((item, index) => {
           const x = padding + (index / (data.length - 1)) * (width - 2 * padding)
-          const y = height - padding - (item.amount / maxAmount) * (height - 2 * padding)
+          const y = height - padding - ((item.amount - minAmount) / (maxAmount - minAmount)) * (height - 2 * padding)
           return `${x},${y}`
         }).join(' ')
 
@@ -194,8 +196,8 @@ import React, { useState, useEffect } from 'react'
 
         // Y-axis ticks (simplified)
         const numTicks = 5
-        const tickIncrement = maxAmount / (numTicks - 1)
-        const yAxisTicks = Array.from({ length: numTicks }, (_, i) => i * tickIncrement)
+        const tickIncrement = (maxAmount - minAmount) / (numTicks - 1)
+        const yAxisTicks = Array.from({ length: numTicks }, (_, i) => minAmount + i * tickIncrement)
 
         return (
           <>
@@ -213,7 +215,7 @@ import React, { useState, useEffect } from 'react'
 
             {/* Y-axis ticks */}
             {yAxisTicks.map(tick => {
-              const y = height - padding - (tick / maxAmount) * (height - 2 * padding)
+              const y = height - padding - ((tick - minAmount) / (maxAmount - minAmount)) * (height - 2 * padding)
               return (
                 <React.Fragment key={tick}>
                   <line x1={padding} y1={y} x2={width - padding} y2={y} stroke="lightgray" strokeWidth="0.5" strokeDasharray="2 2" />
@@ -229,55 +231,72 @@ import React, { useState, useEffect } from 'react'
 
       return (
         <div className="page">
-          <h1 className="text-3xl font-semibold mb-4">Dashboard</h1>
-          <p className="text-gray-700">System Dashboard</p>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white shadow-md rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-2">Total Revenue</h2>
-              <p className="text-gray-700">${totalRevenue}</p>
+          <div className="max-w-4xl mx-auto mt-8"> {/* Changed max-w-5xl to max-w-4xl */}
+            <h1 className="text-3xl font-semibold mb-4">Dashboard</h1>
+            <p className="text-gray-700">System Dashboard</p>
+            {/* Time Range Presets */}
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">Time Range</label>
+              <div className="flex space-x-2">
+                <button onClick={() => handleTimeRangeChange('day')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Day</button>
+                <button onClick={() => handleTimeRangeChange('week')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Week</button>
+                <button onClick={() => handleTimeRangeChange('month')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Month</button>
+                <button onClick={() => handleTimeRangeChange('quarter')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Quarter</button>
+                <button onClick={() => handleTimeRangeChange('year')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Year</button>
+              </div>
             </div>
-            <div className="bg-white shadow-md rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-2">Vehicles by Status</h2>
-              <p className="text-gray-700">Available: {vehicleCounts.available}</p>
-              <p className="text-gray-700">In Maintenance: {vehicleCounts.in_maintenance}</p>
-              <p className="text-gray-700">Rented: {vehicleCounts.rented}</p>
-            </div>
-            <div className="bg-white shadow-md rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-2">Drivers</h2>
-              <p className="text-gray-700">{driverCount}</p>
-            </div>
-            <div className="bg-white shadow-md rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-2">Activities</h2>
-              <p className="text-gray-700">{activityCount}</p>
-            </div>
-            {/* Revenue by Status */}
-            <div className="bg-white shadow-md rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-2">Revenue by Status</h2>
-              <ul>
-                {Object.entries(revenueByStatus).map(([status, amount]) => (
-                  <li key={status} className="text-gray-700">
-                    {status}: ${amount}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            {/* Revenue Over Time Graph */}
-            <div className="bg-white shadow-md rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-2">Revenue Over Time</h2>
-              {/* Time Range Presets */}
-              <div className="mb-2">
-                <div className="flex space-x-2">
-                  <button onClick={() => handleTimeRangeChange('day')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Day</button>
-                  <button onClick={() => handleTimeRangeChange('week')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Week</button>
-                  <button onClick={() => handleTimeRangeChange('month')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Month</button>
-                  <button onClick={() => handleTimeRangeChange('quarter')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Quarter</button>
-                  <button onClick={() => handleTimeRangeChange('year')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Year</button>
+            {loading ? (
+              <p>Loading...</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white shadow-md rounded-lg p-4">
+                  <h2 className="text-xl font-semibold mb-2">Total Revenue</h2>
+                  <p className="text-gray-700">${totalRevenue}</p>
+                </div>
+                <div className="bg-white shadow-md rounded-lg p-4">
+                  <h2 className="text-xl font-semibold mb-2">Vehicles by Status</h2>
+                  <p className="text-gray-700">Available: {vehicleCounts.available}</p>
+                  <p className="text-gray-700">In Maintenance: {vehicleCounts.in_maintenance}</p>
+                  <p className="text-gray-700">Rented: {vehicleCounts.rented}</p>
+                </div>
+                <div className="bg-white shadow-md rounded-lg p-4">
+                  <h2 className="text-xl font-semibold mb-2">Drivers</h2>
+                  <p className="text-gray-700">{driverCount}</p>
+                </div>
+                <div className="bg-white shadow-md rounded-lg p-4">
+                  <h2 className="text-xl font-semibold mb-2">Activities</h2>
+                  <p className="text-gray-700">{activityCount}</p>
+                </div>
+                {/* Revenue by Status */}
+                <div className="bg-white shadow-md rounded-lg p-4">
+                  <h2 className="text-xl font-semibold mb-2">Revenue by Status</h2>
+                  <ul>
+                    {Object.entries(revenueByStatus).map(([status, amount]) => (
+                      <li key={status} className="text-gray-700">
+                        {status}: ${amount}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                {/* Revenue Over Time Graph */}
+                <div className="bg-white shadow-md rounded-lg p-4">
+                  <h2 className="text-xl font-semibold mb-2">Revenue Over Time</h2>
+                  {/* Time Range Presets */}
+                  <div className="mb-2">
+                    <div className="flex space-x-2">
+                      <button onClick={() => handleTimeRangeChange('day')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Day</button>
+                      <button onClick={() => handleTimeRangeChange('week')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Week</button>
+                      <button onClick={() => handleTimeRangeChange('month')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Month</button>
+                      <button onClick={() => handleTimeRangeChange('quarter')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Quarter</button>
+                      <button onClick={() => handleTimeRangeChange('year')} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded text-xs">Year</button>
+                    </div>
+                  </div>
+                  <svg width="400" height="200">
+                    {generateGraph(revenueData)}
+                  </svg>
                 </div>
               </div>
-              <svg width="400" height="200">
-                {generateGraph(revenueData)}
-              </svg>
-            </div>
+            )}
           </div>
         </div>
       )

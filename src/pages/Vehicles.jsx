@@ -129,84 +129,86 @@ import React, { useState, useEffect } from 'react'
       return (
         <>
           <div className="page">
-            <h1 className="text-3xl font-semibold mb-4">Vehicles</h1>
-            <p className="text-gray-700">Manage Vehicles</p>
-            <div>
-              <button
-                onClick={handleAddClick}
-                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Add Vehicle
-              </button>
+            <div className="max-w-5xl mx-auto mt-8"> {/* Added max-w-5xl and mt-8 */}
+              <h1 className="text-3xl font-semibold mb-4">Vehicles</h1>
+              <p className="text-gray-700">Manage Vehicles</p>
+              <div>
+                <button
+                  onClick={handleAddClick}
+                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Add Vehicle
+                </button>
+              </div>
+              <Modal isOpen={showAddForm} onClose={handleCloseModal}>
+                <h2 className="text-2xl font-semibold mb-4">Add New Vehicle</h2>
+                <label htmlFor="make" className="block text-gray-700 text-sm font-bold mb-2">Make</label>
+                <input type="text" id="make" name="make" value={newVehicle.make} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+                <label htmlFor="model" className="block text-gray-700 text-sm font-bold mb-2">Model</label>
+                <input type="text" id="model" name="model" value={newVehicle.model} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+                <label htmlFor="year" className="block text-gray-700 text-sm font-bold mb-2">Year</label>
+                <input type="number" id="year" name="year" value={newVehicle.year} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+                <label htmlFor="license_plate" className="block text-gray-700 text-sm font-bold mb-2">License Plate</label>
+                <input type="text" id="license_plate" name="license_plate" value={newVehicle.license_plate} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+                <label htmlFor="vin" className="block text-gray-700 text-sm font-bold mb-2">VIN</label>
+                <input type="text" id="vin" name="vin" value={newVehicle.vin} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+                <label htmlFor="mileage" className="block text-gray-700 text-sm font-bold mb-2">Mileage</label>
+                <input type="number" id="mileage" name="mileage" value={newVehicle.mileage} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+                <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">Status</label>
+                <select id="status" name="status" value={newVehicle.status} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
+                  <option value="available">Available</option>
+                  <option value="in_maintenance">In Maintenance</option>
+                  <option value="rented">Rented</option>
+                </select>
+                <label htmlFor="observations" className="block text-gray-700 text-sm font-bold mb-2">Observations</label>
+                <textarea id="observations" name="observations" value={newVehicle.observations} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+                <button
+                  onClick={handleAddVehicle}
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                >
+                  Add Vehicle
+                </button>
+              </Modal>
+              <Modal isOpen={showVehicleDetails} onClose={handleCloseModal}>
+                {selectedVehicle && <VehicleRecordCard vehicle={selectedVehicle} />}
+              </Modal>
             </div>
-            <Modal isOpen={showAddForm} onClose={handleCloseModal}>
-              <h2 className="text-2xl font-semibold mb-4">Add New Vehicle</h2>
-              <label htmlFor="make" className="block text-gray-700 text-sm font-bold mb-2">Make</label>
-              <input type="text" id="make" name="make" value={newVehicle.make} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-              <label htmlFor="model" className="block text-gray-700 text-sm font-bold mb-2">Model</label>
-              <input type="text" id="model" name="model" value={newVehicle.model} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-              <label htmlFor="year" className="block text-gray-700 text-sm font-bold mb-2">Year</label>
-              <input type="number" id="year" name="year" value={newVehicle.year} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-              <label htmlFor="license_plate" className="block text-gray-700 text-sm font-bold mb-2">License Plate</label>
-              <input type="text" id="license_plate" name="license_plate" value={newVehicle.license_plate} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-              <label htmlFor="vin" className="block text-gray-700 text-sm font-bold mb-2">VIN</label>
-              <input type="text" id="vin" name="vin" value={newVehicle.vin} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-              <label htmlFor="mileage" className="block text-gray-700 text-sm font-bold mb-2">Mileage</label>
-              <input type="number" id="mileage" name="mileage" value={newVehicle.mileage} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-              <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">Status</label>
-              <select id="status" name="status" value={newVehicle.status} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
-                <option value="available">Available</option>
-                <option value="in_maintenance">In Maintenance</option>
-                <option value="rented">Rented</option>
-              </select>
-              <label htmlFor="observations" className="block text-gray-700 text-sm font-bold mb-2">Observations</label>
-              <textarea id="observations" name="observations" value={newVehicle.observations} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-              <button
-                onClick={handleAddVehicle}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              >
-                Add Vehicle
-              </button>
-            </Modal>
-            <Modal isOpen={showVehicleDetails} onClose={handleCloseModal}>
-              {selectedVehicle && <VehicleRecordCard vehicle={selectedVehicle} />}
-            </Modal>
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold mb-2">Vehicles List</h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
-                <thead>
-                  <tr>
-                    <TableHeader>Make</TableHeader>
-                    <TableHeader>Model</TableHeader>
-                    <TableHeader>Year</TableHeader>
-                    <TableHeader>License Plate</TableHeader>
-                    <TableHeader>VIN</TableHeader>
-                    <TableHeader>Mileage</TableHeader>
-                    <TableHeader>Status</TableHeader>
-                    <TableHeader>Observations</TableHeader>
-                    <TableHeader>Actions</TableHeader>
-                  </tr>
-                </thead>
-                <tbody>
-                  {vehicles.map((vehicle) => (
-                    <tr key={vehicle.id} className="hover:bg-gray-100">
-                      <TableData>{vehicle.make}</TableData>
-                      <TableData>{vehicle.model}</TableData>
-                      <TableData>{vehicle.year}</TableData>
-                      <TableData>{vehicle.license_plate}</TableData>
-                      <TableData>{vehicle.vin}</TableData>
-                      <TableData>{vehicle.mileage}</TableData>
-                      <TableData>{vehicle.status}</TableData>
-                      <TableData>{vehicle.observations}</TableData>
-                      <TableData>
-                        <button onClick={() => handleViewDetails(vehicle.id)} className="text-blue-500 hover:text-blue-700">View Details</button>
-                      </TableData>
+            <div className="bg-white shadow-md rounded-lg p-4"> {/* Added box with background, shadow, rounded corners, and padding */}
+              <h2 className="text-xl font-semibold mb-2">Vehicles List</h2>
+              <div className="overflow-x-auto">
+                <table className="min-w-full leading-normal rounded-lg overflow-hidden">
+                  <thead>
+                    <tr>
+                      <TableHeader>Make</TableHeader>
+                      <TableHeader>Model</TableHeader>
+                      <TableHeader>Year</TableHeader>
+                      <TableHeader>License Plate</TableHeader>
+                      <TableHeader>VIN</TableHeader>
+                      <TableHeader>Mileage</TableHeader>
+                      <TableHeader>Status</TableHeader>
+                      <TableHeader>Observations</TableHeader>
+                      <TableHeader>Actions</TableHeader>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {vehicles.map((vehicle) => (
+                      <tr key={vehicle.id} className="hover:bg-gray-100">
+                        <TableData>{vehicle.make}</TableData>
+                        <TableData>{vehicle.model}</TableData>
+                        <TableData>{vehicle.year}</TableData>
+                        <TableData>{vehicle.license_plate}</TableData>
+                        <TableData>{vehicle.vin}</TableData>
+                        <TableData>{vehicle.mileage}</TableData>
+                        <TableData>{vehicle.status}</TableData>
+                        <TableData>{vehicle.observations}</TableData>
+                        <TableData>
+                          <button onClick={() => handleViewDetails(vehicle.id)} className="text-blue-500 hover:text-blue-700">View Details</button>
+                        </TableData>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </>
