@@ -1,7 +1,6 @@
 import React from 'react'
 import { supabase } from '../../supabaseClient'
 import { useNavigate } from 'react-router-dom'
-import Breadcrumb from '../components/Breadcrumb'
 
 function Profile() {
   const navigate = useNavigate()
@@ -22,14 +21,8 @@ function Profile() {
     }
   }
 
-  const breadcrumbSegments = [
-    { label: 'Home', url: '/' },
-    { label: 'Profile' },
-  ];
-
   return (
     <div className="page">
-      <Breadcrumb segments={breadcrumbSegments} />
       <div className="flex justify-end">
         <button
           onClick={handleLogout}
