@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { supabase } from '../../supabaseClient'
-import Modal from '../components/Modal'
-import VehicleRecordCard from '../components/VehicleRecordCard'
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../supabaseClient';
+import Modal from '../components/Modal';
+import VehicleRecordCard from '../components/VehicleRecordCard';
+import Breadcrumb from '../components/Breadcrumb';
 
 // Reusable Table Header Component
 function TableHeader({ children }) {
@@ -9,7 +10,7 @@ function TableHeader({ children }) {
     <th className="px-4 py-2 border-b-2 border-gray-300 bg-blue-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
       {children}
     </th>
-  )
+  );
 }
 
 // Reusable Table Data Cell Component
@@ -18,12 +19,12 @@ function TableData({ children }) {
     <td className="px-4 py-3 border-b border-gray-200 bg-stone-50 text-sm text-gray-600">
       {children}
     </td>
-  )
+  );
 }
 
 function Vehicles() {
-  const [vehicles, setVehicles] = useState([])
-  const [showAddForm, setShowAddForm] = useState(false)
+  const [vehicles, setVehicles] = useState([]);
+  const [showAddForm, setShowAddForm] = useState(false);
   const [newVehicle, setNewVehicle] = useState({
     make: '',
     model: '',
@@ -33,50 +34,50 @@ function Vehicles() {
     mileage: '',
     status: 'available', // Default status
     observations: '', // Add observations
-  })
-  const [selectedVehicle, setSelectedVehicle] = useState(null)
-  const [showVehicleDetails, setShowVehicleDetails] = useState(false)
+  });
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [showVehicleDetails, setShowVehicleDetails] = useState(false);
 
   useEffect(() => {
-    fetchVehicles()
-  }, [])
+    fetchVehicles();
+  }, []);
 
   const fetchVehicles = async () => {
     try {
       const { data, error } = await supabase
         .from('vehicles')
-        .select('*')
+        .select('*');
 
       if (error) {
-        console.error('Error fetching vehicles:', error)
-        alert(error.message)
+        console.error('Error fetching vehicles:', error);
+        alert(error.message);
       } else {
-        console.log('Vehicles:', data)
-        setVehicles(data)
+        console.log('Vehicles:', data);
+        setVehicles(data);
       }
     } catch (error) {
-      console.error('Error fetching vehicles:', error.message)
-      alert(error.message)
+      console.error('Error fetching vehicles:', error.message);
+      alert(error.message);
     }
   }
 
   const handleInputChange = (e) => {
-    setNewVehicle({ ...newVehicle, [e.target.name]: e.target.value })
+    setNewVehicle({ ...newVehicle, [e.target.name]: e.target.value });
   }
 
   const handleAddVehicle = async () => {
     try {
       const { data, error } = await supabase
         .from('vehicles')
-        .insert([newVehicle])
+        .insert([newVehicle]);
 
       if (error) {
-        console.error('Error adding vehicle:', error)
-        alert(error.message)
+        console.error('Error adding vehicle:', error);
+        alert(error.message);
       } else {
-        console.log('Vehicle added:', data)
-        alert('Vehicle added successfully!')
-        fetchVehicles()
+        console.log('Vehicle added:', data);
+        alert('Vehicle added successfully!');
+        fetchVehicles();
         setNewVehicle({
           make: '',
           model: '',
@@ -86,22 +87,22 @@ function Vehicles() {
           mileage: '',
           status: 'available', // Reset status
           observations: '', // Reset observations
-        })
-        setShowAddForm(false)
+        });
+        setShowAddForm(false);
       }
     } catch (error) {
-      console.error('Error adding vehicle:', error.message)
-      alert(error.message)
+      console.error('Error adding vehicle:', error.message);
+      alert(error.message);
     }
   }
 
   const handleAddClick = () => {
-    setShowAddForm(true)
+    setShowAddForm(true);
   }
 
   const handleCloseModal = () => {
-    setShowAddForm(false)
-    setShowVehicleDetails(false)
+    setShowAddForm(false);
+    setShowVehicleDetails(false);
   }
 
   const handleViewDetails = async (id) => {
@@ -110,26 +111,32 @@ function Vehicles() {
         .from('vehicles')
         .select('*')
         .eq('id', id)
-        .single()
+        .single();
 
       if (error) {
-        console.error('Error fetching vehicle:', error)
-        alert(error.message)
+        console.error('Error fetching vehicle:', error);
+        alert(error.message);
       } else {
-        console.log('Vehicle:', data)
-        setSelectedVehicle(data)
-        setShowVehicleDetails(true)
+        console.log('Vehicle:', data);
+        setSelectedVehicle(data);
+        setShowVehicleDetails(true);
       }
     } catch (error) {
-      console.error('Error fetching vehicle:', error.message)
-      alert(error.message)
+      console.error('Error fetching vehicle:', error.message);
+      alert(error.message);
     }
   }
+
+  const breadcrumbSegments = [
+    { label: 'Home', url: '/' },
+    { label: 'Vehicles' },
+  ];
 
   return (
     <>
       <div className="page">
         <div className="max-w-5xl mx-auto mt-8"> {/* Added max-w-5xl and mt-8 */}
+          <Breadcrumb segments={breadcrumbSegments} />
           <div className="flex justify-end items-center mb-4">
             <button
               onClick={handleAddClick}

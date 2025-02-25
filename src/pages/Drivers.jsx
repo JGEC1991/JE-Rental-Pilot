@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseClient';
 import Modal from '../components/Modal';
 import DriverRecordCard from '../components/DriverRecordCard';
+import Breadcrumb from '../components/Breadcrumb';
 
 // Reusable Table Header Component
 function TableHeader({ children }) {
@@ -241,9 +242,15 @@ function Drivers() {
     setShowDriverDetails(true);
   }
 
+  const breadcrumbSegments = [
+    { label: 'Home', url: '/' },
+    { label: 'Drivers' },
+  ];
+
   return (
     <div className="page">
       <div className="max-w-5xl mx-auto mt-8"> {/* Added max-w-5xl and mt-8 */}
+        <Breadcrumb segments={breadcrumbSegments} />
         <div className="flex justify-end items-center mb-4">
           <button
             onClick={handleAddClick}
