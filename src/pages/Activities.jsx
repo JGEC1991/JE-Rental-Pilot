@@ -21,8 +21,6 @@ function TableData({ children }) {
 }
 
 function Activities() {
-  const [attachments, setAttachments] = useState([])
-  const [attachmentUrls, setAttachmentUrls] = useState([])
   const [vehicles, setVehicles] = useState([])
   const [drivers, setDrivers] = useState([])
   const [activities, setActivities] = useState([])
@@ -105,43 +103,6 @@ function Activities() {
     }
   }
 
-  const handleAttachmentUpload = async (e) => {
-    const files = Array.from(e.target.files)
-    setAttachments(files)
-
-    try {
-      const uploadPromises = files.map(async (file) => {
-        const { data, error } = await supabase.storage
-          .from('activity-attachments')
-          .upload(`${file.name}`, file, {
-            cacheControl: '3600',
-            upsert: false,
-            public: true,
-            contentType: file.type,
-          })
-
-        if (error) {
-          console.error('Error uploading attachment:', error)
-          alert(error.message)
-          return null
-        } else {
-          console.log('Attachment uploaded:', data)
-          const attachmentUrl = supabase.storage.from('activity-attachments').getPublicUrl(`${file.name}`).data.publicUrl
-          return attachmentUrl
-        }
-      })
-
-      const urls = await Promise.all(uploadPromises)
-      setAttachmentUrls(urls.filter(url => url !== null))
-      setNewActivity({ ...newActivity, attachments: urls.filter(url => url !== null) })
-      alert('Attachments uploaded successfully!')
-
-    } catch (error) {
-      console.error('Error uploading attachments:', error.message)
-      alert(error.message)
-    }
-  }
-
   const handleInputChange = (e) => {
     setNewActivity({ ...newActivity, [e.target.name]: e.target.value })
   }
@@ -166,7 +127,6 @@ function Activities() {
           description: '',
           attachments: [],
         })
-        setAttachmentUrls([])
         setShowAddForm(false)
       }
     } catch (error) {
@@ -186,54 +146,15 @@ function Activities() {
   return (
     <>
       <div className="page">
-        <h1 className="text-3xl font-semibold mb-4">Activities</h1>
-        <p className="text-gray-700">Activity Logs</p>
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold mb-2">Upload Activity Attachments</h2>
-          <input type="file" accept="image/*,application/pdf" multiple onChange={handleAttachmentUpload} className="mb-2" />
-          <div className="flex">
-            {attachmentUrls.map((url, index) => (
-              <img key={index} src={url} alt={`Attachment ${index + 1}`} style={{ width: '200px', margin: '10px' }} />
-            ))}
+        <div className="max-w-5xl mx-auto mt-8"> {/* Added max-w-5xl and mt-8 */}
+          <div className="flex justify-end items-center mb-4">
+            <button
+              onClick={handleAddClick}
+              className="text-white font-bold py-2 px-4 rounded"
+            >
+              <img src="https://ticghrxzdsdoaiwvahht.supabase.co/storage/v1/object/public/assets/Navigation/plus.png" alt="Add Activity" style={{ width: '20px', height: '20px' }} />
+            </button>
           </div>
-        </div>
-        <div>
-          <button
-            onClick={handleAddClick}
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Add Activity
-          </button>
-        </div>
-        <Modal isOpen={showAddForm} onClose={handleCloseModal}>
-          <h2 className="text-2xl font-semibold mb-4">Add New Activity</h2>
-          <label htmlFor="vehicle_id" className="block text-gray-700 text-sm font-bold mb-2">Vehicle</label>
-          <select id="vehicle_id" name="vehicle_id" value={newActivity.vehicle_id} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
-            <option value="">Select Vehicle</option>
-            {vehicles.map((vehicle) => (
-              <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model}</option>
-            ))}
-          </select>
-          <label htmlFor="driver_id" className="block text-gray-700 text-sm font-bold mb-2">Driver</label>
-          <select id="driver_id" name="driver_id" value={newActivity.driver_id} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
-            <option value="">Select Driver</option>
-            {drivers.map((driver) => (
-              <option key={driver.id} value={driver.id}>{driver.full_name}</option>
-            ))}
-          </select>
-          <label htmlFor="activity_type" className="block text-gray-700 text-sm font-bold mb-2">Activity Type</label>
-          <input type="text" id="activity_type" name="activity_type" value={newActivity.activity_type} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-          <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">Description</label>
-          <textarea id="description" name="description" value={newActivity.description} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-          <button
-            onClick={handleAddActivity}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            Add Activity
-          </button>
-        </Modal>
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Activities List</h2>
           <div className="bg-white shadow-md rounded-lg p-4 overflow-x-auto">
             <table className="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
               <thead>
@@ -262,6 +183,33 @@ function Activities() {
               </tbody>
             </table>
           </div>
+          <Modal isOpen={showAddForm} onClose={handleCloseModal}>
+            <h2 className="text-2xl font-semibold mb-4">Add New Activity</h2>
+            <label htmlFor="vehicle_id" className="block text-gray-700 text-sm font-bold mb-2">Vehicle</label>
+            <select id="vehicle_id" name="vehicle_id" value={newActivity.vehicle_id} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
+              <option value="">Select Vehicle</option>
+              {vehicles.map((vehicle) => (
+                <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model}</option>
+              ))}
+            </select>
+            <label htmlFor="driver_id" className="block text-gray-700 text-sm font-bold mb-2">Driver</label>
+            <select id="driver_id" name="driver_id" value={newActivity.driver_id} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
+              <option value="">Select Driver</option>
+              {drivers.map((driver) => (
+                <option key={driver.id} value={driver.id}>{driver.full_name}</option>
+              ))}
+            </select>
+            <label htmlFor="activity_type" className="block text-gray-700 text-sm font-bold mb-2">Activity Type</label>
+            <input type="text" id="activity_type" name="activity_type" value={newActivity.activity_type} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+            <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">Description</label>
+            <textarea id="description" name="description" value={newActivity.description} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+            <button
+              onClick={handleAddActivity}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Add Activity
+            </button>
+          </Modal>
         </div>
       </div>
     </>
