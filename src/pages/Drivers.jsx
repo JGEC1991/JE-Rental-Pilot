@@ -162,76 +162,78 @@ import React, { useState, useEffect } from 'react'
 
       return (
         <div className="page">
-          <h1 className="text-3xl font-semibold mb-4">Drivers</h1>
-          <p className="text-gray-700">Manage Drivers</p>
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold mb-2">Upload Driver's License</h2>
-            <input type="file" accept="image/*" onChange={handleDriversLicenseUpload} className="mb-2" />
-            {driversLicenseUrl && <img src={driversLicenseUrl} alt="Driver's License" style={{ width: '200px' }} />}
-          </div>
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold mb-2">Upload Police Record</h2>
-            <input type="file" accept="image/*" onChange={handlePoliceRecordUpload} className="mb-2" />
-            {policeRecordUrl && <img src={policeRecordUrl} alt="Police Record" style={{ width: '200px' }} />}
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold mb-2">Drivers List</h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
-                <thead>
-                  <tr>
-                    <TableHeader>Full Name</TableHeader>
-                    <TableHeader>Address</TableHeader>
-                    <TableHeader>Phone</TableHeader>
-                    <TableHeader>Driver's License</TableHeader>
-                    <TableHeader>Police Record</TableHeader>
-                  </tr>
-                </thead>
-                <tbody>
-                  {drivers.map((driver) => (
-                    <tr key={driver.id} className="hover:bg-gray-100">
-                      <TableData>{driver.full_name}</TableData>
-                      <TableData>{driver.address}</TableData>
-                      <TableData>{driver.phone}</TableData>
-                      <TableData>
-                        {driver.drivers_license_photo && (
-                          <img src={driver.drivers_license_photo} alt="Driver's License" style={{ width: '100px' }} />
-                        )}
-                      </TableData>
-                      <TableData>
-                        {driver.police_records_photo && (
-                          <img src={driver.police_records_photo} alt="Police Record" style={{ width: '100px' }} />
-                        )}
-                      </TableData>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <div className="max-w-5xl mx-auto mt-8"> {/* Added max-w-5xl and mt-8 */}
+            <h1 className="text-3xl font-semibold mb-4">Drivers</h1>
+            <p className="text-gray-700">Manage Drivers</p>
+            <div className="mb-4">
+              <h2 className="text-xl font-semibold mb-2">Upload Driver's License</h2>
+              <input type="file" accept="image/*" onChange={handleDriversLicenseUpload} className="mb-2" />
+              {driversLicenseUrl && <img src={driversLicenseUrl} alt="Driver's License" style={{ width: '200px' }} />}
             </div>
+            <div className="mb-4">
+              <h2 className="text-xl font-semibold mb-2">Upload Police Record</h2>
+              <input type="file" accept="image/*" onChange={handlePoliceRecordUpload} className="mb-2" />
+              {policeRecordUrl && <img src={policeRecordUrl} alt="Police Record" style={{ width: '200px' }} />}
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold mb-2">Drivers List</h2>
+              <div className="bg-white shadow-md rounded-lg p-4 overflow-x-auto"> {/* Added box with background, shadow, rounded corners, and padding */}
+                <table className="min-w-full leading-normal rounded-lg overflow-hidden">
+                  <thead>
+                    <tr>
+                      <TableHeader>Full Name</TableHeader>
+                      <TableHeader>Address</TableHeader>
+                      <TableHeader>Phone</TableHeader>
+                      <TableHeader>Driver's License</TableHeader>
+                      <TableHeader>Police Record</TableHeader>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {drivers.map((driver) => (
+                      <tr key={driver.id} className="hover:bg-gray-100">
+                        <TableData>{driver.full_name}</TableData>
+                        <TableData>{driver.address}</TableData>
+                        <TableData>{driver.phone}</TableData>
+                        <TableData>
+                          {driver.drivers_license_photo && (
+                            <img src={driver.drivers_license_photo} alt="Driver's License" style={{ width: '100px' }} />
+                          )}
+                        </TableData>
+                        <TableData>
+                          {driver.police_records_photo && (
+                            <img src={driver.police_records_photo} alt="Police Record" style={{ width: '100px' }} />
+                          )}
+                        </TableData>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div>
+              <button
+                onClick={handleAddClick}
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Add Driver
+              </button>
+            </div>
+            <Modal isOpen={showAddForm} onClose={handleCloseModal}>
+              <h2 className="text-2xl font-semibold mb-4">Add New Driver</h2>
+              <label htmlFor="full_name" className="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
+              <input type="text" id="full_name" name="full_name" value={newDriver.full_name} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+              <label htmlFor="address" className="block text-gray-700 text-sm font-bold mb-2">Address</label>
+              <input type="text" id="address" name="address" value={newDriver.address} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+              <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2">Phone</label>
+              <input type="text" id="phone" name="phone" value={newDriver.phone} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+              <button
+                onClick={handleAddDriver}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              >
+                Add Driver
+              </button>
+            </Modal>
           </div>
-          <div>
-            <button
-              onClick={handleAddClick}
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Add Driver
-            </button>
-          </div>
-          <Modal isOpen={showAddForm} onClose={handleCloseModal}>
-            <h2 className="text-2xl font-semibold mb-4">Add New Driver</h2>
-            <label htmlFor="full_name" className="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
-            <input type="text" id="full_name" name="full_name" value={newDriver.full_name} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-            <label htmlFor="address" className="block text-gray-700 text-sm font-bold mb-2">Address</label>
-            <input type="text" id="address" name="address" value={newDriver.address} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-            <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2">Phone</label>
-            <input type="text" id="phone" name="phone" value={newDriver.phone} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-            <button
-              onClick={handleAddDriver}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              Add Driver
-            </button>
-          </Modal>
         </div>
       )
     }
