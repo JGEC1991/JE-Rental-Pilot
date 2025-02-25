@@ -3,6 +3,24 @@ import React, { useState, useEffect } from 'react'
     import Modal from '../components/Modal'
     import VehicleRecordCard from '../components/VehicleRecordCard'
 
+    // Reusable Table Header Component
+    function TableHeader({ children }) {
+      return (
+        <th className="px-4 py-2 border-b border-gray-300 bg-blue-50 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+          {children}
+        </th>
+      )
+    }
+
+    // Reusable Table Data Cell Component
+    function TableData({ children }) {
+      return (
+        <td className="px-4 py-3 border-b border-gray-200 bg-stone-50 text-sm text-gray-600">
+          {children}
+        </td>
+      )
+    }
+
     function Vehicles() {
       const [vehicles, setVehicles] = useState([])
       const [showAddForm, setShowAddForm] = useState(false)
@@ -12,6 +30,7 @@ import React, { useState, useEffect } from 'react'
         year: '',
         license_plate: '',
         vin: '',
+        mileage: '', // Add mileage to newVehicle state
       })
       const [selectedVehicle, setSelectedVehicle] = useState(null)
       const [showVehicleDetails, setShowVehicleDetails] = useState(false)
@@ -62,6 +81,7 @@ import React, { useState, useEffect } from 'react'
               year: '',
               license_plate: '',
               vin: '',
+              mileage: '', // Reset mileage
             })
             setShowAddForm(false)
           }
@@ -106,36 +126,7 @@ import React, { useState, useEffect } from 'react'
         <>
           <div className="page">
             <h1 className="text-3xl font-semibold mb-4">Vehicles</h1>
-            <p className="text-gray-700">List of Vehicles</p>
-            <div>
-              <h2 className="text-xl font-semibold mb-2">Vehicles List</h2>
-              <table className="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
-                <thead>
-                  <tr>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Make</th>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Model</th>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Year</th>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">License Plate</th>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">VIN</th>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {vehicles.map((vehicle) => (
-                    <tr key={vehicle.id}>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{vehicle.make}</td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{vehicle.model}</td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{vehicle.year}</td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{vehicle.license_plate}</td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{vehicle.vin}</td>
-                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                        <button onClick={() => handleViewDetails(vehicle.id)} className="text-blue-500 hover:text-blue-700">View Details</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <p className="text-gray-700">Manage Vehicles</p>
             <div>
               <button
                 onClick={handleAddClick}
@@ -156,6 +147,8 @@ import React, { useState, useEffect } from 'react'
               <input type="text" id="license_plate" name="license_plate" value={newVehicle.license_plate} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
               <label htmlFor="vin" className="block text-gray-700 text-sm font-bold mb-2">VIN</label>
               <input type="text" id="vin" name="vin" value={newVehicle.vin} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+              <label htmlFor="mileage" className="block text-gray-700 text-sm font-bold mb-2">Mileage</label>
+              <input type="number" id="mileage" name="mileage" value={newVehicle.mileage} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
               <button
                 onClick={handleAddVehicle}
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -166,6 +159,39 @@ import React, { useState, useEffect } from 'react'
             <Modal isOpen={showVehicleDetails} onClose={handleCloseModal}>
               {selectedVehicle && <VehicleRecordCard vehicle={selectedVehicle} />}
             </Modal>
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold mb-2">Vehicles List</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
+                <thead>
+                  <tr>
+                    <TableHeader>Make</TableHeader>
+                    <TableHeader>Model</TableHeader>
+                    <TableHeader>Year</TableHeader>
+                    <TableHeader>License Plate</TableHeader>
+                    <TableHeader>VIN</TableHeader>
+                    <TableHeader>Mileage</TableHeader>
+                    <TableHeader>Actions</TableHeader>
+                  </tr>
+                </thead>
+                <tbody>
+                  {vehicles.map((vehicle) => (
+                    <tr key={vehicle.id} className="hover:bg-gray-100">
+                      <TableData>{vehicle.make}</TableData>
+                      <TableData>{vehicle.model}</TableData>
+                      <TableData>{vehicle.year}</TableData>
+                      <TableData>{vehicle.license_plate}</TableData>
+                      <TableData>{vehicle.vin}</TableData>
+                      <TableData>{vehicle.mileage}</TableData>
+                      <TableData>
+                        <button onClick={() => handleViewDetails(vehicle.id)} className="text-blue-500 hover:text-blue-700">View Details</button>
+                      </TableData>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       )
