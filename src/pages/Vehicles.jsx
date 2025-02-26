@@ -36,6 +36,17 @@ function Vehicles() {
   })
   const [selectedVehicle, setSelectedVehicle] = useState(null)
   const [showVehicleDetails, setShowVehicleDetails] = useState(false)
+  const [editingVehicleId, setEditingVehicleId] = useState(null)
+  const [editedVehicle, setEditedVehicle] = useState({
+    make: '',
+    model: '',
+    year: '',
+    license_plate: '',
+    vin: '',
+    mileage: '',
+    status: 'available',
+    observations: '',
+  })
 
   useEffect(() => {
     fetchVehicles()
@@ -102,6 +113,7 @@ function Vehicles() {
   const handleCloseModal = () => {
     setShowAddForm(false)
     setShowVehicleDetails(false)
+    setEditingVehicleId(null)
   }
 
   const handleViewDetails = async (id) => {
@@ -123,6 +135,69 @@ function Vehicles() {
     } catch (error) {
       console.error('Error fetching vehicle:', error.message)
       alert(error.message)
+    }
+  }
+
+  const handleEdit = (vehicle) => {
+    setEditingVehicleId(vehicle.id)
+    setEditedVehicle({
+      make: vehicle.make || '',
+      model: vehicle.model || '',
+      year: vehicle.year || '',
+      license_plate: vehicle.license_plate || '',
+      vin: vehicle.vin || '',
+      mileage: vehicle.mileage || '',
+      status: vehicle.status || 'available',
+      observations: vehicle.observations || '',
+    })
+  }
+
+  const handleEditedInputChange = (e) => {
+    setEditedVehicle({ ...editedVehicle, [e.target.name]: e.target.value })
+  }
+
+  const handleSave = async (id) => {
+    try {
+      const { data, error } = await supabase
+        .from('vehicles')
+        .update(editedVehicle)
+        .eq('id', id)
+
+      if (error) {
+        console.error('Error updating vehicle:', error)
+        alert(error.message)
+      } else {
+        console.log('Vehicle updated:', data)
+        alert('Vehicle updated successfully!')
+        fetchVehicles()
+        setEditingVehicleId(null)
+      }
+    } catch (error) {
+      console.error('Error updating vehicle:', error.message)
+      alert(error.message)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this vehicle?')) {
+      try {
+        const { data, error } = await supabase
+          .from('vehicles')
+          .delete()
+          .eq('id', id)
+
+        if (error) {
+          console.error('Error deleting vehicle:', error)
+          alert(error.message)
+        } else {
+          console.log('Vehicle deleted:', data)
+          alert('Vehicle deleted successfully!')
+          fetchVehicles()
+        }
+      } catch (error) {
+        console.error('Error deleting vehicle:', error.message)
+        alert(error.message)
+      }
     }
   }
 
@@ -156,16 +231,79 @@ function Vehicles() {
               <tbody>
                 {vehicles.map((vehicle) => (
                   <tr key={vehicle.id} className="hover:bg-gray-100">
-                    <TableData>{vehicle.make}</TableData>
-                    <TableData>{vehicle.model}</TableData>
-                    <TableData>{vehicle.year}</TableData>
-                    <TableData>{vehicle.license_plate}</TableData>
-                    <TableData>{vehicle.vin}</TableData>
-                    <TableData>{vehicle.mileage}</TableData>
-                    <TableData>{vehicle.status}</TableData>
-                    <TableData>{vehicle.observations}</TableData>
                     <TableData>
-                      <button onClick={() => handleViewDetails(vehicle.id)} className="text-blue-500 hover:text-blue-700">View Details</button>
+                      {editingVehicleId === vehicle.id ? (
+                        <input type="text" name="make" value={editedVehicle.make} onChange={handleEditedInputChange} />
+                      ) : (
+                        vehicle.make
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingVehicleId === vehicle.id ? (
+                        <input type="text" name="model" value={editedVehicle.model} onChange={handleEditedInputChange} />
+                      ) : (
+                        vehicle.model
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingVehicleId === vehicle.id ? (
+                        <input type="number" name="year" value={editedVehicle.year} onChange={handleEditedInputChange} />
+                      ) : (
+                        vehicle.year
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingVehicleId === vehicle.id ? (
+                        <input type="text" name="license_plate" value={editedVehicle.license_plate} onChange={handleEditedInputChange} />
+                      ) : (
+                        vehicle.license_plate
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingVehicleId === vehicle.id ? (
+                        <input type="text" name="vin" value={editedVehicle.vin} onChange={handleEditedInputChange} />
+                      ) : (
+                        vehicle.vin
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingVehicleId === vehicle.id ? (
+                        <input type="number" name="mileage" value={editedVehicle.mileage} onChange={handleEditedInputChange} />
+                      ) : (
+                        vehicle.mileage
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingVehicleId === vehicle.id ? (
+                        <select name="status" value={editedVehicle.status} onChange={handleEditedInputChange}>
+                          <option value="available">Available</option>
+                          <option value="in_maintenance">In Maintenance</option>
+                          <option value="rented">Rented</option>
+                        </select>
+                      ) : (
+                        vehicle.status
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingVehicleId === vehicle.id ? (
+                        <textarea name="observations" value={editedVehicle.observations} onChange={handleEditedInputChange} />
+                      ) : (
+                        vehicle.observations
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingVehicleId === vehicle.id ? (
+                        <>
+                          <button onClick={() => handleSave(vehicle.id)} className="text-green-500 hover:text-green-700 mr-2">Save</button>
+                          <button onClick={() => setEditingVehicleId(null)} className="text-gray-500 hover:text-gray-700">Cancel</button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => handleEdit(vehicle)} className="text-blue-500 hover:text-blue-700 mr-2">Edit</button>
+                          <button onClick={() => handleDelete(vehicle.id)} className="text-red-500 hover:text-red-700">Delete</button>
+                          <button onClick={() => handleViewDetails(vehicle.id)} className="text-blue-500 hover:text-blue-700">View Details</button>
+                        </>
+                      )}
                     </TableData>
                   </tr>
                 ))}

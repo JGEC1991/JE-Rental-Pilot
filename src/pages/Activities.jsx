@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../supabaseClient'
 import Modal from '../components/Modal'
+import ActivityRecordCard from '../components/ActivityRecordCard'
 
 // Reusable Table Header Component
 function TableHeader({ children }) {
@@ -32,6 +33,16 @@ function Activities() {
     description: '',
     attachments: [],
   })
+  const [editingActivityId, setEditingActivityId] = useState(null)
+  const [editedActivity, setEditedActivity] = useState({
+    vehicle_id: '',
+    driver_id: '',
+    activity_type: '',
+    description: '',
+    attachments: [],
+  })
+  const [selectedActivity, setSelectedActivity] = useState(null)
+  const [showActivityDetails, setShowActivityDetails] = useState(false)
 
   useEffect(() => {
     fetchVehicles()
@@ -86,6 +97,8 @@ function Activities() {
           activity_type,
           description,
           attachments,
+          vehicle_id,
+          driver_id,
           vehicles (make, model, license_plate),
           drivers (full_name)
         `)
@@ -141,6 +154,73 @@ function Activities() {
 
   const handleCloseModal = () => {
     setShowAddForm(false)
+    setEditingActivityId(null)
+    setShowActivityDetails(false)
+  }
+
+  const handleEdit = (activity) => {
+    setEditingActivityId(activity.id)
+    setEditedActivity({
+      vehicle_id: activity.vehicle_id || '',
+      driver_id: activity.driver_id || '',
+      activity_type: activity.activity_type || '',
+      description: activity.description || '',
+      attachments: activity.attachments || [],
+    })
+  }
+
+  const handleEditedInputChange = (e) => {
+    setEditedActivity({ ...editedActivity, [e.target.name]: e.target.value })
+  }
+
+  const handleSave = async (id) => {
+    try {
+      const { data, error } = await supabase
+        .from('activities')
+        .update(editedActivity)
+        .eq('id', id)
+
+      if (error) {
+        console.error('Error updating activity:', error)
+        alert(error.message)
+      } else {
+        console.log('Activity updated:', data)
+        alert('Activity updated successfully!')
+        fetchActivities()
+        setEditingActivityId(null)
+      }
+    } catch (error) {
+      console.error('Error updating activity:', error.message)
+      alert(error.message)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this activity?')) {
+      try {
+        const { data, error } = await supabase
+          .from('activities')
+          .delete()
+          .eq('id', id)
+
+        if (error) {
+          console.error('Error deleting activity:', error)
+          alert(error.message)
+        } else {
+          console.log('Activity deleted:', data)
+          alert('Activity deleted successfully!')
+          fetchActivities()
+        }
+      } catch (error) {
+        console.error('Error deleting activity:', error.message)
+        alert(error.message)
+      }
+    }
+  }
+
+  const handleViewDetails = (activity) => {
+    setSelectedActivity(activity)
+    setShowActivityDetails(true)
   }
 
   return (
@@ -164,19 +244,68 @@ function Activities() {
                   <TableHeader>Activity Type</TableHeader>
                   <TableHeader>Description</TableHeader>
                   <TableHeader>Attachments</TableHeader>
+                  <TableHeader>Actions</TableHeader>
                 </tr>
               </thead>
               <tbody>
                 {activities.map((activity) => (
                   <tr key={activity.id} className="hover:bg-gray-100">
-                    <TableData>{activity.vehicles?.make} {activity.vehicles?.model} ({activity.vehicles?.license_plate})</TableData>
-                    <TableData>{activity.drivers?.full_name}</TableData>
-                    <TableData>{activity.activity_type}</TableData>
-                    <TableData>{activity.description}</TableData>
+                    <TableData>
+                      {editingActivityId === activity.id ? (
+                        <select name="vehicle_id" value={editedActivity.vehicle_id} onChange={handleEditedInputChange}>
+                          <option value="">Select Vehicle</option>
+                          {vehicles.map((vehicle) => (
+                            <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        `${activity.vehicles?.make} ${activity.vehicles?.model} (${activity.vehicles?.license_plate})`
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingActivityId === activity.id ? (
+                        <select name="driver_id" value={editedActivity.driver_id} onChange={handleEditedInputChange}>
+                          <option value="">Select Driver</option>
+                          {drivers.map((driver) => (
+                            <option key={driver.id} value={driver.id}>{driver.full_name}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        activity.drivers?.full_name
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingActivityId === activity.id ? (
+                        <input type="text" name="activity_type" value={editedActivity.activity_type} onChange={handleEditedInputChange} />
+                      ) : (
+                        activity.activity_type
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingActivityId === activity.id ? (
+                        <textarea name="description" value={editedActivity.description} onChange={handleEditedInputChange} />
+                      ) : (
+                        activity.description
+                      )}
+                    </TableData>
                     <TableData>
                       {activity.attachments && activity.attachments.map((url, index) => (
                         <img key={index} src={url} alt={`Attachment ${index + 1}`} style={{ width: '100px', margin: '5px' }} />
                       ))}
+                    </TableData>
+                    <TableData>
+                      {editingActivityId === activity.id ? (
+                        <>
+                          <button onClick={() => handleSave(activity.id)} className="text-green-500 hover:text-green-700 mr-2">Save</button>
+                          <button onClick={() => setEditingActivityId(null)} className="text-gray-500 hover:text-gray-700">Cancel</button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => handleEdit(activity)} className="text-blue-500 hover:text-blue-700 mr-2">Edit</button>
+                          <button onClick={() => handleDelete(activity.id)} className="text-red-500 hover:text-red-700">Delete</button>
+                          <button onClick={() => handleViewDetails(activity)} className="text-blue-500 hover:text-blue-700">View Details</button>
+                        </>
+                      )}
                     </TableData>
                   </tr>
                 ))}
@@ -209,6 +338,9 @@ function Activities() {
             >
               Add Activity
             </button>
+          </Modal>
+          <Modal isOpen={showActivityDetails} onClose={handleCloseModal}>
+            {selectedActivity && <ActivityRecordCard activity={selectedActivity} />}
           </Modal>
         </div>
       </div>

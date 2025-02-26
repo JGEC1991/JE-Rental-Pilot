@@ -44,6 +44,13 @@ function Drivers() {
   });
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [showDriverDetails, setShowDriverDetails] = useState(false);
+  const [editingDriverId, setEditingDriverId] = useState(null);
+  const [editedDriver, setEditedDriver] = useState({
+    full_name: '',
+    address: '',
+    phone: '',
+    email: '',
+  });
 
   useEffect(() => {
     fetchDrivers();
@@ -234,11 +241,71 @@ function Drivers() {
   const handleCloseModal = () => {
     setShowAddForm(false);
     setShowDriverDetails(false);
+    setEditingDriverId(null);
   }
 
   const handleViewDetails = (driver) => {
     setSelectedDriver(driver);
     setShowDriverDetails(true);
+  }
+
+  const handleEdit = (driver) => {
+    setEditingDriverId(driver.id);
+    setEditedDriver({
+      full_name: driver.full_name || '',
+      address: driver.address || '',
+      phone: driver.phone || '',
+      email: driver.email || '',
+    });
+  }
+
+  const handleEditedInputChange = (e) => {
+    setEditedDriver({ ...editedDriver, [e.target.name]: e.target.value });
+  }
+
+  const handleSave = async (id) => {
+    try {
+      const { data, error } = await supabase
+        .from('drivers')
+        .update(editedDriver)
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error updating driver:', error);
+        alert(error.message);
+      } else {
+        console.log('Driver updated:', data);
+        alert('Driver updated successfully!');
+        fetchDrivers();
+        setEditingDriverId(null);
+      }
+    } catch (error) {
+      console.error('Error updating driver:', error.message);
+      alert(error.message);
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this driver?')) {
+      try {
+        const { data, error } = await supabase
+          .from('drivers')
+          .delete()
+          .eq('id', id);
+
+        if (error) {
+          console.error('Error deleting driver:', error);
+          alert(error.message);
+        } else {
+          console.log('Driver deleted:', data);
+          alert('Driver deleted successfully!');
+          fetchDrivers();
+        }
+      } catch (error) {
+        console.error('Error deleting driver:', error.message);
+        alert(error.message);
+      }
+    }
   }
 
   return (
@@ -270,10 +337,34 @@ function Drivers() {
             <tbody>
               {drivers.map((driver) => (
                 <tr key={driver.id} className="hover:bg-gray-100">
-                  <TableData>{driver.full_name}</TableData>
-                  <TableData>{driver.address}</TableData>
-                  <TableData>{driver.phone}</TableData>
-                  <TableData>{driver.email}</TableData>
+                  <TableData>
+                    {editingDriverId === driver.id ? (
+                      <input type="text" name="full_name" value={editedDriver.full_name} onChange={handleEditedInputChange} />
+                    ) : (
+                      driver.full_name
+                    )}
+                  </TableData>
+                  <TableData>
+                    {editingDriverId === driver.id ? (
+                      <input type="text" name="address" value={editedDriver.address} onChange={handleEditedInputChange} />
+                    ) : (
+                      driver.address
+                    )}
+                  </TableData>
+                  <TableData>
+                    {editingDriverId === driver.id ? (
+                      <input type="text" name="phone" value={editedDriver.phone} onChange={handleEditedInputChange} />
+                    ) : (
+                      driver.phone
+                    )}
+                  </TableData>
+                  <TableData>
+                    {editingDriverId === driver.id ? (
+                      <input type="email" name="email" value={editedDriver.email} onChange={handleEditedInputChange} />
+                    ) : (
+                      driver.email
+                    )}
+                  </TableData>
                   <TableData>
                     {driver.drivers_license_photo && (
                       <img src={driver.drivers_license_photo} alt="Driver's License" style={{ width: '100px' }} />
@@ -295,7 +386,18 @@ function Drivers() {
                     )}
                   </TableData>
                   <TableData>
-                    <button onClick={() => handleViewDetails(driver)} className="text-blue-500 hover:text-blue-700">View Details</button>
+                    {editingDriverId === driver.id ? (
+                      <>
+                        <button onClick={() => handleSave(driver.id)} className="text-green-500 hover:text-green-700 mr-2">Save</button>
+                        <button onClick={() => setEditingDriverId(null)} className="text-gray-500 hover:text-gray-700">Cancel</button>
+                      </>
+                    ) : (
+                      <>
+                        <button onClick={() => handleEdit(driver)} className="text-blue-500 hover:text-blue-700 mr-2">Edit</button>
+                        <button onClick={() => handleDelete(driver.id)} className="text-red-500 hover:text-red-700">Delete</button>
+                        <button onClick={() => handleViewDetails(driver)} className="text-blue-500 hover:text-blue-700">View Details</button>
+                      </>
+                    )}
                   </TableData>
                 </tr>
               ))}

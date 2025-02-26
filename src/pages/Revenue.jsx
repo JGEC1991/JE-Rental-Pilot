@@ -33,6 +33,15 @@ function Revenue() {
     description: '',
     status: 'Pending',
   })
+  const [editingRevenueId, setEditingRevenueId] = useState(null)
+  const [editedRevenue, setEditedRevenue] = useState({
+    vehicle_id: '',
+    driver_id: '',
+    amount: '',
+    date: '',
+    description: '',
+    status: 'Pending',
+  })
 
   useEffect(() => {
     fetchVehicles()
@@ -105,7 +114,7 @@ function Revenue() {
     }
   }
 
-  const handleInputChange = async (e) => {
+  const handleInputChange = (e) => {
     setNewRevenue({ ...newRevenue, [e.target.name]: e.target.value })
   }
 
@@ -144,6 +153,68 @@ function Revenue() {
 
   const handleCloseModal = () => {
     setShowAddForm(false)
+    setEditingRevenueId(null)
+  }
+
+  const handleEdit = (item) => {
+    setEditingRevenueId(item.id)
+    setEditedRevenue({
+      vehicle_id: item.vehicle_id || '',
+      driver_id: item.driver_id || '',
+      amount: item.amount || '',
+      date: item.date || '',
+      description: item.description || '',
+      status: item.status || 'Pending',
+    })
+  }
+
+  const handleEditedInputChange = (e) => {
+    setEditedRevenue({ ...editedRevenue, [e.target.name]: e.target.value })
+  }
+
+  const handleSave = async (id) => {
+    try {
+      const { data, error } = await supabase
+        .from('revenue')
+        .update(editedRevenue)
+        .eq('id', id)
+
+      if (error) {
+        console.error('Error updating revenue:', error)
+        alert(error.message)
+      } else {
+        console.log('Revenue updated:', data)
+        alert('Revenue updated successfully!')
+        fetchRevenue()
+        setEditingRevenueId(null)
+      }
+    } catch (error) {
+      console.error('Error updating revenue:', error.message)
+      alert(error.message)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this revenue record?')) {
+      try {
+        const { data, error } = await supabase
+          .from('revenue')
+          .delete()
+          .eq('id', id)
+
+        if (error) {
+          console.error('Error deleting revenue:', error)
+          alert(error.message)
+        } else {
+          console.log('Revenue deleted:', data)
+          alert('Revenue deleted successfully!')
+          fetchRevenue()
+        }
+      } catch (error) {
+        console.error('Error deleting revenue:', error.message)
+        alert(error.message)
+      }
+    }
   }
 
   return (
@@ -168,17 +239,83 @@ function Revenue() {
                   <TableHeader>Date</TableHeader>
                   <TableHeader>Description</TableHeader>
                   <TableHeader>Status</TableHeader>
+                  <TableHeader>Actions</TableHeader>
                 </tr>
               </thead>
               <tbody>
                 {revenue.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-100">
-                    <TableData>{item.vehicles?.make} {item.vehicles?.model} ({item.vehicles?.license_plate})</TableData>
-                    <TableData>{item.drivers?.full_name}</TableData>
-                    <TableData>{item.amount}</TableData>
-                    <TableData>{item.date}</TableData>
-                    <TableData>{item.description}</TableData>
-                    <TableData>{item.status}</TableData>
+                    <TableData>
+                      {editingRevenueId === item.id ? (
+                        <select name="vehicle_id" value={editedRevenue.vehicle_id} onChange={handleEditedInputChange}>
+                          <option value="">Select Vehicle</option>
+                          {vehicles.map((vehicle) => (
+                            <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        item.vehicles?.make + ' ' + item.vehicles?.model + ' (' + item.vehicles?.license_plate + ')'
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingRevenueId === item.id ? (
+                        <select name="driver_id" value={editedRevenue.driver_id} onChange={handleEditedInputChange}>
+                          <option value="">Select Driver</option>
+                          {drivers.map((driver) => (
+                            <option key={driver.id} value={driver.id}>{driver.full_name}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        item.drivers?.full_name
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingRevenueId === item.id ? (
+                        <input type="number" name="amount" value={editedRevenue.amount} onChange={handleEditedInputChange} />
+                      ) : (
+                        item.amount
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingRevenueId === item.id ? (
+                        <input type="date" name="date" value={editedRevenue.date} onChange={handleEditedInputChange} />
+                      ) : (
+                        item.date
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingRevenueId === item.id ? (
+                        <textarea name="description" value={editedRevenue.description} onChange={handleEditedInputChange} />
+                      ) : (
+                        item.description
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingRevenueId === item.id ? (
+                        <select name="status" value={editedRevenue.status} onChange={handleEditedInputChange}>
+                          <option value="Completed">Completed</option>
+                          <option value="Pending">Pending</option>
+                          <option value="Past Due">Past Due</option>
+                          <option value="Incomplete">Incomplete</option>
+                          <option value="Canceled">Canceled</option>
+                        </select>
+                      ) : (
+                        item.status
+                      )}
+                    </TableData>
+                    <TableData>
+                      {editingRevenueId === item.id ? (
+                        <>
+                          <button onClick={() => handleSave(item.id)} className="text-green-500 hover:text-green-700 mr-2">Save</button>
+                          <button onClick={() => setEditingRevenueId(null)} className="text-gray-500 hover:text-gray-700">Cancel</button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => handleEdit(item)} className="text-blue-500 hover:text-blue-700 mr-2">Edit</button>
+                          <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700">Delete</button>
+                        </>
+                      )}
+                    </TableData>
                   </tr>
                 ))}
               </tbody>
