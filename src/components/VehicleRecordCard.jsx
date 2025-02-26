@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '../../supabaseClient';
 
 function VehicleRecordCard({ vehicle, isEditMode = false }) {
+  const [activeTab, setActiveTab] = useState('details');
   const [make, setMake] = useState(vehicle?.make || '');
   const [model, setModel] = useState(vehicle?.model || '');
   const [color, setColor] = useState(vehicle?.color || '');
@@ -39,13 +40,15 @@ function VehicleRecordCard({ vehicle, isEditMode = false }) {
       alert('Vehicle record updated successfully!');
     }
 
-    await Promise.all([
-      handleUpload(frontPhoto, 'Front', setFrontPhoto),
-      handleUpload(rearPhoto, 'Rear', setRearPhoto),
-      handleUpload(rightPhoto, 'Right', setRightPhoto),
-      handleUpload(leftPhoto, 'Left', setLeftPhoto),
-      handleUpload(dashboardPhoto, 'Dashboard', setDashboardPhoto),
-    ]);
+    if (activeTab === 'photos') {
+      await Promise.all([
+        handleUpload(frontPhoto, 'Front', setFrontPhoto),
+        handleUpload(rearPhoto, 'Rear', setRearPhoto),
+        handleUpload(rightPhoto, 'Right', setRightPhoto),
+        handleUpload(leftPhoto, 'Left', setLeftPhoto),
+        handleUpload(dashboardPhoto, 'Dashboard', setDashboardPhoto),
+      ]);
+    }
   };
 
   return (
@@ -59,214 +62,233 @@ function VehicleRecordCard({ vehicle, isEditMode = false }) {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Make</label>
-            {isEditMode ? (
-              <input
-                type="text"
-                value={make}
-                onChange={(e) => setMake(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Enter make"
-              />
-            ) : <p className="px-4 py-2 bg-gray-50 rounded-lg">{make}</p>}
+      {/* Tabs */}
+      <div className="mb-4">
+        <button
+          className={`px-4 py-2 rounded-t-lg ${activeTab === 'details' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'}`}
+          onClick={() => setActiveTab('details')}
+        >
+          Details
+        </button>
+        <button
+          className={`px-4 py-2 rounded-t-lg ${activeTab === 'photos' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'}`}
+          onClick={() => setActiveTab('photos')}
+        >
+          Photos
+        </button>
+      </div>
+
+      {/* Details Tab */}
+      {activeTab === 'details' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Make</label>
+              {isEditMode ? (
+                <input
+                  type="text"
+                  value={make}
+                  onChange={(e) => setMake(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Enter make"
+                />
+              ) : <p className="px-4 py-2 bg-gray-50 rounded-lg">{make}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+              {isEditMode ? (
+                <input
+                  type="text"
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Enter model"
+                />
+              ) : <p className="px-4 py-2 bg-gray-50 rounded-lg">{model}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
+              {isEditMode ? (
+                <input
+                  type="text"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Enter color"
+                />
+              ) : <p className="px-4 py-2 bg-gray-50 rounded-lg">{color}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+              {isEditMode ? (
+                <input
+                  type="number"
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Enter year"
+                />
+              ) : <p className="px-4 py-2 bg-gray-50 rounded-lg">{year}</p>}
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
-            {isEditMode ? (
-              <input
-                type="text"
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Enter model"
-              />
-            ) : <p className="px-4 py-2 bg-gray-50 rounded-lg">{model}</p>}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">License Plate</label>
+              {isEditMode ? (
+                <input
+                  type="text"
+                  value={licensePlate}
+                  onChange={(e) => setLicensePlate(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Enter license plate"
+                />
+              ) : <p className="px-4 py-2 bg-gray-50 rounded-lg">{licensePlate}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">VIN</label>
+              {isEditMode ? (
+                <input
+                  type="text"
+                  value={vin}
+                  onChange={(e) => setVin(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Enter VIN"
+                />
+              ) : <p className="px-4 py-2 bg-gray-50 rounded-lg">{vin}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Mileage</label>
+              {isEditMode ? (
+                <input
+                  type="number"
+                  value={mileage}
+                  onChange={(e) => setMileage(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Enter mileage"
+                />
+              ) : <p className="px-4 py-2 bg-gray-50 rounded-lg">{mileage}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              {isEditMode ? (
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                >
+                  <option value="">Select status</option>
+                  <option value="available">Available</option>
+                  <option value="in_use">In Use</option>
+                  <option value="maintenance">Maintenance</option>
+                  <option value="retired">Retired</option>
+                </select>
+              ) : <p className="px-4 py-2 bg-gray-50 rounded-lg capitalize">{status}</p>}
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
+          <div className="col-span-1 md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Observations</label>
             {isEditMode ? (
-              <input
-                type="text"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Enter color"
+              <textarea
+                value={observations}
+                onChange={(e) => setObservations(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-32"
+                placeholder="Enter observations"
               />
-            ) : <p className="px-4 py-2 bg-gray-50 rounded-lg">{color}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
-            {isEditMode ? (
-              <input
-                type="number"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Enter year"
-              />
-            ) : <p className="px-4 py-2 bg-gray-50 rounded-lg">{year}</p>}
+            ) : <p className="px-4 py-2 bg-gray-50 rounded-lg min-h-[8rem]">{observations}</p>}
           </div>
         </div>
+      )}
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">License Plate</label>
-            {isEditMode ? (
-              <input
-                type="text"
-                value={licensePlate}
-                onChange={(e) => setLicensePlate(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Enter license plate"
-              />
-            ) : <p className="px-4 py-2 bg
--gray-50 rounded-lg">{licensePlate}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">VIN</label>
-            {isEditMode ? (
-              <input
-                type="text"
-                value={vin}
-                onChange={(e) => setVin(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Enter VIN"
-              />
-            ) : <p className="px-4 py-2 bg-gray-50 rounded-lg">{vin}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Mileage</label>
-            {isEditMode ? (
-              <input
-                type="number"
-                value={mileage}
-                onChange={(e) => setMileage(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Enter mileage"
-              />
-            ) : <p className="px-4 py-2 bg-gray-50 rounded-lg">{mileage}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            {isEditMode ? (
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              >
-                <option value="">Select status</option>
-                <option value="available">Available</option>
-                <option value="in_use">In Use</option>
-                <option value="maintenance">Maintenance</option>
-                <option value="retired">Retired</option>
-              </select>
-            ) : <p className="px-4 py-2 bg-gray-50 rounded-lg capitalize">{status}</p>}
-          </div>
-        </div>
-
-        <div className="col-span-1 md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Observations</label>
-          {isEditMode ? (
-            <textarea
-              value={observations}
-              onChange={(e) => setObservations(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-32"
-              placeholder="Enter observations"
-            />
-          ) : <p className="px-4 py-2 bg-gray-50 rounded-lg min-h-[8rem]">{observations}</p>}
-        </div>
-
-        {isEditMode && (
-          <div className="col-span-1 md:col-span-2 space-y-6">
-            <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Vehicle Photos</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Front View</label>
-                <div className="relative">
-                  <input
-                    type="file"
-                    onChange={(e) => setFrontPhoto(e.target.files[0])}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    accept="image/*"
-                  />
-                  {vehicle?.front_image_url && (
-                    <img src={vehicle.front_image_url} alt="Front" className="mt-2 rounded-lg w-full h-40 object-cover" />
-                  )}
-                </div>
+      {/* Photos Tab */}
+      {activeTab === 'photos' && (
+        <div className="col-span-1 md:col-span-2 space-y-6">
+          <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Vehicle Photos</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Front View</label>
+              <div className="relative">
+                <input
+                  type="file"
+                  onChange={(e) => setFrontPhoto(e.target.files[0])}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  accept="image/*"
+                />
+                {vehicle?.front_image_url && (
+                  <img src={vehicle.front_image_url} alt="Front" className="mt-2 rounded-lg w-full h-40 object-cover" />
+                )}
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Rear View</label>
-                <div className="relative">
-                  <input
-                    type="file"
-                    onChange={(e) => setRearPhoto(e.target.files[0])}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    accept="image/*"
-                  />
-                  {vehicle?.rear_image_url && (
-                    <img src={vehicle.rear_image_url} alt="Rear" className="mt-2 rounded-lg w-full h-40 object-cover" />
-                  )}
-                </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Rear View</label>
+              <div className="relative">
+                <input
+                  type="file"
+                  onChange={(e) => setRearPhoto(e.target.files[0])}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  accept="image/*"
+                />
+                {vehicle?.rear_image_url && (
+                  <img src={vehicle.rear_image_url} alt="Rear" className="mt-2 rounded-lg w-full h-40 object-cover" />
+                )}
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Right Side</label>
-                <div className="relative">
-                  <input
-                    type="file"
-                    onChange={(e) => setRightPhoto(e.target.files[0])}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    accept="image/*"
-                  />
-                  {vehicle?.right_image_url && (
-                    <img src={vehicle.right_image_url} alt="Right" className="mt-2 rounded-lg w-full h-40 object-cover" />
-                  )}
-                </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Right Side</label>
+              <div className="relative">
+                <input
+                  type="file"
+                  onChange={(e) => setRightPhoto(e.target.files[0])}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  accept="image/*"
+                />
+                {vehicle?.right_image_url && (
+                  <img src={vehicle.right_image_url} alt="Right" className="mt-2 rounded-lg w-full h-40 object-cover" />
+                )}
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Left Side</label>
-                <div className="relative">
-                  <input
-                    type="file"
-                    onChange={(e) => setLeftPhoto(e.target.files[0])}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    accept="image/*"
-                  />
-                  {vehicle?.left_image_url && (
-                    <img src={vehicle.left_image_url} alt="Left" className="mt-2 rounded-lg w-full h-40 object-cover" />
-                  )}
-                </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Left Side</label>
+              <div className="relative">
+                <input
+                  type="file"
+                  onChange={(e) => setLeftPhoto(e.target.files[0])}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  accept="image/*"
+                />
+                {vehicle?.left_image_url && (
+                  <img src={vehicle.left_image_url} alt="Left" className="mt-2 rounded-lg w-full h-40 object-cover" />
+                )}
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Dashboard</label>
-                <div className="relative">
-                  <input
-                    type="file"
-                    onChange={(e) => setDashboardPhoto(e.target.files[0])}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    accept="image/*"
-                  />
-                  {vehicle?.dashboard_image_url && (
-                    <img src={vehicle.dashboard_image_url} alt="Dashboard" className="mt-2 rounded-lg w-full h-40 object-cover" />
-                  )}
-                </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Dashboard</label>
+              <div className="relative">
+                <input
+                  type="file"
+                  onChange={(e) => setDashboardPhoto(e.target.files[0])}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  accept="image/*"
+                />
+                {vehicle?.dashboard_image_url && (
+                  <img src={vehicle.dashboard_image_url} alt="Dashboard" className="mt-2 rounded-lg w-full h-40 object-cover" />
+                )}
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {isEditMode && (
         <div className="mt-8 flex justify-end">

@@ -51,6 +51,7 @@ function Drivers() {
     phone: '',
     email: '',
   });
+  const [showEditModal, setShowEditModal] = useState(false); // Add this line
 
   useEffect(() => {
     fetchDrivers();
@@ -242,25 +243,20 @@ function Drivers() {
     setShowAddForm(false);
     setShowDriverDetails(false);
     setEditingDriverId(null);
+    setSelectedDriver(null);
+    setShowEditModal(false);
   }
 
   const handleViewDetails = (driver) => {
     setSelectedDriver(driver);
     setShowDriverDetails(true);
+    setEditingDriverId(null); // Ensure edit mode is off when viewing details
   }
 
-  const handleEdit = (driver) => {
-    setEditingDriverId(driver.id);
-    setEditedDriver({
-      full_name: driver.full_name || '',
-      address: driver.address || '',
-      phone: driver.phone || '',
-      email: driver.email || '',
-    });
-  }
-
-  const handleEditedInputChange = (e) => {
-    setEditedDriver({ ...editedDriver, [e.target.name]: e.target.value });
+  const handleEditClick = (driver) => {
+    setSelectedDriver(driver);
+    setShowEditModal(true);
+    setEditingDriverId(driver.id); // Set the editing driver ID
   }
 
   const handleSave = async (id) => {
@@ -278,6 +274,7 @@ function Drivers() {
         alert('Driver updated successfully!');
         fetchDrivers();
         setEditingDriverId(null);
+        setShowEditModal(false); // Close the edit modal after saving
       }
     } catch (error) {
       console.error('Error updating driver:', error.message);
@@ -337,34 +334,10 @@ function Drivers() {
             <tbody>
               {drivers.map((driver) => (
                 <tr key={driver.id} className="hover:bg-gray-100">
-                  <TableData>
-                    {editingDriverId === driver.id ? (
-                      <input type="text" name="full_name" value={editedDriver.full_name} onChange={handleEditedInputChange} />
-                    ) : (
-                      driver.full_name
-                    )}
-                  </TableData>
-                  <TableData>
-                    {editingDriverId === driver.id ? (
-                      <input type="text" name="address" value={editedDriver.address} onChange={handleEditedInputChange} />
-                    ) : (
-                      driver.address
-                    )}
-                  </TableData>
-                  <TableData>
-                    {editingDriverId === driver.id ? (
-                      <input type="text" name="phone" value={editedDriver.phone} onChange={handleEditedInputChange} />
-                    ) : (
-                      driver.phone
-                    )}
-                  </TableData>
-                  <TableData>
-                    {editingDriverId === driver.id ? (
-                      <input type="email" name="email" value={editedDriver.email} onChange={handleEditedInputChange} />
-                    ) : (
-                      driver.email
-                    )}
-                  </TableData>
+                  <TableData>{driver.full_name}</TableData>
+                  <TableData>{driver.address}</TableData>
+                  <TableData>{driver.phone}</TableData>
+                  <TableData>{driver.email}</TableData>
                   <TableData>
                     {driver.drivers_license_photo && (
                       <img src={driver.drivers_license_photo} alt="Driver's License" style={{ width: '100px' }} />
@@ -386,18 +359,9 @@ function Drivers() {
                     )}
                   </TableData>
                   <TableData>
-                    {editingDriverId === driver.id ? (
-                      <>
-                        <button onClick={() => handleSave(driver.id)} className="text-green-500 hover:text-green-700 mr-2">Save</button>
-                        <button onClick={() => setEditingDriverId(null)} className="text-gray-500 hover:text-gray-700">Cancel</button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => handleEdit(driver)} className="text-blue-500 hover:text-blue-700 mr-2">Edit</button>
-                        <button onClick={() => handleDelete(driver.id)} className="text-red-500 hover:text-red-700">Delete</button>
-                        <button onClick={() => handleViewDetails(driver)} className="text-blue-500 hover:text-blue-700">View Details</button>
-                      </>
-                    )}
+                    <button onClick={() => handleEditClick(driver)} className="text-blue-500 hover:text-blue-700 mr-2">Edit</button>
+                    <button onClick={() => handleDelete(driver.id)} className="text-red-500 hover:text-red-700">Delete</button>
+                    <button onClick={() => handleViewDetails(driver)} className="text-blue-500 hover:text-blue-700">View Details</button>
                   </TableData>
                 </tr>
               ))}
@@ -438,6 +402,9 @@ function Drivers() {
         </Modal>
         <Modal isOpen={showDriverDetails} onClose={handleCloseModal}>
           {selectedDriver && <DriverRecordCard driver={selectedDriver} />}
+        </Modal>
+        <Modal isOpen={showEditModal} onClose={handleCloseModal}>
+          {selectedDriver && <DriverRecordCard driver={selectedDriver} isEditMode={true} />}
         </Modal>
       </div>
     </div>
