@@ -149,16 +149,40 @@ function Revenue() {
   return (
     <>
       <div className="page">
-        <div className="max-w-5xl mx-auto mt-8"> {/* Added max-w-5xl and mt-8 */}
-          <h1 className="text-3xl font-semibold mb-4">Revenue</h1>
-          <p className="text-gray-700">Manage Revenue</p>
-          <div>
+        <div className="max-w-5xl mx-auto mt-8">
+          <div className="flex justify-end items-center mb-4">
             <button
               onClick={handleAddClick}
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+              className="text-white font-bold py-2 px-4 rounded"
             >
-              Add Revenue
+              <img src="https://ticghrxzdsdoaiwvahht.supabase.co/storage/v1/object/public/assets/Navigation/plus.png" alt="Add Revenue" style={{ width: '20px', height: '20px' }} />
             </button>
+          </div>
+          <div className="bg-white shadow-md rounded-lg p-4 overflow-x-auto">
+            <table className="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
+              <thead>
+                <tr>
+                  <TableHeader>Vehicle</TableHeader>
+                  <TableHeader>Driver</TableHeader>
+                  <TableHeader>Amount</TableHeader>
+                  <TableHeader>Date</TableHeader>
+                  <TableHeader>Description</TableHeader>
+                  <TableHeader>Status</TableHeader>
+                </tr>
+              </thead>
+              <tbody>
+                {revenue.map((item) => (
+                  <tr key={item.id} className="hover:bg-gray-100">
+                    <TableData>{item.vehicles?.make} {item.vehicles?.model} ({item.vehicles?.license_plate})</TableData>
+                    <TableData>{item.drivers?.full_name}</TableData>
+                    <TableData>{item.amount}</TableData>
+                    <TableData>{item.date}</TableData>
+                    <TableData>{item.description}</TableData>
+                    <TableData>{item.status}</TableData>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
           <Modal isOpen={showAddForm} onClose={handleCloseModal}>
             <h2 className="text-2xl font-semibold mb-4">Add New Revenue</h2>
@@ -197,35 +221,6 @@ function Revenue() {
               Add Revenue
             </button>
           </Modal>
-          <div>
-            <h2 className="text-xl font-semibold mb-2">Revenue List</h2>
-            <div className="bg-white shadow-md rounded-lg p-4 overflow-x-auto">
-              <table className="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
-                <thead>
-                  <tr>
-                    <TableHeader>Vehicle</TableHeader>
-                    <TableHeader>Driver</TableHeader>
-                    <TableHeader>Amount</TableHeader>
-                    <TableHeader>Date</TableHeader>
-                    <TableHeader>Description</TableHeader>
-                    <TableHeader>Status</TableHeader>
-                  </tr>
-                </thead>
-                <tbody>
-                  {revenue.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-100">
-                      <TableData>{item.vehicles?.make} {item.vehicles?.model} ({item.vehicles?.license_plate})</TableData>
-                      <TableData>{item.drivers?.full_name}</TableData>
-                      <TableData>{item.amount}</TableData>
-                      <TableData>{item.date}</TableData>
-                      <TableData>{item.description}</TableData>
-                      <TableData>{item.status}</TableData>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
         </div>
       </div>
     </>
