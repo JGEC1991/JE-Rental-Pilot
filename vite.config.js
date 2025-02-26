@@ -27,5 +27,9 @@ export default defineConfig({
         secure: false,
       },
     },
+    allowedHosts: [
+      '4de40888-0e72-4cdd-99c3-f044a4607a0d-00-2nwhnwduhic2q.worf.replit.dev',
+      '.replit.dev'
+    ],
   },
 })
