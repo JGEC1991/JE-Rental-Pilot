@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { supabase } from '../../supabaseClient'
 
-function DriverRecordCard({ driver }) {
+function DriverRecordCard({ driver, isEditMode = false }) {
   const [activeTab, setActiveTab] = useState('details')
   const [driversLicense, setDriversLicense] = useState(null)
   const [policeRecord, setPoliceRecord] = useState(null)
@@ -137,9 +137,11 @@ function DriverRecordCard({ driver }) {
 
   return (
     <div className="container mx-auto max-w-2xl p-8 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-900">
-        {driver?.full_name}
-      </h2>
+      <div className="border-b pb-4 mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">
+          {driver?.full_name}
+        </h2>
+      </div>
 
       {/* Tabs */}
       <div className="mb-4">
@@ -162,36 +164,48 @@ function DriverRecordCard({ driver }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <label htmlFor="address" className="block text-gray-700 text-sm font-bold mb-2">Address</label>
-            <input
-              type="text"
-              id="address"
-              name="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
+            {isEditMode ? (
+              <input
+                type="text"
+                id="address"
+                name="address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              />
+            ) : (
+              <p>{driver?.address}</p>
+            )}
           </div>
           <div>
             <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2">Phone</label>
-            <input
-              type="text"
-              id="phone"
-              name="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
+            {isEditMode ? (
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              />
+            ) : (
+              <p>{driver?.phone}</p>
+            )}
           </div>
           <div>
             <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
+            {isEditMode ? (
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              />
+            ) : (
+              <p>{driver?.email}</p>
+            )}
           </div>
         </div>
       )}
@@ -214,19 +228,21 @@ function DriverRecordCard({ driver }) {
                 <div className="absolute top-0 right-0 p-1 flex flex-col items-end">
                   <button onClick={() => handleDownloadImage(driver.drivers_license_photo)} className="text-white bg-gray-600 rounded-full w-6 h-6 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75v-2.25m-9-5.25v7.5m3-3 3-3M5.25 7.5h13.5" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75v-2.25m-9-5.25v7.5m3-3 3-3M5.25 7.5h13.5" />
                     </svg>
                   </button>
                 </div>
               </div>
             )}
-            <input
-              type="file"
-              id="driversLicense"
-              accept="image/*"
-              onChange={(e) => setDriversLicense(e.target.files[0])}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
-            />
+            {isEditMode && (
+              <input
+                type="file"
+                id="driversLicense"
+                accept="image/*"
+                onChange={(e) => setDriversLicense(e.target.files[0])}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
+              />
+            )}
           </div>
           <div>
             <label htmlFor="policeRecord" className="block text-gray-700 text-sm font-bold mb-2">
@@ -243,19 +259,21 @@ function DriverRecordCard({ driver }) {
                 <div className="absolute top-0 right-0 p-1 flex flex-col items-end">
                   <button onClick={() => handleDownloadImage(driver.police_records_photo)} className="text-white bg-gray-600 rounded-full w-6 h-6 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75v-2.25m-9-5.25v7.5m3-3 3-3M5.25 7.5h13.5" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 0 005.25 21h13.5A2.25 0 0021 18.75v-2.25m-9-5.25v7.5m3-3 3-3M5.25 7.5h13.5" />
                     </svg>
                   </button>
                 </div>
               </div>
             )}
-            <input
-              type="file"
-              id="policeRecord"
-              accept="image/*"
-              onChange={(e) => setPoliceRecord(e.target.files[0])}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
-            />
+            {isEditMode && (
+              <input
+                type="file"
+                id="policeRecord"
+                accept="image/*"
+                onChange={(e) => setPoliceRecord(e.target.files[0])}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
+              />
+            )}
           </div>
           <div>
             <label htmlFor="criminalRecord" className="block text-gray-700 text-sm font-bold mb-2">
@@ -272,19 +290,21 @@ function DriverRecordCard({ driver }) {
                 <div className="absolute top-0 right-0 p-1 flex flex-col items-end">
                   <button onClick={() => handleDownloadImage(driver.criminal_records_photo)} className="text-white bg-gray-600 rounded-full w-6 h-6 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75v-2.25m-9-5.25v7.5m3-3 3-3M5.25 7.5h13.5" />
-                    </svg>
-                  </button>
-                </div>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 0 005.25 21h13.5A2.25 0 0021 18.75v-2.25m-9-5.25v7.5m3-3 3-3M5.25 7.5h13.5" />
+                  </svg>
+                </button>
               </div>
+            </div>
             )}
-            <input
-              type="file"
-              id="criminalRecord"
-              accept="image/*"
-              onChange={(e) => setCriminalRecord(e.target.files[0])}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
-            />
+            {isEditMode && (
+              <input
+                type="file"
+                id="criminalRecord"
+                accept="image/*"
+                onChange={(e) => setCriminalRecord(e.target.files[0])}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
+              />
+            )}
           </div>
           <div>
             <label htmlFor="profilePhoto" className="block text-gray-700 text-sm font-bold mb-2">
@@ -307,26 +327,29 @@ function DriverRecordCard({ driver }) {
                 </div>
               </div>
             )}
-            <input
-              type="file"
-              id="profilePhoto"
-              accept="image/*"
-              onChange={(e) => setProfilePhoto(e.target.files[0])}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
-            />
+            {isEditMode && (
+              <input
+                type="file"
+                id="profilePhoto"
+                accept="image/*"
+                onChange={(e) => setProfilePhoto(e.target.files[0])}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
+              />
+            )}
           </div>
         </div>
       )}
 
-      <div className="mt-8 flex justify-end">
-        <button
-          onClick={handleSave}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all"
-        >
-          Save Changes
-        </button>
-      </div>
-
+      {isEditMode && (
+        <div className="mt-8 flex justify-end">
+          <button
+            onClick={handleSave}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all"
+          >
+            Save Changes
+          </button>
+        </div>
+      )}
       {expandedImage && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-75 z-50" onClick={handleCloseExpandedImage}>
           <div className="relative" ref={modalRef} onClick={(e) => e.stopPropagation()}>
