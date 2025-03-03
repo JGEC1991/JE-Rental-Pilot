@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseClient';
 import Modal from '../components/Modal';
@@ -48,6 +47,10 @@ function Activities() {
     date: new Date().toISOString().split('T')[0],
     attachments: []
   });
+  
+  const [createExpense, setCreateExpense] = useState(false);
+  const [expenseAmount, setExpenseAmount] = useState('');
+  const [expenseStatus, setExpenseStatus] = useState('Pending');
 
   useEffect(() => {
     fetchActivities();
@@ -126,6 +129,29 @@ function Activities() {
       
       if (error) throw error;
       
+      // Create expense if checkbox is checked
+      if (createExpense && expenseAmount) {
+        const { error: expenseError } = await supabase
+          .from('expenses')
+          .insert([
+            {
+              vehicle_id: newActivity.vehicle_id,
+              driver_id: newActivity.driver_id,
+              activity_id: data[0].id,
+              amount: parseFloat(expenseAmount),
+              date: newActivity.date,
+              description: `Expense for ${newActivity.activity_type}: ${newActivity.description || ''}`,
+              status: expenseStatus,
+              category: newActivity.activity_type || 'Other'
+            }
+          ]);
+        
+        if (expenseError) {
+          console.error("Error adding expense:", expenseError);
+          alert(`Activity created but expense creation failed: ${expenseError.message}`);
+        }
+      }
+      
       // Reset form and refresh data
       setNewActivity({
         vehicle_id: '',
@@ -136,6 +162,9 @@ function Activities() {
         attachments: []
       });
       setAttachments([]);
+      setCreateExpense(false);
+      setExpenseAmount('');
+      setExpenseStatus('Pending');
       setShowAddForm(false);
       fetchActivities();
     } catch (error) {
@@ -401,6 +430,54 @@ function Activities() {
             </div>
           )}
         </div>
+        <div className="mb-4">
+          <div className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              id="create-expense"
+              checked={createExpense}
+              onChange={(e) => setCreateExpense(e.target.checked)}
+              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="create-expense" className="ml-2 block text-gray-700 font-bold">
+              Create an expense for this activity
+            </label>
+          </div>
+          
+          {createExpense && (
+            <div className="pl-6 border-l-2 border-blue-200 mt-2">
+              <div className="mb-4">
+                <label htmlFor="expense-amount" className="block text-gray-700 text-sm font-bold mb-2">Expense Amount</label>
+                <input
+                  type="number"
+                  id="expense-amount"
+                  value={expenseAmount}
+                  onChange={(e) => setExpenseAmount(e.target.value)}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  min="0"
+                  step="0.01"
+                  required
+                  placeholder="Enter expense amount"
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label htmlFor="expense-status" className="block text-gray-700 text-sm font-bold mb-2">Expense Status</label>
+                <select
+                  id="expense-status"
+                  value={expenseStatus}
+                  onChange={(e) => setExpenseStatus(e.target.value)}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Canceled">Canceled</option>
+                </select>
+              </div>
+            </div>
+          )}
+        </div>
+        
         <button
           onClick={handleAddActivity}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
