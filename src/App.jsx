@@ -11,6 +11,7 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Drivers from './pages/Drivers'
 import Revenue from './pages/Revenue'
+import Expenses from './pages/Expenses' // Added import for Expenses page
 import { supabase } from '../supabaseClient'
 import './index.css' // Import the CSS file
 
@@ -74,6 +75,9 @@ function App() {
                 <Link to="/revenue" className="text-white hover:text-gray-300">Revenue</Link>
               </li>
               <li>
+                <Link to="/expenses" className="text-white hover:text-gray-300">Expenses</Link>
+              </li> {/* Added Expenses link to navigation */}
+              <li>
                 <Link to="/dashboard" className="text-white hover:text-gray-300">Dashboard</Link>
               </li>
               <li>
@@ -99,6 +103,7 @@ function App() {
         <Route path="/dashboard" element={session ? <Dashboard /> : <Navigate to="/login" />} />
         <Route path="/settings" element={session ? <Settings /> : <Navigate to="/login" />} />
         <Route path="/admin" element={session ? <Admin /> : <Navigate to="/login" />} />
+        <Route path="/expenses" element={session ? <Expenses /> : <Navigate to="/login" />} /> {/* Added route for Expenses page */}
       </Routes>
     </div>
   )
