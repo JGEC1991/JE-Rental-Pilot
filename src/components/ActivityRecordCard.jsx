@@ -115,6 +115,20 @@ function ActivityRecordCard({ activity, isEditMode = false, onClose, onActivityU
     setExpandedImage(null);
   };
 
+  const [showExpenseForm, setShowExpenseForm] = useState(false);
+  const [expenseAmount, setExpenseAmount] = useState('');
+  const [expenseStatus, setExpenseStatus] = useState('Pending');
+  const [expenseCategories] = useState([
+    'Maintenance',
+    'Repair',
+    'Fuel',
+    'Insurance',
+    'Registration',
+    'Tax',
+    'Other'
+  ]);
+  const [expenseCategory, setExpenseCategory] = useState('');
+
   const handleSave = async () => {
     try {
       const updatedActivity = {
@@ -144,6 +158,42 @@ function ActivityRecordCard({ activity, isEditMode = false, onClose, onActivityU
     } catch (error) {
       console.error('Error:', error);
       alert('An error occurred while saving changes.');
+    }
+  };
+
+  const handleCreateExpense = async () => {
+    try {
+      if (!expenseAmount || !expenseCategory) {
+        alert('Please fill in all required expense fields');
+        return;
+      }
+      
+      const { data, error } = await supabase
+        .from('expenses')
+        .insert([
+          {
+            vehicle_id: vehicleId || activity.vehicle_id,
+            driver_id: driverId || activity.driver_id,
+            activity_id: activity.id,
+            amount: parseFloat(expenseAmount),
+            date: date || activity.date,
+            description: `Expense for ${activityType || activity.activity_type}: ${description || activity.description || ''}`,
+            status: expenseStatus,
+            category: expenseCategory || activityType || activity.activity_type || 'Other'
+          }
+        ])
+        .select();
+      
+      if (error) throw error;
+      
+      alert('Expense created successfully!');
+      setShowExpenseForm(false);
+      setExpenseAmount('');
+      setExpenseStatus('Pending');
+      setExpenseCategory('');
+    } catch (error) {
+      console.error('Error creating expense:', error);
+      alert(`Error creating expense: ${error.message}`);
     }
   };
 
@@ -279,12 +329,76 @@ function ActivityRecordCard({ activity, isEditMode = false, onClose, onActivityU
       )}
 
       {isEditMode && (
-        <div className="mt-6 flex justify-end">
+        <div className="mt-6 flex justify-between">
+          <button 
+            onClick={() => setShowExpenseForm(!showExpenseForm)}
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-200 transition-all"
+          >
+            {showExpenseForm ? 'Cancel Expense' : 'Create Expense'}
+          </button>
           <button 
             onClick={handleSave}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all"
           >
             Save Changes
+          </button>
+        </div>
+      )}
+
+      {showExpenseForm && (
+        <div className="mt-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+          <h3 className="text-xl font-semibold mb-4 text-gray-800">Create Expense for this Activity</h3>
+          
+          <div className="mb-4">
+            <label htmlFor="expense-category" className="block text-gray-700 text-sm font-bold mb-2">Expense Category</label>
+            <select
+              id="expense-category"
+              value={expenseCategory}
+              onChange={(e) => setExpenseCategory(e.target.value)}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              required
+            >
+              <option value="">Select Category</option>
+              {expenseCategories.map((category) => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="mb-4">
+            <label htmlFor="expense-amount" className="block text-gray-700 text-sm font-bold mb-2">Amount</label>
+            <input
+              type="number"
+              id="expense-amount"
+              value={expenseAmount}
+              onChange={(e) => setExpenseAmount(e.target.value)}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              min="0"
+              step="0.01"
+              required
+              placeholder="Enter expense amount"
+            />
+          </div>
+          
+          <div className="mb-4">
+            <label htmlFor="expense-status" className="block text-gray-700 text-sm font-bold mb-2">Status</label>
+            <select
+              id="expense-status"
+              value={expenseStatus}
+              onChange={(e) => setExpenseStatus(e.target.value)}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            >
+              <option value="Pending">Pending</option>
+              <option value="Paid">Paid</option>
+              <option value="Canceled">Canceled</option>
+            </select>
+          </div>
+          
+          <button
+            onClick={handleCreateExpense}
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Create Expense
           </button>
         </div>
       )}
