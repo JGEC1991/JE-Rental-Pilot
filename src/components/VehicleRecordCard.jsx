@@ -30,13 +30,9 @@
       const photoDate = new Date(photo.lastModified).toISOString().split('T')[0];
   
       if (photoDate !== today) {
-        const confirmUpload = window.confirm(
-          `This photo appears to be from ${photoDate}, not today (${today}). Only photos from today should be uploaded. Do you want to continue anyway?`
-        );
-        if (!confirmUpload) {
-          setPhotoState(null);
-          return;
-        }
+        alert(`This photo appears to be from ${photoDate}, not today (${today}). Only photos from today can be uploaded.`);
+        setPhotoState(null);
+        return;
       }
   
       const { data, error } = await supabase.storage
