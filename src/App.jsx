@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
     import { BrowserRouter as Router, Route, Routes, Link, Navigate, useLocation } from 'react-router-dom';
+    import { useTranslation } from 'react-i18next';
+    import i18n from './i18n';
     import Home from './pages/Home';
     import Profile from './pages/Profile';
     import Vehicles from './pages/Vehicles';
@@ -19,6 +21,7 @@ import React, { useState, useEffect } from 'react';
       const [session, setSession] = useState(null);
       const [loading, setLoading] = useState(true);
       const location = useLocation();
+      const { t, i18n } = useTranslation();
     
       useEffect(() => {
         const fetchSession = async () => {
@@ -45,6 +48,10 @@ import React, { useState, useEffect } from 'react';
         localStorage.setItem('lastPath', location.pathname);
       }, [location]);
     
+      const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng);
+      };
+    
       if (loading) {
         return <div>Loading...</div>;
       }
@@ -62,72 +69,82 @@ import React, { useState, useEffect } from 'react';
                   <li>
                     <Link to="/" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m1-10V4a1 1 0 00-1-1H3m4 6h6m-6 0l6-6"></path></svg>
-                      Home
+                      {t('home')}
                     </Link>
                   </li>
                   <li>
                     <Link to="/profile" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 8a18.066 18.066 0 00-5.332-1.01M19.5 18.5l.75-1.5"></path></svg>
-                      Profile
+                      {t('profile')}
                     </Link>
                   </li>
                   <li>
                     <Link to="/vehicles" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M3 5h12a2 2 0 012 2v1a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2zm5 10v2m6-2v2M3 15h12a2 2 0 012 2v1a2 2 0 01-2 2H3a2 2 0 01-2-2v-1a2 2 0 012-2z"></path></svg>
-                      Vehicles
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M3 5h12a2 2 0 012 2v1a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2zm5 10v2m6-2v2M3 15h12a2 2 0 012 2v1a2 2 0 01-2-2H3a2 2 0 01-2-2v-1a2 2 0 012-2z"></path></svg>
+                      {t('vehicles')}
                     </Link>
                   </li>
                   <li>
                     <Link to="/drivers" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.692M6 10V18a1 1 0 001 1h10a1 1 0 001-1v-8a1 1 0 00-1-1H7a1 1 0 00-1 1z"></path></svg>
-                      Drivers
+                      {t('drivers')}
                     </Link>
                   </li>
                   <li>
                     <Link to="/activities" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                      Activities
+                      {t('activities')}
                     </Link>
                   </li>
                   <li>
                     <Link to="/revenue" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                      Revenue
+                      {t('revenue')}
                     </Link>
                   </li>
                   <li>
                     <Link to="/expenses" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                      Expenses
+                      {t('expenses')}
                     </Link>
                   </li>
                   <li>
                     <Link to="/dashboard" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                      Dashboard
+                      {t('dashboard')}
                     </Link>
                   </li>
                   <li>
                     <Link to="/settings" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7m14 6l-7-7-7 7"></path></svg>
-                      Settings
+                      {t('settings')}
                     </Link>
                   </li>
                   <li>
                     <Link to="/admin" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                      Admin
+                      {t('admin')}
                     </Link>
                   </li>
                 </ul>
               </nav>
               <div className="mt-auto">
+                <div className="flex justify-center mt-4">
+                  <select
+                    value={i18n.language}
+                    onChange={(e) => changeLanguage(e.target.value)}
+                    className="bg-gray-700 text-white rounded-md py-2 px-4 focus:outline-none"
+                  >
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                  </select>
+                </div>
                 <button
                   onClick={() => supabase.auth.signOut()}
-                  className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors"
+                  className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors mt-2"
                 >
                   <svg className="w-5 h-5 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                  Logout
+                  {t('logout')}
                 </button>
               </div>
             </div>

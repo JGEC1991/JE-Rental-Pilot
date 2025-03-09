@@ -1,0 +1,13 @@
+{
+      "home": "Home",
+      "profile": "Profile",
+      "vehicles": "Vehicles",
+      "drivers": "Drivers",
+      "activities": "Activities",
+      "revenue": "Revenue",
+      "expenses": "Expenses",
+      "dashboard": "Dashboard",
+      "settings": "Settings",
+      "admin": "Admin",
+      "logout": "Logout"
+    }
