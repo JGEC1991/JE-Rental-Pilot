@@ -137,5 +137,11 @@
   "selectADriver": "Seleccionar un conductor",
   "selectActivityType": "Seleccionar un tipo de actividad",
   "enterDescription": "Ingresar descripción",
-  "addActivity": "Agregar actividad"
+  "addActivity": "Agregar actividad",
+  "createExpense": "¿Crear gasto?",
+  "expenseAmount": "Monto del gasto",
+  "expenseStatus": "Estado del gasto",
+  "enterExpenseAmount": "Ingresar el monto del gasto",
+  "activityAndExpenseAddedSuccessfully": "¡Actividad y gasto agregados con éxito!",
+  "activityAddedSuccessfully": "¡Actividad agregada con éxito!"
 }
