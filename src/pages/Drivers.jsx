@@ -6,9 +6,10 @@ import React, { useState, useEffect } from 'react';
     
     // Reusable Table Header Component
     function TableHeader({ children }) {
+      const { t } = useTranslation();
       return (
         <th className="px-4 py-2 border-b-2 border-gray-300 bg-blue-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-          {children}
+          {t(children)}
         </th>
       );
     }
@@ -323,15 +324,15 @@ import React, { useState, useEffect } from 'react';
                 <table className="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
                   <thead>
                     <tr>
-                      <TableHeader>{t('fullName')}</TableHeader>
-                      <TableHeader>{t('address')}</TableHeader>
-                      <TableHeader>{t('phone')}</TableHeader>
-                      <TableHeader>{t('email')}</TableHeader>
-                      <TableHeader>{t('driversLicense')}</TableHeader>
-                      <TableHeader>{t('policeRecord')}</TableHeader>
-                      <TableHeader>{t('criminalRecord')}</TableHeader>
-                      <TableHeader>{t('profilePhoto')}</TableHeader>
-                      <TableHeader>{t('actions')}</TableHeader>
+                      <TableHeader>{'fullName'}</TableHeader>
+                      <TableHeader>{'address'}</TableHeader>
+                      <TableHeader>{'phone'}</TableHeader>
+                      <TableHeader>{'email'}</TableHeader>
+                      <TableHeader>{'driversLicense'}</TableHeader>
+                      <TableHeader>{'policeRecord'}</TableHeader>
+                      <TableHeader>{'criminalRecord'}</TableHeader>
+                      <TableHeader>{'profilePhoto'}</TableHeader>
+                      <TableHeader>{'actions'}</TableHeader>
                     </tr>
                   </thead>
                   <tbody>

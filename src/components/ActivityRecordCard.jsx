@@ -1,421 +1,301 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase } from '../../supabaseClient';
-
-function ActivityRecordCard({ activity, isEditMode = false, onClose, onActivityUpdated }) {
-  const [drivers, setDrivers] = useState([]);
-  const [vehicles, setVehicles] = useState([]);
-  const [activityTypes] = useState([
-    'Maintenance',
-    'Repair',
-    'Cleaning',
-    'Flat tire',
-    'Inspection',
-    'Other'
-  ]);
-
-  // Form state
-  const [vehicleId, setVehicleId] = useState(activity?.vehicle_id || '');
-  const [driverId, setDriverId] = useState(activity?.driver_id || '');
-  const [activityType, setActivityType] = useState(activity?.activity_type || '');
-  const [description, setDescription] = useState(activity?.description || '');
-  const [date, setDate] = useState(activity?.date || new Date().toISOString().split('T')[0]);
-  const [attachments, setAttachments] = useState(activity?.attachments || []);
-  const [expandedImage, setExpandedImage] = useState(null);
-  const modalRef = useRef(null);
-
-  useEffect(() => {
-    fetchDrivers();
-    fetchVehicles();
-
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        setExpandedImage(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const fetchDrivers = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('drivers')
-        .select('*');
-      
-      if (error) throw error;
-      setDrivers(data || []);
-    } catch (error) {
-      console.error("Error fetching drivers:", error);
-    }
-  };
-
-  const fetchVehicles = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('vehicles')
-        .select('*');
-      
-      if (error) throw error;
-      setVehicles(data || []);
-    } catch (error) {
-      console.error("Error fetching vehicles:", error);
-    }
-  };
-
-  const handleAttachmentUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    const uploadPromises = files.map(async (file) => {
-      const fileName = `${Date.now()}-${file.name}`;
-      const { data, error } = await supabase.storage
-        .from('activity-attachments')
-        .upload(fileName, file);
-      
-      if (error) {
-        console.error("Error uploading file:", error);
-        return null;
-      }
-      
-      // Get the public URL for the uploaded file
-      const { data: publicUrlData } = supabase.storage
-        .from('activity-attachments')
-        .getPublicUrl(fileName);
-      
-      return publicUrlData.publicUrl;
-    });
+    import { supabase } from '../../supabaseClient';
+    import { useTranslation } from 'react-i18next';
     
-    const uploadedUrls = await Promise.all(uploadPromises);
-    const validUrls = uploadedUrls.filter((url) => url !== null);
+    function ActivityRecordCard({ activity, isEditMode = false, onClose, onActivityUpdated }) {
+      const [drivers, setDrivers] = useState([]);
+      const [vehicles, setVehicles] = useState([]);
+      const [activityTypes] = useState([
+        'Maintenance',
+        'Repair',
+        'Cleaning',
+        'Fuel',
+        'Inspection',
+        'Other'
+      ]);
     
-    // Update local state
-    const newAttachments = [...attachments, ...validUrls];
-    setAttachments(newAttachments);
+      // Form state
+      const [vehicleId, setVehicleId] = useState(activity?.vehicle_id || '');
+      const [driverId, setDriverId] = useState(activity?.driver_id || '');
+      const [activityType, setActivityType] = useState(activity?.activity_type || '');
+      const [description, setDescription] = useState(activity?.description || '');
+      const [date, setDate] = useState(activity?.date || new Date().toISOString().split('T')[0]);
+      const [attachments, setAttachments] = useState(activity?.attachments || []);
+      const [expandedImage, setExpandedImage] = useState(null);
+      const modalRef = useRef(null);
+      const { t } = useTranslation();
     
-    // If in edit mode, also update the activity in the database
-    if (isEditMode && activity?.id) {
-      const { error } = await supabase
-        .from('activities')
-        .update({ attachments: newAttachments })
-        .eq('id', activity.id);
-        
-      if (error) {
-        console.error("Error updating activity attachments:", error);
-      }
-    }
-  };
-
-  const handleImageClick = (url) => {
-    setExpandedImage(url);
-  };
-
-  const handleCloseExpandedImage = () => {
-    setExpandedImage(null);
-  };
-
-  const [showExpenseForm, setShowExpenseForm] = useState(false);
-  const [expenseAmount, setExpenseAmount] = useState('');
-  const [expenseStatus, setExpenseStatus] = useState('Pending');
-  const [expenseCategories] = useState([
-    'Maintenance',
-    'Repair',
-    'Fuel',
-    'Insurance',
-    'Registration',
-    'Tax',
-    'Other'
-  ]);
-  const [expenseCategory, setExpenseCategory] = useState('');
-
-  const handleSave = async () => {
-    try {
-      const updatedActivity = {
-        vehicle_id: vehicleId,
-        driver_id: driverId,
-        activity_type: activityType,
-        description: description,
-        date: date,
-        attachments: attachments.length > 0 ? attachments : null
-      };
-
-      console.log("Saving activity with attachments:", updatedActivity.attachments);
-
-      const { error } = await supabase
-        .from('activities')
-        .update(updatedActivity)
-        .eq('id', activity.id);
-
-      if (error) {
-        console.error('Error updating activity:', error);
-        alert(error.message);
-      } else {
-        alert('Activity updated successfully!');
-        if (onClose) onClose();
-        if (onActivityUpdated) onActivityUpdated();
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred while saving changes.');
-    }
-  };
-
-  const handleCreateExpense = async () => {
-    try {
-      if (!expenseAmount || !expenseCategory) {
-        alert('Please fill in all required expense fields');
-        return;
-      }
-      
-      const { data, error } = await supabase
-        .from('expenses')
-        .insert([
-          {
-            vehicle_id: vehicleId || activity.vehicle_id,
-            driver_id: driverId || activity.driver_id,
-            activity_id: activity.id,
-            amount: parseFloat(expenseAmount),
-            date: date || activity.date,
-            description: `Expense for ${activityType || activity.activity_type}: ${description || activity.description || ''}`,
-            status: expenseStatus,
-            category: expenseCategory || activityType || activity.activity_type || 'Other'
+      useEffect(() => {
+        fetchDrivers();
+        fetchVehicles();
+    
+        const handleClickOutside = (event) => {
+          if (modalRef.current && !modalRef.current.contains(event.target)) {
+            setExpandedImage(null);
           }
-        ])
-        .select();
-      
-      if (error) throw error;
-      
-      alert('Expense created successfully!');
-      setShowExpenseForm(false);
-      setExpenseAmount('');
-      setExpenseStatus('Pending');
-      setExpenseCategory('');
-    } catch (error) {
-      console.error('Error creating expense:', error);
-      alert(`Error creating expense: ${error.message}`);
-    }
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString();
-  };
-
-  return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">Activity Details</h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <p className="text-gray-800 mb-2">
-            <strong>Vehicle:</strong> 
-            {isEditMode ? (
-              <select
-                value={vehicleId}
-                onChange={(e) => setVehicleId(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-1"
-              >
-                <option value="">Select a Vehicle</option>
-                {vehicles.map((vehicle) => (
-                  <option key={vehicle.id} value={vehicle.id}>
-                    {vehicle.make} {vehicle.model} ({vehicle.license_plate})
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <span> {activity?.vehicles ? `${activity.vehicles.make} ${activity.vehicles.model} (${activity.vehicles.license_plate})` : 'N/A'}</span>
-            )}
-          </p>
+        };
+    
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+          document.removeEventListener('mousedown', handleClickOutside);
+        };
+      }, []);
+    
+      const fetchDrivers = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('drivers')
+            .select('*');
           
-          <p className="text-gray-800 mb-2">
-            <strong>Driver:</strong> 
-            {isEditMode ? (
-              <select
-                value={driverId}
-                onChange={(e) => setDriverId(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-1"
-              >
-                <option value="">Select a Driver</option>
-                {drivers.map((driver) => (
-                  <option key={driver.id} value={driver.id}>
-                    {driver.full_name}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <span> {activity?.drivers ? activity.drivers.full_name : 'N/A'}</span>
-            )}
-          </p>
+          if (error) throw error;
+          setDrivers(data || []);
+        } catch (error) {
+          console.error("Error fetching drivers:", error);
+        }
+      };
+    
+      const fetchVehicles = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('vehicles')
+            .select('*');
           
-          <p className="text-gray-800 mb-2">
-            <strong>Activity Type:</strong> 
-            {isEditMode ? (
-              <select
-                value={activityType}
-                onChange={(e) => setActivityType(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-1"
-              >
-                <option value="">Select Activity Type</option>
-                {activityTypes.map((type) => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            ) : (
-              <span> {activity?.activity_type || 'N/A'}</span>
-            )}
-          </p>
+          if (error) throw error;
+          setVehicles(data || []);
+        } catch (error) {
+          console.error("Error fetching vehicles:", error);
+        }
+      };
+    
+      const handleAttachmentUpload = async (e) => {
+        const files = Array.from(e.target.files);
+        const uploadPromises = files.map(async (file) => {
+          const fileName = `${Date.now()}-${file.name}`;
+          const { data, error } = await supabase.storage
+            .from('activity-attachments')
+            .upload(fileName, file);
           
-          <p className="text-gray-800 mb-2">
-            <strong>Date:</strong> 
-            {isEditMode ? (
+          if (error) {
+            console.error("Error uploading file:", error);
+            return null;
+          }
+          
+          // Get the public URL for the uploaded file
+          const { data: publicUrlData } = supabase.storage
+            .from('activity-attachments')
+            .getPublicUrl(fileName);
+          
+          return publicUrlData.publicUrl;
+        });
+        
+        const uploadedUrls = await Promise.all(uploadPromises);
+        const validUrls = uploadedUrls.filter((url) => url !== null);
+        
+        // Update local state
+        const newAttachments = [...attachments, ...validUrls];
+        setAttachments(newAttachments);
+        
+        // If in edit mode, also update the activity in the database
+        if (isEditMode && activity?.id) {
+          const { error } = await supabase
+            .from('activities')
+            .update({ attachments: newAttachments })
+            .eq('id', activity.id);
+            
+          if (error) {
+            console.error("Error updating activity attachments:", error);
+          }
+        }
+      };
+    
+      const handleImageClick = (url) => {
+        setExpandedImage(url);
+      };
+    
+      const handleCloseExpandedImage = () => {
+        setExpandedImage(null);
+      };
+    
+      const handleSave = async () => {
+        try {
+          const updatedActivity = {
+            vehicle_id: vehicleId,
+            driver_id: driverId,
+            activity_type: activityType,
+            description: description,
+            date: date,
+            attachments: attachments.length > 0 ? attachments : null
+          };
+    
+          console.log("Saving activity with attachments:", updatedActivity.attachments);
+    
+          const { error } = await supabase
+            .from('activities')
+            .update(updatedActivity)
+            .eq('id', activity.id);
+    
+          if (error) {
+            console.error('Error updating activity:', error);
+            alert(error.message);
+          } else {
+            alert(t('activityUpdatedSuccessfully'));
+            if (onClose) onClose();
+            if (onActivityUpdated) onActivityUpdated();
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('An error occurred while saving changes.');
+        }
+      };
+    
+      const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleDateString();
+      };
+    
+      return (
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">{t('activityDetails')}</h2>
+    
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-gray-800 mb-2">
+                <strong>{t('vehicle')}:</strong> 
+                {isEditMode ? (
+                  <select
+                    value={vehicleId}
+                    onChange={(e) => setVehicleId(e.target.value)}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-1"
+                  >
+                    <option value="">{t('selectAVehicle')}</option>
+                    {vehicles.map((vehicle) => (
+                      <option key={vehicle.id} value={vehicle.id}>
+                        {vehicle.make} {vehicle.model} ({vehicle.license_plate})
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <span> {activity?.vehicles ? `${activity.vehicles.make} ${activity.vehicles.model} (${activity.vehicles.license_plate})` : 'N/A'}</span>
+                )}
+              </p>
+              
+              <p className="text-gray-800 mb-2">
+                <strong>{t('driver')}:</strong> 
+                {isEditMode ? (
+                  <select
+                    value={driverId}
+                    onChange={(e) => setDriverId(e.target.value)}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-1"
+                  >
+                    <option value="">{t('selectADriver')}</option>
+                    {drivers.map((driver) => (
+                      <option key={driver.id} value={driver.id}>
+                        {driver.full_name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <span> {activity?.drivers ? activity.drivers.full_name : 'N/A'}</span>
+                )}
+              </p>
+              
+              <p className="text-gray-800 mb-2">
+                <strong>{t('activityType')}:</strong> 
+                {isEditMode ? (
+                  <select
+                    value={activityType}
+                    onChange={(e) => setActivityType(e.target.value)}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-1"
+                  >
+                    <option value="">{t('selectActivityType')}</option>
+                    {activityTypes.map((type) => (
+                      <option key={type} value={type}>{t(type.toLowerCase())}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <span> {t(activity?.activity_type?.toLowerCase() || 'other') || 'N/A'}</span>
+                )}
+              </p>
+              
+              <p className="text-gray-800 mb-2">
+                <strong>{t('date')}:</strong> 
+                <span> {formatDate(activity?.date)}</span>
+              </p>
+              
+              <p className="text-gray-800 mb-2">
+                <strong>{t('description')}:</strong> 
+                {isEditMode ? (
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-1"
+                    rows="3"
+                    placeholder={t('enterDescription')}
+                  ></textarea>
+                ) : (
+                  <span> {activity?.description || 'N/A'}</span>
+                )}
+              </p>
+            </div>
+          </div>
+    
+          <hr className="my-6 border-gray-300" />
+    
+          <h3 className="text-xl font-semibold mt-4 mb-2 text-gray-900">{t('attachments')}</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {attachments && attachments.map((url, index) => (
+              <div key={index}>
+                <img
+                  src={url}
+                  alt={`Attachment ${index + 1}`}
+                  className="object-cover w-32 h-32 rounded-md shadow-md cursor-pointer"
+                  onClick={() => handleImageClick(url)}
+                />
+              </div>
+            ))}
+          </div>
+    
+          {isEditMode && (
+            <div className="mt-4">
+              <label htmlFor="attachments" className="block text-gray-700 text-sm font-bold mb-2">
+                {t('uploadAttachments')}
+              </label>
               <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-1"
+                type="file"
+                id="attachments"
+                accept="image/*"
+                multiple
+                onChange={handleAttachmentUpload}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
               />
-            ) : (
-              <span> {formatDate(activity?.date)}</span>
-            )}
-          </p>
+            </div>
+          )}
+    
+          {isEditMode && (
+            <div className="mt-6 flex justify-end">
+              <button 
+                onClick={handleSave}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all"
+              >
+                {t('saveChanges')}
+              </button>
+            </div>
+          )}
           
-          <p className="text-gray-800 mb-2">
-            <strong>Description:</strong> 
-            {isEditMode ? (
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-1"
-                rows="3"
-              ></textarea>
-            ) : (
-              <span> {activity?.description || 'N/A'}</span>
-            )}
-          </p>
+          {expandedImage && (
+            <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-75 z-50" onClick={handleCloseExpandedImage}>
+              <div className="relative" ref={modalRef} onClick={(e) => e.stopPropagation()}>
+                <img src={expandedImage} alt="Expanded" className="max-w-4xl max-h-4xl rounded-lg" style={{ maxWidth: '80vw', maxHeight: '80vh' }} />
+                <button onClick={handleCloseExpandedImage} className="absolute top-4 right-4 bg-gray-700 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
-
-      <hr className="my-6 border-gray-300" />
-
-      <h3 className="text-xl font-semibold mt-4 mb-2 text-gray-900">Attachments</h3>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {attachments && attachments.map((url, index) => (
-          <div key={index}>
-            <img
-              src={url}
-              alt={`Attachment ${index + 1}`}
-              className="object-cover w-32 h-32 rounded-md shadow-md cursor-pointer"
-              onClick={() => handleImageClick(url)}
-            />
-          </div>
-        ))}
-      </div>
-
-      {isEditMode && (
-        <div className="mt-4">
-          <label htmlFor="attachments" className="block text-gray-700 text-sm font-bold mb-2">
-            Upload Attachments
-          </label>
-          <input
-            type="file"
-            id="attachments"
-            accept="image/*"
-            multiple
-            onChange={handleAttachmentUpload}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
-          />
-        </div>
-      )}
-
-      {isEditMode && (
-        <div className="mt-6 flex justify-between">
-          <button 
-            onClick={() => setShowExpenseForm(!showExpenseForm)}
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-200 transition-all"
-          >
-            {showExpenseForm ? 'Cancel Expense' : 'Create Expense'}
-          </button>
-          <button 
-            onClick={handleSave}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all"
-          >
-            Save Changes
-          </button>
-        </div>
-      )}
-
-      {showExpenseForm && (
-        <div className="mt-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">Create Expense for this Activity</h3>
-          
-          <div className="mb-4">
-            <label htmlFor="expense-category" className="block text-gray-700 text-sm font-bold mb-2">Expense Category</label>
-            <select
-              id="expense-category"
-              value={expenseCategory}
-              onChange={(e) => setExpenseCategory(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            >
-              <option value="">Select Category</option>
-              {expenseCategories.map((category) => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-          </div>
-          
-          <div className="mb-4">
-            <label htmlFor="expense-amount" className="block text-gray-700 text-sm font-bold mb-2">Amount</label>
-            <input
-              type="number"
-              id="expense-amount"
-              value={expenseAmount}
-              onChange={(e) => setExpenseAmount(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              min="0"
-              step="0.01"
-              required
-              placeholder="Enter expense amount"
-            />
-          </div>
-          
-          <div className="mb-4">
-            <label htmlFor="expense-status" className="block text-gray-700 text-sm font-bold mb-2">Status</label>
-            <select
-              id="expense-status"
-              value={expenseStatus}
-              onChange={(e) => setExpenseStatus(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            >
-              <option value="Pending">Pending</option>
-              <option value="Paid">Paid</option>
-              <option value="Canceled">Canceled</option>
-            </select>
-          </div>
-          
-          <button
-            onClick={handleCreateExpense}
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            Create Expense
-          </button>
-        </div>
-      )}
-      
-      {expandedImage && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-75 z-50" onClick={handleCloseExpandedImage}>
-          <div className="relative" ref={modalRef} onClick={(e) => e.stopPropagation()}>
-            <img src={expandedImage} alt="Expanded" className="max-w-4xl max-h-4xl rounded-lg" style={{ maxWidth: '80vw', maxHeight: '80vh' }} />
-            <button onClick={handleCloseExpandedImage} className="absolute top-4 right-4 bg-gray-700 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-600">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default ActivityRecordCard;
+      );
+    }
+    
+    export default ActivityRecordCard;
