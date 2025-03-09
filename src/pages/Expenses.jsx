@@ -5,9 +5,10 @@ import React, { useState, useEffect } from 'react';
     
     // Reusable Table Header Component
     function TableHeader({ children }) {
+      const { t } = useTranslation();
       return (
         <th className="px-4 py-2 border-b-2 border-gray-300 bg-blue-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-          {children}
+          {t(children)}
         </th>
       );
     }
@@ -320,27 +321,32 @@ import React, { useState, useEffect } from 'react';
         <>
           <div className="page">
             <div className="max-w-5xl mx-auto mt-8">
-              <div className="flex justify-end items-center mb-4">
+              <div className="flex justify-end items-center mb-6">
                 <button
                   onClick={() => setShowAddForm(true)}
                   className="text-white font-bold py-2 px-4 rounded"
                 >
-                  <img src="https://ticghrxzdsdoaiwvahht.supabase.co/storage/v1/object/public/assets/Navigation/plus.png" alt={t('addExpense')} style={{ width: '20px', height: '20px' }} />
+                  <img 
+                    src="https://ticghrxzdsdoaiwvahht.supabase.co/storage/v1/object/public/assets/Navigation/plus.png" 
+                    alt={t('addExpense')} 
+                    className="w-6 h-6"
+                  />
                 </button>
               </div>
-              <div className="bg-white shadow-md rounded-lg p-4 overflow-x-auto">
-                <table className="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
+    
+              <div className="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative">
+                <table className="border-collapse table-auto w-full whitespace-nowrap bg-white table-striped relative">
                   <thead>
                     <tr>
-                      <TableHeader>{t('date')}</TableHeader>
-                      <TableHeader>{t('vehicle')}</TableHeader>
-                      <TableHeader>{t('driver')}</TableHeader>
-                      <TableHeader>{t('category')}</TableHeader>
-                      <TableHeader>{t('amount')}</TableHeader>
-                      <TableHeader>{t('description')}</TableHeader>
-                      <TableHeader>{t('relatedActivity')}</TableHeader>
-                      <TableHeader>{t('status')}</TableHeader>
-                      <TableHeader>{t('actions')}</TableHeader>
+                      <TableHeader>{'date'}</TableHeader>
+                      <TableHeader>{'vehicle'}</TableHeader>
+                      <TableHeader>{'driver'}</TableHeader>
+                      <TableHeader>{'category'}</TableHeader>
+                      <TableHeader>{'amount'}</TableHeader>
+                      <TableHeader>{'description'}</TableHeader>
+                      <TableHeader>{'relatedActivity'}</TableHeader>
+                      <TableHeader>{'status'}</TableHeader>
+                      <TableHeader>{'actions'}</TableHeader>
                     </tr>
                   </thead>
                   <tbody>
@@ -398,23 +404,26 @@ import React, { useState, useEffect } from 'react';
                   </tbody>
                 </table>
               </div>
+    
               <Modal isOpen={showAddForm} onClose={handleCloseModal}>
                 <h2 className="text-2xl font-semibold mb-4">{t('addNewExpense')}</h2>
-                <label htmlFor="activity_id" className="block text-gray-700 text-sm font-bold mb-2">{t('relatedActivity')} (Optional)</label>
-                <select
-                  id="activity_id"
-                  name="activity_id"
-                  value={newExpense.activity_id}
-                  onChange={handleInputChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                >
-                  <option value="">{t('selectActivity')}</option>
-                  {activities.map((activity) => (
-                    <option key={activity.id} value={activity.id}>
-                      {activity.activity_type} - {activity.vehicles ? `${activity.vehicles.make} ${activity.vehicles.model}` : 'Unknown Vehicle'} ({formatDate(activity.date)})
-                    </option>
-                  ))}
-                </select>
+                <div className="mb-4">
+                  <label htmlFor="activity_id" className="block text-gray-700 text-sm font-bold mb-2">{t('relatedActivity')} (Optional)</label>
+                  <select
+                    id="activity_id"
+                    name="activity_id"
+                    value={newExpense.activity_id}
+                    onChange={handleInputChange}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  >
+                    <option value="">{t('selectActivity')}</option>
+                    {activities.map((activity) => (
+                      <option key={activity.id} value={activity.id}>
+                        {activity.activity_type} - {activity.vehicles ? `${activity.vehicles.make} ${activity.vehicles.model}` : 'Unknown Vehicle'} ({formatDate(activity.date)})
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <div className="mb-4">
                   <label htmlFor="vehicle_id" className="block text-gray-700 text-sm font-bold mb-2">{t('vehicle')}</label>
                   <select
@@ -478,6 +487,7 @@ import React, { useState, useEffect } from 'react';
                     min="0"
                     step="0.01"
                     required
+                    placeholder={t('enterExpenseAmount')}
                   />
                 </div>
                 <div className="mb-4">
@@ -611,6 +621,7 @@ import React, { useState, useEffect } from 'react';
                     min="0"
                     step="0.01"
                     required
+                    placeholder={t('enterExpenseAmount')}
                   />
                 </div>
                 <div className="mb-4">
@@ -663,7 +674,7 @@ import React, { useState, useEffect } from 'react';
         </div>
       </div>
     </>
-  )
-}
-
-export default Expenses
+      )
+    }
+    
+    export default Expenses

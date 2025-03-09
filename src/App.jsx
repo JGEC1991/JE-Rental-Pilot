@@ -21,7 +21,7 @@ import React, { useState, useEffect } from 'react';
       const [session, setSession] = useState(null);
       const [loading, setLoading] = useState(true);
       const location = useLocation();
-      const { t, i18n } = useTranslation();
+      const { t } = useTranslation();
     
       useEffect(() => {
         const fetchSession = async () => {
@@ -151,22 +151,20 @@ import React, { useState, useEffect } from 'react';
           )}
     
           {/* Main Content */}
-          <div className="flex-1 overflow-y-auto p-8">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/profile" element={session ? <Profile /> : <Navigate to="/login" />} />
-              <Route path="/vehicles" element={session ? <Vehicles /> : <Navigate to="/login" />} />
-              <Route path="/drivers" element={session ? <Drivers /> : <Navigate to="/login" />} />
-              <Route path="/activities" element={session ? <Activities /> : <Navigate to="/login" />} />
-              <Route path="/revenue" element={session ? <Revenue /> : <Navigate to="/login" />} />
-              <Route path="/expenses" element={session ? <Expenses /> : <Navigate to="/login" />} />
-              <Route path="/dashboard" element={session ? <Dashboard /> : <Navigate to="/login" />} />
-              <Route path="/settings" element={session ? <Settings /> : <Navigate to="/login" />} />
-              <Route path="/admin" element={session ? <Admin /> : <Navigate to="/login" />} />
-            </Routes>
-          </div>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/profile" element={session ? <Profile /> : <Navigate to="/login" />} />
+            <Route path="/vehicles" element={session ? <Vehicles /> : <Navigate to="/login" />} />
+            <Route path="/drivers" element={session ? <Drivers /> : <Navigate to="/login" />} />
+            <Route path="/activities" element={session ? <Activities /> : <Navigate to="/login" />} />
+            <Route path="/revenue" element={session ? <Revenue /> : <Navigate to="/login" />} />
+            <Route path="/expenses" element={session ? <Expenses /> : <Navigate to="/login" />} />
+            <Route path="/dashboard" element={session ? <Dashboard /> : <Navigate to="/login" />} />
+            <Route path="/settings" element={session ? <Settings /> : <Navigate to="/login" />} />
+            <Route path="/admin" element={session ? <Admin /> : <Navigate to="/login" />} />
+          </Routes>
         </div>
       );
     }

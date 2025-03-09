@@ -375,11 +375,11 @@ import React, { useState, useEffect } from 'react';
               <Modal isOpen={showAddForm} onClose={handleCloseModal}>
                 <h2 className="text-2xl font-semibold mb-4">{t('addNewDriver')}</h2>
                 <label htmlFor="full_name" className="block text-gray-700 text-sm font-bold mb-2">{t('fullName')}</label>
-                <input type="text" id="full_name" name="full_name" value={newDriver.full_name} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+                <input type="text" id="full_name" name="full_name" value={newDriver.full_name} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterFullName')}/>
                 <label htmlFor="address" className="block text-gray-700 text-sm font-bold mb-2">{t('address')}</label>
-                <input type="text" id="address" name="address" value={newDriver.address} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+                <input type="text" id="address" name="address" value={newDriver.address} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterAddress')}/>
                 <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2">{t('phone')}</label>
-                <input type="text" id="phone" name="phone" value={newDriver.phone} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
+                <input type="text" id="phone" name="phone" value={newDriver.phone} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterPhone')}/>
                 <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">{t('email')}</label>
                 <input
                   type="email"
@@ -388,6 +388,7 @@ import React, { useState, useEffect } from 'react';
                   value={newDriver.email}
                   onChange={handleInputChange}
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"
+                  placeholder={t('enterEmail')}
                 />
                 <label htmlFor="drivers_license_photo" className="block text-gray-700 text-sm font-bold mb-2">{t('driversLicensePhoto')}</label>
                 <input type="file" id="drivers_license_photo" name="drivers_license_photo" accept="image/*" onChange={handleDriversLicenseUpload} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />

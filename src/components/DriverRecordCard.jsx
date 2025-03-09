@@ -234,7 +234,7 @@ import React, { useState, useRef, useEffect } from 'react'
                     <div className="absolute top-0 right-0 p-1 flex flex-col items-end">
                       <button onClick={() => handleDownloadImage(driver.drivers_license_photo)} className="text-white bg-gray-600 rounded-full w-6 h-6 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 0 005.25 21h13.5A2.25 0 0021 18.75v-2.25m-9-5.25v7.5m3-3 3-3M5.25 7.5h13.5" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75v-2.25m-9-5.25v7.5m3-3 3-3M5.25 7.5h13.5" />
                         </svg>
                       </button>
                     </div>

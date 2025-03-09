@@ -6,9 +6,10 @@ import React, { useState, useEffect } from 'react';
     
     // Reusable Table Header Component
     function TableHeader({ children }) {
+      const { t } = useTranslation();
       return (
         <th className="px-4 py-2 border-b-2 border-gray-300 bg-blue-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-          {children}
+          {t(children)}
         </th>
       );
     }
@@ -32,12 +33,14 @@ import React, { useState, useEffect } from 'react';
       const [showActivityDetails, setShowActivityDetails] = useState(false);
       const [showEditModal, setShowEditModal] = useState(false);
       const [activityTypes] = useState([
+        'Carwash',
+        'Check engine',
+        'Flat tire',
         'Maintenance',
-        'Repair',
-        'Cleaning',
-        'Fuel',
-        'Inspection',
-        'Other'
+        'Other',
+        'Physical inspection',
+        'Suspension',
+        'Tow'
       ]);
       
       const [newActivity, setNewActivity] = useState({
@@ -227,13 +230,17 @@ import React, { useState, useEffect } from 'react';
         'Tow'
       ];
     
+      const handleAddClick = () => {
+        setShowAddForm(true);
+      };
+    
       return (
         <>
           <div className="page">
             <div className="max-w-5xl mx-auto mt-8">
               <div className="flex justify-end items-center mb-4">
                 <button
-                  onClick={() => setShowAddForm(true)}
+                  onClick={handleAddClick}
                   className="text-white font-bold py-2 px-4 rounded"
                 >
                   <img src="https://ticghrxzdsdoaiwvahht.supabase.co/storage/v1/object/public/assets/Navigation/plus.png" alt={t('addActivity')} style={{ width: '20px', height: '20px' }} />
@@ -243,12 +250,12 @@ import React, { useState, useEffect } from 'react';
                 <table className="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
                   <thead>
                     <tr>
-                      <TableHeader>{t('vehicle')}</TableHeader>
-                      <TableHeader>{t('driver')}</TableHeader>
-                      <TableHeader>{t('activityType')}</TableHeader>
-                      <TableHeader>{t('description')}</TableHeader>
-                      <TableHeader>{t('attachments')}</TableHeader>
-                      <TableHeader>{t('actions')}</TableHeader>
+                      <TableHeader>{'vehicle'}</TableHeader>
+                      <TableHeader>{'driver'}</TableHeader>
+                      <TableHeader>{'activityType'}</TableHeader>
+                      <TableHeader>{'description'}</TableHeader>
+                      <TableHeader>{'attachments'}</TableHeader>
+                      <TableHeader>{'actions'}</TableHeader>
                     </tr>
                   </thead>
                   <tbody>
@@ -272,13 +279,6 @@ import React, { useState, useEffect } from 'react';
                         </TableData>
                       </tr>
                     ))}
-                    {activities.length === 0 && (
-                      <tr>
-                        <td colSpan="7" className="px-4 py-3 text-center text-gray-500">
-                          {t('noActivitiesFound')}
-                        </td>
-                      </tr>
-                    )}
                   </tbody>
                 </table>
               </div>
