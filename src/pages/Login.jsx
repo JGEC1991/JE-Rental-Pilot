@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '../../supabaseClient';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -29,6 +30,11 @@ function Login() {
       console.error('Login error:', error.message);
       alert(error.message);
     }
+  };
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+    localStorage.setItem('i18nextLng', lng);
   };
 
   return (
@@ -88,6 +94,16 @@ function Login() {
             </button>
           </div>
         </form>
+        <div className="flex justify-center mt-4">
+          <select
+            value={i18n.language}
+            onChange={(e) => changeLanguage(e.target.value)}
+            className="bg-gray-100 text-gray-700 rounded-md py-2 px-4 focus:outline-none"
+          >
+            <option value="en">English</option>
+            <option value="es">Español</option>
+          </select>
+        </div>
       </div>
 
       {/* Welcome Section */}
