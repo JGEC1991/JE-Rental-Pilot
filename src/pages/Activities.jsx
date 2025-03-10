@@ -55,6 +55,21 @@ function Activities() {
   const [createExpense, setCreateExpense] = useState(false);
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseStatus, setExpenseStatus] = useState('Pending');
+
+  // New state variables for expense details
+  const [expenseCategory, setExpenseCategory] = useState('');
+  const [expenseDescription, setExpenseDescription] = useState('');
+
+  const [expenseCategories] = useState([
+    'Maintenance',
+    'Repair',
+    'Fuel',
+    'Insurance',
+    'Registration',
+    'Tax',
+    'Other'
+  ]);
+
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -112,6 +127,20 @@ function Activities() {
       ...prev,
       [name]: value
     }));
+
+    // Auto-fill vehicle and driver if activity is selected
+    if (name === 'activity_id' && value) {
+      const selectedActivity = activities.find(activity => activity.id.toString() === value);
+      if (selectedActivity) {
+        setNewActivity(prev => ({
+          ...prev,
+          vehicle_id: selectedActivity.vehicle_id,
+          driver_id: selectedActivity.driver_id,
+        }));
+        setExpenseCategory(selectedActivity.activity_type || '');
+        setExpenseDescription(`Expense for ${selectedActivity.activity_type}: ${selectedActivity.description || ''}`);
+      }
+    }
   };
 
   const handleAddActivity = async () => {
@@ -146,9 +175,9 @@ function Activities() {
               activity_id: activityData.id,
               amount: parseFloat(expenseAmount),
               date: newActivity.date,
-              description: `Expense for ${newActivity.activity_type}: ${newActivity.description || ''}`,
+              description: expenseDescription,
               status: expenseStatus,
-              category: newActivity.activity_type || 'Other'
+              category: expenseCategory
             }
           ]);
 
@@ -177,6 +206,8 @@ function Activities() {
       setCreateExpense(false);
       setExpenseAmount('');
       setExpenseStatus('Pending');
+      setExpenseCategory('');
+      setExpenseDescription('');
       setShowAddForm(false);
       fetchActivities();
     } catch (error) {
@@ -350,6 +381,24 @@ function Activities() {
               <>
                 <label htmlFor="expenseAmount" className="block text-gray-700 text-sm font-bold mb-2">{t('expenseAmount')}</label>
                 <input type="number" id="expenseAmount" name="expenseAmount" value={expenseAmount} onChange={(e) => setExpenseAmount(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterExpenseAmount')} />
+
+                <label htmlFor="expenseCategory" className="block text-gray-700 text-sm font-bold mb-2">{t('expenseCategory')}</label>
+                <select
+                  id="expenseCategory"
+                  name="expenseCategory"
+                  value={expenseCategory}
+                  onChange={(e) => setExpenseCategory(e.target.value)}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"
+                  required
+                >
+                  <option value="">{t('selectCategory')}</option>
+                  {expenseCategories.map((category) => (
+                    <option key={category} value={category}>{t(category.toLowerCase())}</option>
+                  ))}
+                </select>
+
+                <label htmlFor="expenseDescription" className="block text-gray-700 text-sm font-bold mb-2">{t('description')}</label>
+                <textarea id="expenseDescription" name="expenseDescription" value={expenseDescription} onChange={(e) => setExpenseDescription(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
                 
                 <label htmlFor="expenseStatus" className="block text-gray-700 text-sm font-bold mb-2">{t('expenseStatus')}</label>
                 <select id="expenseStatus" name="expenseStatus" value={expenseStatus} onChange={(e) => setExpenseStatus(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
