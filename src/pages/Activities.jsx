@@ -154,7 +154,8 @@ function Activities() {
 
         if (expenseError) {
           console.error("Error adding expense:", expenseError);
-          alert(`Error adding expense: ${expenseError.message}`);
+          console.log("Expense Error Object:", expenseError); // Inspect the error object
+          alert(`Error adding expense: ${expenseError?.message || 'Unknown error'}`);
         } else {
           console.log("Expense added successfully!");
           alert(t('activityAndExpenseAddedSuccessfully'));
@@ -354,6 +355,8 @@ function Activities() {
                 <select id="expenseStatus" name="expenseStatus" value={expenseStatus} onChange={(e) => setExpenseStatus(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
                   <option value="Pending">{t('pending')}</option>
                   <option value="Paid">{t('paid')}</option>
+                  <option value="Past Due">{t('pastDue')}</option>
+                  <option value="Incomplete">{t('incomplete')}</option>
                   <option value="Canceled">{t('canceled')}</option>
                 </select>
               </>
