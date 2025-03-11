@@ -55,21 +55,6 @@ function Activities() {
   const [createExpense, setCreateExpense] = useState(false);
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseStatus, setExpenseStatus] = useState('Pending');
-
-  // New state variables for expense details
-  const [expenseCategory, setExpenseCategory] = useState('');
-  const [expenseDescription, setExpenseDescription] = useState('');
-
-  const [expenseCategories] = useState([
-    'Maintenance',
-    'Repair',
-    'Fuel',
-    'Insurance',
-    'Registration',
-    'Tax',
-    'Other'
-  ]);
-
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -127,20 +112,6 @@ function Activities() {
       ...prev,
       [name]: value
     }));
-
-    // Auto-fill vehicle and driver if activity is selected
-    if (name === 'activity_id' && value) {
-      const selectedActivity = activities.find(activity => activity.id.toString() === value);
-      if (selectedActivity) {
-        setNewActivity(prev => ({
-          ...prev,
-          vehicle_id: selectedActivity.vehicle_id,
-          driver_id: selectedActivity.driver_id,
-        }));
-        setExpenseCategory(selectedActivity.activity_type || '');
-        setExpenseDescription(`Expense for ${selectedActivity.activity_type}: ${selectedActivity.description || ''}`);
-      }
-    }
   };
 
   const handleAddActivity = async () => {
@@ -175,9 +146,9 @@ function Activities() {
               activity_id: activityData.id,
               amount: parseFloat(expenseAmount),
               date: newActivity.date,
-              description: expenseDescription,
+              description: `Expense for ${newActivity.activity_type}: ${newActivity.description || ''}`,
               status: expenseStatus,
-              category: expenseCategory
+              category: newActivity.activity_type || 'Other'
             }
           ]);
 
@@ -206,8 +177,6 @@ function Activities() {
       setCreateExpense(false);
       setExpenseAmount('');
       setExpenseStatus('Pending');
-      setExpenseCategory('');
-      setExpenseDescription('');
       setShowAddForm(false);
       fetchActivities();
     } catch (error) {
