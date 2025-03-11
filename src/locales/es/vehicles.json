@@ -1,0 +1,23 @@
+{
+  "make": "Marca",
+  "model": "Modelo",
+  "year": "Año",
+  "licensePlate": "Matrícula",
+  "vin": "VIN",
+  "mileage": "Kilometraje",
+  "status": "Estado",
+  "observations": "Observaciones",
+  "actions": "Acciones",
+  "addNewVehicle": "Agregar nuevo vehículo",
+  "selectVehicle": "Seleccionar vehículo",
+  "enterMake": "Ingresar marca",
+  "enterModel": "Ingresar modelo",
+  "enterColor": "Ingresar color",
+  "enterYear": "Ingresar año",
+  "enterLicensePlate": "Ingresar matrícula",
+  "enterVIN": "Ingresar VIN",
+  "enterMileage": "Ingresar kilometraje",
+  "selectStatus": "Seleccionar estado",
+  "enterObservations": "Ingresar observaciones",
+  "confirmDeleteVehicle": "¿Está seguro de que desea eliminar este vehículo?"
+}

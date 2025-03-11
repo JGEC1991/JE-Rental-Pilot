@@ -3,13 +3,14 @@ import { supabase } from '../../supabaseClient';
 import Modal from '../components/Modal';
 import VehicleRecordCard from '../components/VehicleRecordCard';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 // Reusable Table Header Component
 function TableHeader({ children }) {
   const { t } = useTranslation();
   return (
     <th className="px-4 py-2 border-b-2 border-gray-300 bg-blue-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-      {t(children)}
+      {t(children, { ns: 'vehicles' })}
     </th>
   );
 }
@@ -39,7 +40,7 @@ function Vehicles() {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [showVehicleDetails, setShowVehicleDetails] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const { t } = useTranslation();
+  const { t } = useTranslation(['vehicles', 'translation']);
 
   useEffect(() => {
     fetchVehicles();
@@ -79,7 +80,7 @@ function Vehicles() {
         alert(error.message);
       } else {
         console.log('Vehicle added:', data);
-        alert(t('vehicleAddedSuccessfully'));
+        alert(t('vehicleAddedSuccessfully', { ns: 'translation' }));
         fetchVehicles();
         setNewVehicle({
           make: '',
@@ -138,7 +139,7 @@ function Vehicles() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm(t('confirmDeleteVehicle'))) {
+    if (window.confirm(t('confirmDeleteVehicle', { ns: 'translation' }))) {
       try {
         const { data, error } = await supabase
           .from('vehicles')
@@ -169,7 +170,7 @@ function Vehicles() {
               onClick={handleAddClick}
               className="text-white font-bold py-2 px-4 rounded"
             >
-              <img src="https://ticghrxzdsdoaiwvahht.supabase.co/storage/v1/object/public/assets/Navigation/plus.png" alt={t('addVehicle')} style={{ width: '20px', height: '20px' }} />
+              <img src="https://ticghrxzdsdoaiwvahht.supabase.co/storage/v1/object/public/assets/Navigation/plus.png" alt={t('addVehicle', { ns: 'vehicles' })} style={{ width: '20px', height: '20px' }} />
             </button>
           </div>
           <div className="bg-white shadow-md rounded-lg p-4 overflow-x-auto"> {/* Added box with background, shadow, rounded corners, and padding */}
@@ -199,9 +200,9 @@ function Vehicles() {
                     <TableData>{vehicle.status}</TableData>
                     <TableData>{vehicle.observations}</TableData>
                     <TableData>
-                      <button onClick={() => handleEditClick(vehicle)} className="text-blue-500 hover:text-blue-700 mr-2">{t('edit')}</button>
-                      <button onClick={() => handleDelete(vehicle.id)} className="text-red-500 hover:text-red-700">{t('delete')}</button>
-                      <button onClick={() => handleViewDetails(vehicle.id)} className="text-blue-500 hover:text-blue-700">{t('viewDetails')}</button>
+                      <button onClick={() => handleEditClick(vehicle)} className="text-blue-500 hover:text-blue-700 mr-2">{t('edit', { ns: 'translation' })}</button>
+                      <button onClick={() => handleDelete(vehicle.id)} className="text-red-500 hover:text-red-700">{t('delete', { ns: 'translation' })}</button>
+                      <button onClick={() => handleViewDetails(vehicle.id)} className="text-blue-500 hover:text-blue-700">{t('viewDetails', { ns: 'translation' })}</button>
                     </TableData>
                   </tr>
                 ))}
@@ -209,28 +210,28 @@ function Vehicles() {
             </table>
           </div>
           <Modal isOpen={showAddForm} onClose={handleCloseModal}>
-            <h2 className="text-2xl font-semibold mb-4">{t('addNewVehicle')}</h2>
-            <label htmlFor="make" className="block text-gray-700 text-sm font-bold mb-2">{t('make')}</label>
-            <input type="text" id="make" name="make" value={newVehicle.make} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterMake')}/>
-            <label htmlFor="model" className="block text-gray-700 text-sm font-bold mb-2">{t('model')}</label>
-            <input type="text" id="model" name="model" value={newVehicle.model} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterModel')}/>
-            <label htmlFor="year" className="block text-gray-700 text-sm font-bold mb-2">{t('year')}</label>
-            <input type="number" id="year" name="year" value={newVehicle.year} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterYear')}/>
-            <label htmlFor="license_plate" className="block text-gray-700 text-sm font-bold mb-2">{t('licensePlate')}</label>
-            <input type="text" id="license_plate" name="license_plate" value={newVehicle.license_plate} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterLicensePlate')}/>
-            <label htmlFor="vin" className="block text-gray-700 text-sm font-bold mb-2">{t('vin')}</label>
-            <input type="text" id="vin" name="vin" value={newVehicle.vin} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterVIN')}/>
-            <label htmlFor="mileage" className="block text-gray-700 text-sm font-bold mb-2">{t('mileage')}</label>
-            <input type="number" id="mileage" name="mileage" value={newVehicle.mileage} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterMileage')}/>
-            <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">{t('status')}</label>
-            <input type="text" id="status" name="status" value={newVehicle.status} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('selectStatus')}/>
-            <label htmlFor="observations" className="block text-gray-700 text-sm font-bold mb-2">{t('observations')}</label>
-            <textarea id="observations" name="observations" value={newVehicle.observations} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterObservations')}/>
+            <h2 className="text-2xl font-semibold mb-4">{t('addNewVehicle', { ns: 'vehicles' })}</h2>
+            <label htmlFor="make" className="block text-gray-700 text-sm font-bold mb-2">{t('make', { ns: 'vehicles' })}</label>
+            <input type="text" id="make" name="make" value={newVehicle.make} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterMake', { ns: 'vehicles' })}/>
+            <label htmlFor="model" className="block text-gray-700 text-sm font-bold mb-2">{t('model', { ns: 'vehicles' })}</label>
+            <input type="text" id="model" name="model" value={newVehicle.model} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterModel', { ns: 'vehicles' })}/>
+            <label htmlFor="year" className="block text-gray-700 text-sm font-bold mb-2">{t('year', { ns: 'vehicles' })}</label>
+            <input type="number" id="year" name="year" value={newVehicle.year} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterYear', { ns: 'vehicles' })}/>
+            <label htmlFor="license_plate" className="block text-gray-700 text-sm font-bold mb-2">{t('licensePlate', { ns: 'vehicles' })}</label>
+            <input type="text" id="license_plate" name="license_plate" value={newVehicle.license_plate} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterLicensePlate', { ns: 'vehicles' })}/>
+            <label htmlFor="vin" className="block text-gray-700 text-sm font-bold mb-2">{t('vin', { ns: 'vehicles' })}</label>
+            <input type="text" id="vin" name="vin" value={newVehicle.vin} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterVIN', { ns: 'vehicles' })}/>
+            <label htmlFor="mileage" className="block text-gray-700 text-sm font-bold mb-2">{t('mileage', { ns: 'vehicles' })}</label>
+            <input type="number" id="mileage" name="mileage" value={newVehicle.mileage} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterMileage', { ns: 'vehicles' })}/>
+            <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">{t('status', { ns: 'vehicles' })}</label>
+            <input type="text" id="status" name="status" value={newVehicle.status} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('selectStatus', { ns: 'vehicles' })}/>
+            <label htmlFor="observations" className="block text-gray-700 text-sm font-bold mb-2">{t('observations', { ns: 'vehicles' })}</label>
+            <textarea id="observations" name="observations" value={newVehicle.observations} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterObservations', { ns: 'vehicles' })}/>
             <button
               onClick={handleAddVehicle}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
-              {t('addVehicle')}
+              {t('addVehicle', { ns: 'translation' })}
             </button>
           </Modal>
           <Modal isOpen={showVehicleDetails} onClose={handleCloseModal}>
@@ -245,4 +246,4 @@ function Vehicles() {
   );
 }
 
-export default Vehicles;
+export default Vehicles

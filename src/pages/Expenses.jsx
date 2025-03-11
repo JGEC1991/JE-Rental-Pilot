@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../../supabaseClient';
-import Modal from '../components/Modal';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect } from 'react'
+import { supabase } from '../../supabaseClient'
+import Modal from '../components/Modal'
+import { useTranslation } from 'react-i18next'
+import i18n from '../i18n';
 
 // Reusable Table Header Component
 function TableHeader({ children }) {
   const { t } = useTranslation();
   return (
     <th className="px-4 py-2 border-b-2 border-gray-300 bg-blue-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-      {t(children)}
+      {t(children, { ns: 'expenses' })}
     </th>
-  );
+  )
 }
 
 // Reusable Table Data Cell Component
@@ -19,24 +20,22 @@ function TableData({ children }) {
     <td className="px-4 py-3 border-b border-gray-200 bg-stone-50 text-sm text-gray-600">
       {children}
     </td>
-  );
+  )
 }
 
 function Expenses() {
-  const [expenses, setExpenses] = useState([]);
-  const [drivers, setDrivers] = useState([]);
-  const [vehicles, setVehicles] = useState([]);
-  const [activities, setActivities] = useState([]);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [showEditForm, setShowEditForm] = useState(false);
-  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [expenses, setExpenses] = useState([])
+  const [drivers, setDrivers] = useState([])
+  const [vehicles, setVehicles] = useState([])
+  const [activities, setActivities] = useState([])
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [showEditForm, setShowEditForm] = useState(false)
+  const [selectedExpense, setSelectedExpense] = useState(null)
   const [statusOptions] = useState([
-    'Completed',
     'Pending',
-    'Past Due',
-    'Incomplete',
+    'Paid',
     'Canceled'
-  ]);
+  ])
   const [expenseCategories] = useState([
     'Maintenance',
     'Repair',
@@ -45,26 +44,26 @@ function Expenses() {
     'Registration',
     'Tax',
     'Other'
-  ]);
+  ])
   
   const [newExpense, setNewExpense] = useState({
     vehicle_id: '',
     driver_id: '',
     activity_id: '',
     amount: '',
-    date: new Date().toISOString().split('T')[0],
+    date: '',
     description: '',
     status: 'Pending',
     category: ''
-  });
-  const { t } = useTranslation();
+  })
+  const { t } = useTranslation(['expenses', 'translation'])
 
   useEffect(() => {
-    fetchExpenses();
-    fetchDrivers();
-    fetchVehicles();
-    fetchActivities();
-  }, []);
+    fetchExpenses()
+    fetchDrivers()
+    fetchVehicles()
+    fetchActivities()
+  }, [])
 
   const fetchExpenses = async () => {
     try {
@@ -76,40 +75,40 @@ function Expenses() {
           drivers(*),
           activities(*)
         `)
-        .order('date', { ascending: false });
+        .order('date', { ascending: false })
       
-      if (error) throw error;
-      setExpenses(data || []);
+      if (error) throw error
+      setExpenses(data || [])
     } catch (error) {
-      console.error("Error fetching expenses:", error);
+      console.error("Error fetching expenses:", error)
     }
-  };
+  }
 
   const fetchDrivers = async () => {
     try {
       const { data, error } = await supabase
         .from('drivers')
-        .select('*');
+        .select('*')
       
-      if (error) throw error;
-      setDrivers(data || []);
+      if (error) throw error
+      setDrivers(data || [])
     } catch (error) {
-      console.error("Error fetching drivers:", error);
+      console.error("Error fetching drivers:", error)
     }
-  };
+  }
 
   const fetchVehicles = async () => {
     try {
       const { data, error } = await supabase
         .from('vehicles')
-        .select('*');
+        .select('*')
       
-      if (error) throw error;
-      setVehicles(data || []);
+      if (error) throw error
+      setVehicles(data || [])
     } catch (error) {
-      console.error("Error fetching vehicles:", error);
+      console.error("Error fetching vehicles:", error)
     }
-  };
+  }
 
   const fetchActivities = async () => {
     try {
@@ -122,7 +121,7 @@ function Expenses() {
     } catch (error) {
       console.error("Error fetching activities:", error);
     }
-  };
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -172,7 +171,7 @@ function Expenses() {
     try {
       // Validate inputs
       if (!newExpense.vehicle_id || !newExpense.amount || !newExpense.date || !newExpense.category) {
-        alert(t('pleaseFillRequiredFields'));
+        alert(t('pleaseFillRequiredFields', { ns: 'translation' }));
         return;
       }
 
@@ -217,7 +216,7 @@ function Expenses() {
     try {
       // Validate inputs
       if (!selectedExpense.vehicle_id || !selectedExpense.amount || !selectedExpense.date || !selectedExpense.category) {
-        alert(t('pleaseFillRequiredFields'));
+        alert(t('pleaseFillRequiredFields', { ns: 'translation' }));
         return;
       }
 
@@ -240,7 +239,7 @@ function Expenses() {
       setShowEditForm(false);
       setSelectedExpense(null);
       fetchExpenses();
-      alert(t('expenseUpdatedSuccessfully'));
+      alert(t('expenseUpdatedSuccessfully', { ns: 'translation' }));
     } catch (error) {
       console.error("Error updating expense:", error);
       alert(`Error updating expense: ${error.message}`);
@@ -253,7 +252,7 @@ function Expenses() {
   };
 
   const handleDeleteExpense = async (id) => {
-    if (window.confirm(t('confirmDeleteExpense'))) {
+    if (window.confirm(t('confirmDeleteExpense', { ns: 'translation' }))) {
       try {
         const { error } = await supabase
           .from('expenses')
@@ -293,12 +292,8 @@ function Expenses() {
         return 'bg-green-100 text-green-800';
       case 'Pending':
         return 'bg-yellow-100 text-yellow-800';
-      case 'Past Due':
-        return 'bg-red-100 text-red-800';
-      case 'Incomplete':
-        return 'bg-gray-100 text-gray-800';
       case 'Canceled':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-blue-100 text-blue-800';
     }
@@ -327,14 +322,14 @@ function Expenses() {
     <>
       <div className="page">
         <div className="max-w-5xl mx-auto mt-8">
-          <div className="flex justify-end items-center mb-4">
+          <div className="flex justify-end items-center mb-6">
             <button
               onClick={() => setShowAddForm(true)}
               className="text-white font-bold py-2 px-4 rounded"
             >
               <img 
                 src="https://ticghrxzdsdoaiwvahht.supabase.co/storage/v1/object/public/assets/Navigation/plus.png" 
-                alt={t('addExpense')} 
+                alt={t('addExpense', { ns: 'translation' })} 
                 className="w-6 h-6"
               />
             </button>
@@ -365,7 +360,7 @@ function Expenses() {
                     <TableData>{expense.drivers ? expense.drivers.full_name : 'N/A'}</TableData>
                     <TableData>
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getCategoryBadgeColor(expense.category)}`}>
-                        {t(expense.category.toLowerCase())}
+                        {t(expense.category.toLowerCase(), { ns: 'translation' })}
                       </span>
                     </TableData>
                     <TableData>{formatCurrency(expense.amount)}</TableData>
@@ -388,13 +383,13 @@ function Expenses() {
                           onClick={() => handleEditExpense(expense)}
                           className="text-green-500 hover:text-green-700"
                         >
-                          {t('edit')}
+                          {t('edit', { ns: 'translation' })}
                         </button>
                         <button
                           onClick={() => handleDeleteExpense(expense.id)}
                           className="text-red-500 hover:text-red-700"
                         >
-                          {t('delete')}
+                          {t('delete', { ns: 'translation' })}
                         </button>
                       </div>
                     </TableData>
@@ -405,267 +400,231 @@ function Expenses() {
           </div>
 
           <Modal isOpen={showAddForm} onClose={handleCloseModal}>
-            <h2 className="text-2xl font-semibold mb-4">{t('addNewExpense')}</h2>
-            <div className="mb-4">
-              <label htmlFor="activity_id" className="block text-gray-700 text-sm font-bold mb-2">{t('relatedActivity')} (Optional)</label>
-              <select
-                id="activity_id"
-                name="activity_id"
-                value={newExpense.activity_id}
-                onChange={handleInputChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              >
-                <option value="">{t('selectActivity')}</option>
-                {activities.map((activity) => (
-                  <option key={activity.id} value={activity.id}>
-                    {activity.activity_type} - {activity.vehicles ? `${activity.vehicles.make} ${activity.vehicles.model}` : 'Unknown Vehicle'} ({formatDate(activity.date)})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="mb-4">
-              <label htmlFor="vehicle_id" className="block text-gray-700 text-sm font-bold mb-2">{t('vehicle')}</label>
-              <select
-                id="vehicle_id"
-                name="vehicle_id"
-                value={newExpense.vehicle_id}
-                onChange={handleInputChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-              >
-                <option value="">{t('selectVehicle')}</option>
-                {vehicles.map((vehicle) => (
-                  <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model} ({vehicle.license_plate})</option>
-                ))}
-              </select>
-            </div>
-            <div className="mb-4">
-              <label htmlFor="driver_id" className="block text-gray-700 text-sm font-bold mb-2">{t('driver')} (Optional)</label>
-              <select
-                id="driver_id"
-                name="driver_id"
-                value={newExpense.driver_id}
-                onChange={handleInputChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              >
-                <option value="">{t('selectDriver')}</option>
-                {drivers.map((driver) => (
-                  <option key={driver.id} value={driver.id}>{driver.full_name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="mb-4">
-              <label htmlFor="category" className="block text-gray-700 text-sm font-bold mb-2">{t('expenseCategory')}</label>
-              <select
-                id="category"
-                name="category"
-                value={newExpense.category}
-                onChange={handleInputChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-              >
-                <option value="">{t('selectCategory')}</option>
-                {expenseCategories.map((category) => (
-                  <option key={category} value={category}>{t(category.toLowerCase())}</option>
-                ))}
-              </select>
-            </div>
-            <div className="mb-4">
-              <label htmlFor="amount" className="block text-gray-700 text-sm font-bold mb-2">{t('amount')}</label>
-              <input
-                type="number"
-                id="amount"
-                name="amount"
-                value={newExpense.amount}
-                onChange={handleInputChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                min="0"
-                step="0.01"
-                required
-                placeholder={t('enterExpenseAmount')}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">{t('date')}</label>
-              <input
-                type="date"
-                id="date"
-                name="date"
-                value={newExpense.date}
-                onChange={handleInputChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">{t('description')}</label>
-              <textarea
-                id="description"
-                name="description"
-                value={newExpense.description}
-                onChange={handleInputChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                rows="3"
-              ></textarea>
-            </div>
-            <div className="mb-4">
-              <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">{t('status')}</label>
-              <select
-                id="status"
-                name="status"
-                value={newExpense.status}
-                onChange={handleInputChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                required
-              >
-                <option value="Pending">{t('pending')}</option>
-                <option value="Paid">{t('paid')}</option>
-                <option value="Past Due">{t('pastDue')}</option>
-                <option value="Incomplete">{t('incomplete')}</option>
-                <option value="Canceled">{t('canceled')}</option>
-              </select>
-            </div>
+            <h2 className="text-2xl font-semibold mb-4">{t('addNewExpense', { ns: 'expenses' })}</h2>
+            <label htmlFor="activity_id" className="block text-gray-700 text-sm font-bold mb-2">{t('relatedActivity', { ns: 'expenses' })} (Optional)</label>
+            <select
+              id="activity_id"
+              name="activity_id"
+              value={newExpense.activity_id}
+              onChange={handleInputChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            >
+              <option value="">{t('selectActivity', { ns: 'translation' })}</option>
+              {activities.map((activity) => (
+                <option key={activity.id} value={activity.id}>
+                  {activity.activity_type} - {activity.vehicles ? `${activity.vehicles.make} ${activity.vehicles.model}` : 'Unknown Vehicle'} ({formatDate(activity.date)})
+                </option>
+              ))}
+            </select>
+            <label htmlFor="vehicle_id" className="block text-gray-700 text-sm font-bold mb-2">{t('vehicle', { ns: 'expenses' })}</label>
+            <select
+              id="vehicle_id"
+              name="vehicle_id"
+              value={newExpense.vehicle_id}
+              onChange={handleInputChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              required
+            >
+              <option value="">{t('selectVehicle', { ns: 'translation' })}</option>
+              {vehicles.map((vehicle) => (
+                <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model} ({vehicle.license_plate})</option>
+              ))}
+            </select>
+            <label htmlFor="driver_id" className="block text-gray-700 text-sm font-bold mb-2">{t('driver', { ns: 'expenses' })} (Optional)</label>
+            <select
+              id="driver_id"
+              name="driver_id"
+              value={newExpense.driver_id}
+              onChange={handleInputChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            >
+              <option value="">{t('selectDriver', { ns: 'translation' })}</option>
+              {drivers.map((driver) => (
+                <option key={driver.id} value={driver.id}>{driver.full_name}</option>
+              ))}
+            </select>
+            <label htmlFor="category" className="block text-gray-700 text-sm font-bold mb-2">{t('expenseCategory', { ns: 'translation' })}</label>
+            <select
+              id="category"
+              name="category"
+              value={newExpense.category}
+              onChange={handleInputChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              required
+            >
+              <option value="">{t('selectCategory', { ns: 'translation' })}</option>
+              {expenseCategories.map((category) => (
+                <option key={category} value={category}>{t(category.toLowerCase(), { ns: 'translation' })}</option>
+              ))}
+            </select>
+            <label htmlFor="amount" className="block text-gray-700 text-sm font-bold mb-2">{t('amount', { ns: 'revenue' })}</label>
+            <input
+              type="number"
+              id="amount"
+              name="amount"
+              value={newExpense.amount}
+              onChange={handleInputChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              min="0"
+              step="0.01"
+              required
+              placeholder={t('enterExpenseAmount', { ns: 'expenses' })}
+            />
+            <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">{t('date', { ns: 'revenue' })}</label>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              value={newExpense.date}
+              onChange={handleInputChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              required
+            />
+            <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">{t('description', { ns: 'revenue' })}</label>
+            <textarea
+              id="description"
+              name="description"
+              value={newExpense.description}
+              onChange={handleInputChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              rows="3"
+            ></textarea>
+            <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">{t('status', { ns: 'revenue' })}</label>
+            <select
+              id="status"
+              name="status"
+              value={newExpense.status}
+              onChange={handleInputChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"
+              required
+            >
+              <option value="Pending">{t('pending', { ns: 'translation' })}</option>
+              <option value="Paid">{t('paid', { ns: 'translation' })}</option>
+              <option value="Past Due">{t('pastDue', { ns: 'translation' })}</option>
+              <option value="Incomplete">{t('incomplete', { ns: 'translation' })}</option>
+              <option value="Canceled">{t('canceled', { ns: 'translation' })}</option>
+            </select>
             <button
               onClick={handleAddExpense}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
-              {t('addExpense')}
+              {t('addExpense', { ns: 'translation' })}
             </button>
           </Modal>
 
           {/* Edit Expense Modal */}
           <Modal isOpen={showEditForm} onClose={handleCloseModal}>
-            <h2 className="text-2xl font-semibold mb-4">{t('updateExpense')}</h2>
+            <h2 className="text-2xl font-semibold mb-4">{t('updateExpense', { ns: 'translation' })}</h2>
             {selectedExpense && (
               <>
-                <div className="mb-4">
-                  <label htmlFor="edit-activity_id" className="block text-gray-700 text-sm font-bold mb-2">{t('relatedActivity')} (Optional)</label>
-                  <select
-                    id="edit-activity_id"
-                    name="activity_id"
-                    value={selectedExpense.activity_id || ""}
-                    onChange={handleEditInputChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  >
-                    <option value="">{t('selectActivity')}</option>
-                    {activities.map((activity) => (
-                      <option key={activity.id} value={activity.id}>
-                        {activity.activity_type} - {activity.vehicles ? `${activity.vehicles.make} ${activity.vehicles.model}` : 'Unknown Vehicle'} ({formatDate(activity.date)})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-4">
-                  <label htmlFor="edit-vehicle_id" className="block text-gray-700 text-sm font-bold mb-2">{t('vehicle')}</label>
-                  <select
-                    id="edit-vehicle_id"
-                    name="vehicle_id"
-                    value={selectedExpense.vehicle_id}
-                    onChange={handleEditInputChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    required
-                  >
-                    <option value="">{t('selectVehicle')}</option>
-                    {vehicles.map((vehicle) => (
-                      <option key={vehicle.id} value={vehicle.id}>
-                        {vehicle.make} {vehicle.model} ({vehicle.license_plate})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-4">
-                  <label htmlFor="edit-driver_id" className="block text-gray-700 text-sm font-bold mb-2">{t('driver')} (Optional)</label>
-                  <select
-                    id="edit-driver_id"
-                    name="driver_id"
-                    value={selectedExpense.driver_id || ""}
-                    onChange={handleEditInputChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  >
-                    <option value="">{t('selectDriver')}</option>
-                    {drivers.map((driver) => (
-                      <option key={driver.id} value={driver.id}>
-                        {driver.full_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-4">
-                  <label htmlFor="edit-category" className="block text-gray-700 text-sm font-bold mb-2">{t('expenseCategory')}</label>
-                  <select
-                    id="edit-category"
-                    name="category"
-                    value={selectedExpense.category}
-                    onChange={handleEditInputChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    required
-                  >
-                    <option value="">{t('selectCategory')}</option>
-                    {expenseCategories.map((category) => (
-                      <option key={category} value={category}>{t(category.toLowerCase())}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mb-4">
-                  <label htmlFor="edit-amount" className="block text-gray-700 text-sm font-bold mb-2">{t('amount')}</label>
-                  <input
-                    type="number"
-                    id="edit-amount"
-                    name="amount"
-                    value={selectedExpense.amount}
-                    onChange={handleEditInputChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    min="0"
-                    step="0.01"
-                    required
-                    placeholder={t('enterExpenseAmount')}
-                  />
-                </div>
-                <div className="mb-4">
-                  <label htmlFor="edit-date" className="block text-gray-700 text-sm font-bold mb-2">{t('date')}</label>
-                  <input
-                    type="date"
-                    id="edit-date"
-                    name="date"
-                    value={selectedExpense.date}
-                    onChange={handleEditInputChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    required
-                  />
-                </div>
-                <div className="mb-4">
-                  <label htmlFor="edit-description" className="block text-gray-700 text-sm font-bold mb-2">{t('description')}</label>
-                  <textarea
-                    id="edit-description"
-                    name="description"
-                    value={selectedExpense.description || ''}
-                    onChange={handleEditInputChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    rows="3"
-                  ></textarea>
-                </div>
-                <div className="mb-4">
-                  <label htmlFor="edit-status" className="block text-gray-700 text-sm font-bold mb-2">{t('status')}</label>
-                  <select
-                    id="edit-status"
-                    name="status"
-                    value={selectedExpense.status}
-                    onChange={handleEditInputChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    required
-                  >
-                    <option value="Pending">{t('pending')}</option>
-                    <option value="Paid">{t('paid')}</option>
-                    <option value="Past Due">{t('pastDue')}</option>
-                    <option value="Incomplete">{t('incomplete')}</option>
-                    <option value="Canceled">{t('canceled')}</option>
-                  </select>
-                </div>
+                <label htmlFor="edit-activity_id" className="block text-gray-700 text-sm font-bold mb-2">{t('relatedActivity', { ns: 'expenses' })} (Optional)</label>
+                <select
+                  id="edit-activity_id"
+                  name="activity_id"
+                  value={selectedExpense.activity_id || ""}
+                  onChange={handleEditInputChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                >
+                  <option value="">{t('selectActivity', { ns: 'translation' })}</option>
+                  {activities.map((activity) => (
+                    <option key={activity.id} value={activity.id}>
+                      {activity.activity_type} - {activity.vehicles ? `${activity.vehicles.make} ${activity.vehicles.model}` : 'Unknown Vehicle'} ({formatDate(activity.date)})
+                    </option>
+                  ))}
+                </select>
+                <label htmlFor="edit-vehicle_id" className="block text-gray-700 text-sm font-bold mb-2">{t('vehicle', { ns: 'expenses' })}</label>
+                <select
+                  id="edit-vehicle_id"
+                  name="vehicle_id"
+                  value={selectedExpense.vehicle_id}
+                  onChange={handleEditInputChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  required
+                >
+                  <option value="">{t('selectVehicle', { ns: 'translation' })}</option>
+                  {vehicles.map((vehicle) => (
+                    <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model} ({vehicle.license_plate})</option>
+                  ))}
+                </select>
+                <label htmlFor="edit-driver_id" className="block text-gray-700 text-sm font-bold mb-2">{t('driver', { ns: 'expenses' })} (Optional)</label>
+                <select
+                  id="edit-driver_id"
+                  name="driver_id"
+                  value={selectedExpense.driver_id || ""}
+                  onChange={handleEditInputChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                >
+                  <option value="">{t('selectDriver', { ns: 'translation' })}</option>
+                  {drivers.map((driver) => (
+                    <option key={driver.id} value={driver.id}>{driver.full_name}</option>
+                  ))}
+                </select>
+                <label htmlFor="edit-category" className="block text-gray-700 text-sm font-bold mb-2">{t('expenseCategory', { ns: 'translation' })}</label>
+                <select
+                  id="edit-category"
+                  name="category"
+                  value={selectedExpense.category}
+                  onChange={handleEditInputChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  required
+                >
+                  <option value="">{t('selectCategory', { ns: 'translation' })}</option>
+                  {expenseCategories.map((category) => (
+                    <option key={category} value={category}>{t(category.toLowerCase(), { ns: 'translation' })}</option>
+                  ))}
+                </select>
+                <label htmlFor="edit-amount" className="block text-gray-700 text-sm font-bold mb-2">{t('amount', { ns: 'revenue' })}</label>
+                <input
+                  type="number"
+                  id="edit-amount"
+                  name="amount"
+                  value={selectedExpense.amount}
+                  onChange={handleEditInputChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  min="0"
+                  step="0.01"
+                  required
+                  placeholder={t('enterExpenseAmount', { ns: 'expenses' })}
+                />
+                <label htmlFor="edit-date" className="block text-gray-700 text-sm font-bold mb-2">{t('date', { ns: 'revenue' })}</label>
+                <input
+                  type="date"
+                  id="edit-date"
+                  name="date"
+                  value={selectedExpense.date}
+                  onChange={handleEditInputChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  required
+                />
+                <label htmlFor="edit-description" className="block text-gray-700 text-sm font-bold mb-2">{t('description', { ns: 'revenue' })}</label>
+                <textarea
+                  id="edit-description"
+                  name="description"
+                  value={selectedExpense.description || ''}
+                  onChange={handleEditInputChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  rows="3"
+                ></textarea>
+                <label htmlFor="edit-status" className="block text-gray-700 text-sm font-bold mb-2">{t('status', { ns: 'revenue' })}</label>
+                <select
+                  id="edit-status"
+                  name="status"
+                  value={selectedExpense.status}
+                  onChange={handleEditInputChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  required
+                >
+                  <option value="Pending">{t('pending', { ns: 'translation' })}</option>
+                  <option value="Paid">{t('paid', { ns: 'translation' })}</option>
+                  <option value="Past Due">{t('pastDue', { ns: 'translation' })}</option>
+                  <option value="Incomplete">{t('incomplete', { ns: 'translation' })}</option>
+                  <option value="Canceled">{t('canceled', { ns: 'translation' })}</option>
+                </select>
                 <button
                   onClick={handleUpdateExpense}
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                 >
-                  {t('updateExpense')}
+                  {t('updateExpense', { ns: 'translation' })}
                 </button>
               </>
             )}
@@ -673,7 +632,7 @@ function Expenses() {
         </div>
       </div>
     </>
-  );
+  )
 }
 
-export default Expenses;
+export default Expenses

@@ -3,13 +3,14 @@ import { supabase } from '../../supabaseClient';
 import Modal from '../components/Modal';
 import ActivityRecordCard from '../components/ActivityRecordCard';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 // Reusable Table Header Component
 function TableHeader({ children }) {
   const { t } = useTranslation();
   return (
     <th className="px-4 py-2 border-b-2 border-gray-300 bg-blue-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-      {t(children)}
+      {t(children, { ns: 'activities' })}
     </th>
   );
 }
@@ -70,7 +71,7 @@ function Activities() {
     'Other'
   ]);
 
-  const { t } = useTranslation();
+  const { t } = useTranslation(['activities', 'translation']);
 
   useEffect(() => {
     fetchActivities();
@@ -187,10 +188,10 @@ function Activities() {
           alert(`Error adding expense: ${expenseError?.message || 'Unknown error'}`);
         } else {
           console.log("Expense added successfully!");
-          alert(t('activityAndExpenseAddedSuccessfully'));
+          alert(t('activityAndExpenseAddedSuccessfully', { ns: 'translation' }));
         }
       } else {
-        alert(t('activityAddedSuccessfully'));
+        alert(t('activityAddedSuccessfully', { ns: 'translation' }));
       }
       
       // Reset form and refresh data
@@ -239,6 +240,7 @@ function Activities() {
     
     const uploadedUrls = await Promise.all(uploadPromises);
     const validUrls = uploadedUrls.filter((url) => url !== null);
+    console.log("Uploaded Attachment URLs:", validUrls); // Log the URLs
     setAttachments([...attachments, ...validUrls]);
   };
 
@@ -381,7 +383,7 @@ function Activities() {
               <>
                 <label htmlFor="expenseAmount" className="block text-gray-700 text-sm font-bold mb-2">{t('expenseAmount')}</label>
                 <input type="number" id="expenseAmount" name="expenseAmount" value={expenseAmount} onChange={(e) => setExpenseAmount(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterExpenseAmount')} />
-
+                
                 <label htmlFor="expenseCategory" className="block text-gray-700 text-sm font-bold mb-2">{t('expenseCategory')}</label>
                 <select
                   id="expenseCategory"
@@ -430,4 +432,4 @@ function Activities() {
   );
 }
 
-export default Activities;
+export default Activities

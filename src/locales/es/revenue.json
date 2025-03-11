@@ -1,0 +1,20 @@
+{
+  "vehicle": "Vehículo",
+  "driver": "Conductor",
+  "amount": "Cantidad",
+  "date": "Fecha",
+  "description": "Descripción",
+  "status": "Estado",
+  "actions": "Acciones",
+  "addNewRevenue": "Agregar nuevo ingreso",
+  "selectVehicle": "Seleccionar vehículo",
+  "selectDriver": "Seleccionar conductor",
+  "enterAmount": "Ingresar cantidad",
+  "enterDate": "Ingresar fecha",
+  "enterDescription": "Ingresar descripción",
+  "selectStatus": "Seleccionar estado",
+  "confirmDeleteRevenue": "¿Está seguro de que desea eliminar este registro de ingresos?",
+  "proofOfPayment": "Comprobante de pago",
+  "updateRevenue": "Actualizar Ingreso",
+  "viewProof": "Ver comprobante"
+}
