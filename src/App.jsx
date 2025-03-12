@@ -134,7 +134,6 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           to="/my-profile"
                           className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
                         >
-                          <span className="h-4 w-4 text-gray-400">M</span>
                           <span>My Profile</span>
                         </Link>
                       </li>
@@ -143,7 +142,6 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           to="/vehicles"
                           className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
                         >
-                          <span className="h-4 w-4 text-gray-400">V</span>
                           <span>Vehicles</span>
                         </Link>
                       </li>
@@ -152,7 +150,6 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           to="/drivers"
                           className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
                         >
-                          <span className="h-4 w-4 text-gray-400">D</span>
                           <span>Drivers</span>
                         </Link>
                       </li>
@@ -161,7 +158,6 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           to="/activities"
                           className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
                         >
-                          <span className="h-4 w-4 text-gray-400">A</span>
                           <span>Activities</span>
                         </Link>
                       </li>
@@ -170,7 +166,6 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           to="/revenue"
                           className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
                         >
-                          <span className="h-4 w-4 text-gray-400">R</span>
                           <span>Revenue</span>
                         </Link>
                       </li>
@@ -179,7 +174,6 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           to="/expenses"
                           className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
                         >
-                          <span className="h-4 w-4 text-gray-400">E</span>
                           <span>Expenses</span>
                         </Link>
                       </li>
@@ -188,7 +182,6 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           to="/dashboard"
                           className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
                         >
-                          <span className="h-4 w-4 text-gray-400">Da</span>
                           <span>Dashboard</span>
                         </Link>
                       </li>
@@ -197,7 +190,6 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           to="/admin"
                           className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
                         >
-                          <span className="h-4 w-4 text-gray-400">Ad</span>
                           <span>Admin</span>
                         </Link>
                       </li>

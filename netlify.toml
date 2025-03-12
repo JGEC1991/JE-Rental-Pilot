@@ -1,6 +1,2 @@
-[build]
-  publish = "dist"
-  command = "npm run build"
-
-[template]
-  required-extensions = ["supabase"]
+[http_headers]
+      "/*" = {Content-Security-Policy = "upgrade-insecure-requests", Cross-Origin-Embedder-Policy = "require-corp", Cross-Origin-Opener-Policy = "same-origin"}
