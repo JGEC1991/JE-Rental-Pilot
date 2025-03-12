@@ -1,6 +1,6 @@
 {
   "signup": "Registrarse",
-  "email": "Correo Electrónico",
+  "email": "Correo electrónico",
   "password": "Contraseña",
-  "invitationToken": "Token de Invitación"
+  "invitationToken": "Token de invitación"
 }

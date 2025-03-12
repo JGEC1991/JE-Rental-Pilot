@@ -106,5 +106,6 @@
   "insurance": "Seguro",
   "registration": "Registro",
   "tax": "Impuesto",
-   "other": "Otro"
+  "other": "Otro",
+  "expenseDescription": "Descripción del gasto"
 }

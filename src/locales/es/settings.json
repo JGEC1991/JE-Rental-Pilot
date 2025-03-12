@@ -2,7 +2,6 @@
   "settings": "Configuración",
   "userSettings": "Configuración de usuario",
   "updateProfile": "Actualizar perfil",
-  "enterPassword": "Ingresar la contraseña",
-  "email": "Correo Electrónico",
-  "password": "Contraseña"
+  "enterEmail": "Ingrese el correo electrónico",
+  "enterPassword": "Ingrese la contraseña"
 }

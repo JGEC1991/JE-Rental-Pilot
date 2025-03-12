@@ -31,5 +31,6 @@
   "right": "Right",
   "left": "Left",
   "dashboardText": "Dashboard",
-  "saveChanges": "Save Changes"
+  "saveChanges": "Save Changes",
+  "errorUploadingPhoto": "Error uploading photo: "
 }

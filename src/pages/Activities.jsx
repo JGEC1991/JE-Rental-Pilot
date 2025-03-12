@@ -27,7 +27,7 @@ function Activities() {
   const [activities, setActivities] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [vehicles, setVehicles] = useState([]);
-  const [attachment, setAttachment] = useState(null); // Changed to single attachment
+  const [attachments, setAttachments] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [showActivityDetails, setShowActivityDetails] = useState(false);
@@ -49,7 +49,7 @@ function Activities() {
     activity_type: '',
     description: '',
     date: new Date().toISOString().split('T')[0],
-    attachments: null // Changed to single attachment
+    attachments: null
   });
   
   const [createExpense, setCreateExpense] = useState(false);
@@ -131,30 +131,7 @@ function Activities() {
 
   const handleAddActivity = async () => {
     try {
-      let attachmentUrl = null;
-
-      if (attachment) {
-        const fileName = `${Date.now()}-${attachment.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('activity-attachments')
-          .upload(fileName, attachment, {
-            cacheControl: '3600',
-            upsert: true,
-            contentType: attachment.type,
-          });
-
-        if (uploadError) {
-          console.error("Error uploading file:", uploadError);
-          alert(`Error uploading file: ${uploadError.message}`);
-          return;
-        }
-
-        const { data: publicUrlData } = supabase.storage
-          .from('activity-attachments')
-          .getPublicUrl(uploadData.path);
-
-        attachmentUrl = publicUrlData.publicUrl;
-      }
+      console.log("Adding activity with attachments:", attachments);
       
       const { data: activityData, error: activityError } = await supabase
         .from('activities')
@@ -165,7 +142,7 @@ function Activities() {
             activity_type: newActivity.activity_type,
             description: newActivity.description,
             date: newActivity.date,
-            attachments: attachmentUrl // Store single URL
+            attachments: attachments
           }
         ])
         .select()
@@ -225,9 +202,30 @@ function Activities() {
     }
   };
 
-  const handleAttachmentUpload = (e) => {
-    const file = e.target.files[0];
-    setAttachment(file);
+  const handleAttachmentUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    const uploadPromises = files.map(async (file) => {
+      const fileName = `${Date.now()}-${file.name}`;
+      const { data, error } = await supabase.storage
+        .from('activity-attachments')
+        .upload(fileName, file);
+      
+      if (error) {
+        console.error("Error uploading file:", error);
+        return null;
+      }
+      
+      // Get the public URL for the uploaded file
+      const { data: publicUrlData } = supabase.storage
+        .from('activity-attachments')
+        .getPublicUrl(fileName);
+      
+      return publicUrlData.publicUrl;
+    });
+    
+    const uploadedUrls = await Promise.all(uploadPromises);
+    const validUrls = uploadedUrls.filter((url) => url !== null);
+    setAttachments(validUrls);
   };
 
   const handleViewActivity = (activity) => {
@@ -318,9 +316,7 @@ function Activities() {
                     <TableData>{activity.description || 'N/A'}</TableData>
                     <TableData>
                       {activity.attachments ? (
-                        <a href={activity.attachments} target="_blank" rel="noopener noreferrer">
-                          View Attachment
-                        </a>
+                        <img src={activity.attachments} alt="Attachment" style={{ width: '100px', margin: '5px' }} />
                       ) : (
                         'N/A'
                       )}

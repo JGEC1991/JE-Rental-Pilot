@@ -2,7 +2,6 @@
   "settings": "Settings",
   "userSettings": "User Settings",
   "updateProfile": "Update Profile",
-  "enterPassword": "Enter password",
-  "email": "Email",
-  "password": "Password"
+  "enterEmail": "Enter email",
+  "enterPassword": "Enter password"
 }
