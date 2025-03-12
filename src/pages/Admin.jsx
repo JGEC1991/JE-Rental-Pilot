@@ -76,7 +76,6 @@ import { useState, useEffect } from 'react'
 
       return (
         <div className="container mx-auto p-6">
-          <h1 className="text-3xl font-semibold mb-6">Admin - User Management</h1>
           <table className="min-w-full leading-normal">
             <thead>
               <tr className="bg-gray-200">

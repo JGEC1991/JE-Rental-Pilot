@@ -143,7 +143,6 @@ import { useState, useEffect } from 'react'
       return (
         <div className="container mx-auto p-6">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-3xl font-semibold">Activities</h1>
             <button
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline text-sm"
               onClick={handleAddActivityClick}

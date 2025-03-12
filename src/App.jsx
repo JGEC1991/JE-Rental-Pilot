@@ -93,41 +93,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                     <Link to="/" className="text-lg font-medium text-gray-900">
                       JerentCars
                     </Link>
-                    <button
-                      className="text-gray-400 hover:text-gray-500 focus:outline-none"
-                      onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                    >
-                      {isSidebarOpen ? (
-                        <svg
-                          className="h-5 w-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      ) : (
-                        <svg
-                          className="h-5 w-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M4 6h16M4 12h16M4 18h16"
-                          />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
+                    </div>
                   <nav className="flex-1 px-2 py-4">
                     <ul className="space-y-1">
                       <li>
@@ -135,7 +101,6 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           to="/my-profile"
                           className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
                         >
-                          <span className="h-4 w-4 text-gray-400">M</span>
                           <span>My Profile</span>
                         </Link>
                       </li>
@@ -144,7 +109,6 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           to="/vehicles"
                           className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
                         >
-                          <span className="h-4 w-4 text-gray-400">V</span>
                           <span>Vehicles</span>
                         </Link>
                       </li>
@@ -153,7 +117,6 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           to="/drivers"
                           className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
                         >
-                          <span className="h-4 w-4 text-gray-400">D</span>
                           <span>Drivers</span>
                         </Link>
                       </li>
@@ -206,11 +169,11 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                   {/* Top Bar */}
                   <header className="bg-white shadow h-16 flex items-center justify-between px-6 border-b border-gray-100">
                     <div>
-                      <span className="text-gray-600 text-sm">
+                      <span className="text-gray-600 text-base">
                         {organizationName}
                       </span>
                     </div>
-                    <button className="text-gray-600 focus:outline-none">
+                    <button className="text-gray-600 focus:outline-none text-base">
                       {userName}
                     </button>
                   </header>
