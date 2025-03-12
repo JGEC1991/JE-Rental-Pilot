@@ -1,190 +1,327 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link, Navigate, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import i18n from './i18n';
-import Home from './pages/Home';
-import Profile from './pages/Profile';
-import Vehicles from './pages/Vehicles';
-import Activities from './pages/Activities';
-import Dashboard from './pages/Dashboard';
-import Settings from './pages/Settings';
-import Admin from './pages/Admin';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import Drivers from './pages/Drivers';
-import Revenue from './pages/Revenue';
-import Expenses from './pages/Expenses';
-import { supabase } from '../supabaseClient';
-import './index.css';
+import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
+    import Home from './pages/Home'
+    import MyProfile from './pages/MyProfile'
+    import Vehicles from './pages/Vehicles'
+    import Drivers from './pages/Drivers'
+    import Activities from './pages/Activities'
+    import Revenue from './pages/Revenue'
+    import Expenses from './pages/Expenses'
+    import Dashboard from './pages/Dashboard'
+    import Admin from './pages/Admin'
+    import Confirmation from './pages/Confirmation' // Import the Confirmation component
+    import { useState, useEffect } from 'react'
+    import { supabase } from './supabaseClient'
 
-function App() {
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const location = useLocation();
-  const { t } = useTranslation();
+    function App() {
+      const [session, setSession] = useState(null)
+      const [organizationName, setOrganizationName] = useState('Loading...')
+      const [userName, setUserName] = useState('John Doe') // Placeholder
+      const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
-  useEffect(() => {
-    const fetchSession = async () => {
-      setLoading(true);
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-      } catch (error) {
-        console.error('Error fetching session:', error);
-        alert(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+      useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          setSession(session)
+        })
 
-    fetchSession();
+        supabase.auth.onAuthStateChange((_event, session) => {
+          setSession(session)
+        })
+      }, [])
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+      useEffect(() => {
+        const fetchOrganizationName = async () => {
+          try {
+            if (session?.user?.id) {
+              const { data: user, error } = await supabase
+                .from('users')
+                .select('organization_id')
+                .eq('id', session.user.id)
+                .single()
 
-    // Load language from local storage on app start
-    const storedLanguage = localStorage.getItem('i18nextLng');
-    if (storedLanguage) {
-      i18n.changeLanguage(storedLanguage);
+              if (error) {
+                console.error('Error fetching user:', error)
+                setOrganizationName('Error')
+                return
+              }
+
+              if (user && user.organization_id) {
+                const { data: organization, error: orgError } = await supabase
+                  .from('organizations')
+                  .select('name')
+                  .eq('id', user.organization_id)
+                  .single()
+
+                if (orgError) {
+                  console.error('Error fetching organization:', orgError)
+                  setOrganizationName('Error')
+                  return
+                }
+
+                if (organization && organization.name) {
+                  setOrganizationName(organization.name)
+                } else {
+                  setOrganizationName('Organization Not Found')
+                }
+              } else {
+                setOrganizationName('No Organization')
+              }
+            } else {
+              setOrganizationName('Not Authenticated')
+            }
+          } catch (error) {
+            console.error('Unexpected error:', error)
+            setOrganizationName('Error')
+          }
+        }
+
+        fetchOrganizationName()
+      }, [session])
+
+      return (
+        <>
+          <BrowserRouter>
+            {session ? (
+              <div className="flex h-screen bg-gray-50">
+                {/* Left Panel Navigation */}
+                <div
+                  className={`bg-white border-r border-gray-100 w-64 flex flex-col transition-transform duration-300 ease-in-out ${
+                    isSidebarOpen ? 'translate-x-0' : '-translate-x-64'
+                  }`}
+                >
+                  <div className="flex items-center justify-between h-16 px-4">
+                    <Link to="/" className="text-lg font-medium text-gray-900">
+                      JerentCars
+                    </Link>
+                    <button
+                      className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                      onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    >
+                      {isSidebarOpen ? (
+                        <svg
+                          className="h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          className="h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M4 6h16M4 12h16M4 18h16"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  <nav className="flex-1 px-2 py-4">
+                    <ul className="space-y-1">
+                      <li>
+                        <Link
+                          to="/my-profile"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                        >
+                          <span className="h-4 w-4 text-gray-400">M</span>
+                          <span>My Profile</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/vehicles"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                        >
+                          <span className="h-4 w-4 text-gray-400">V</span>
+                          <span>Vehicles</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/drivers"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                        >
+                          <span className="h-4 w-4 text-gray-400">D</span>
+                          <span>Drivers</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/activities"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                        >
+                          <span className="h-4 w-4 text-gray-400">A</span>
+                          <span>Activities</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/revenue"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                        >
+                          <span className="h-4 w-4 text-gray-400">R</span>
+                          <span>Revenue</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/expenses"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                        >
+                          <span className="h-4 w-4 text-gray-400">E</span>
+                          <span>Expenses</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/dashboard"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                        >
+                          <span className="h-4 w-4 text-gray-400">Da</span>
+                          <span>Dashboard</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/admin"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                        >
+                          <span className="h-4 w-4 text-gray-400">Ad</span>
+                          <span>Admin</span>
+                        </Link>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+
+                {/* Main Content */}
+                <div className="flex flex-col flex-1 bg-white">
+                  {/* Top Bar */}
+                  <header className="bg-white shadow h-16 flex items-center justify-between px-6 border-b border-gray-100">
+                    <div>
+                      <span className="text-gray-600 text-sm">
+                        {organizationName}
+                      </span>
+                    </div>
+                    <button className="text-gray-600 focus:outline-none">
+                      {userName}
+                    </button>
+                  </header>
+
+                  <main className="bg-white p-6">
+                    <Routes>
+                      <Route
+                        path="/"
+                        element={
+                          session ? (
+                            <Navigate to="/my-profile" replace />
+                          ) : (
+                            <Home />
+                          )
+                        }
+                      />
+                      <Route
+                        path="/my-profile"
+                        element={
+                          session ? (
+                            <MyProfile />
+                          ) : (
+                            <Navigate to="/" replace />
+                          )
+                        }
+                      />
+                      <Route
+                        path="/vehicles"
+                        element={
+                          session ? (
+                            <Vehicles />
+                          ) : (
+                            <Navigate to="/" replace />
+                          )
+                        }
+                      />
+                      <Route
+                        path="/drivers"
+                        element={
+                          session ? (
+                            <Drivers />
+                          ) : (
+                            <Navigate to="/" replace />
+                          )
+                        }
+                      />
+                      <Route
+                        path="/activities"
+                        element={
+                          session ? (
+                            <Activities />
+                          ) : (
+                            <Navigate to="/" replace />
+                          )
+                        }
+                      />
+                      <Route
+                        path="/revenue"
+                        element={
+                          session ? (
+                            <Revenue />
+                          ) : (
+                            <Navigate to="/" replace />
+                          )
+                        }
+                      />
+                      <Route
+                        path="/expenses"
+                        element={
+                          session ? (
+                            <Expenses />
+                          ) : (
+                            <Navigate to="/" replace />
+                          )
+                        }
+                      />
+                      <Route
+                        path="/dashboard"
+                        element={
+                          session ? (
+                            <Dashboard />
+                          ) : (
+                            <Navigate to="/" replace />
+                          )
+                        }
+                      />
+                      <Route
+                        path="/admin"
+                        element={
+                          session ? (
+                            <Admin />
+                          ) : (
+                            <Navigate to="/" replace />
+                          )
+                        }
+                      />
+                      <Route path="/confirmation" element={<Confirmation />} />
+                    </Routes>
+                  </main>
+                </div>
+              </div>
+            ) : (
+              <Home />
+            )}
+          </BrowserRouter>
+        </>
+      )
     }
-  }, []);
 
-  useEffect(() => {
-    localStorage.setItem('lastPath', location.pathname);
-  }, [location]);
-
-  const changeLanguage = (lng) => {
-    i18n.changeLanguage(lng);
-    localStorage.setItem('i18nextLng', lng); // Store language in local storage
-  };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar Navigation */}
-      {session && (
-        <div className="w-64 flex-shrink-0 bg-gray-800 text-white py-4 px-6 flex flex-col">
-          <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-center">CarFleet Pro</h2>
-          </div>
-          <nav className="flex-1">
-            <ul className="space-y-2">
-              <li>
-                <Link to="/" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m1-10V4a1 1 0 00-1-1H3m4 6h6m-6 0l6-6"></path></svg>
-                  {t('home')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/profile" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 8a18.066 18.066 0 00-5.332-1.01M19.5 18.5l.75-1.5"></path></svg>
-                  {t('profile')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/vehicles" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M3 5h12a2 2 0 012 2v1a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2zm5 10v2m6-2v2M3 15h12a2 2 0 012 2v1a2 2 0 01-2-2H3a2 2 0 01-2-2v-1a2 2 0 012-2z"></path></svg>
-                  {t('vehicles')}
-                </Link>
-              </li>
-              {/* Hidden Links */}
-              {/*
-              <li>
-                <Link to="/drivers" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.692M6 10V18a1 1 0 001 1h10a1 1 0 001-1v-8a1 1 0 00-1-1H7a1 1 0 00-1 1z"></path></svg>
-                  {t('drivers')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/dashboard" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                  {t('dashboard')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/admin" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                  {t('admin')}
-                </Link>
-              </li>
-              */}
-              <li>
-                <Link to="/activities" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                  {t('activities')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/revenue" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                  {t('revenue')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/expenses" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                  {t('expenses')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/settings" className="flex items-center py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7m14 6l-7-7-7 7"></path></svg>
-                  {t('settings')}
-                </Link>
-              </li>
-            </ul>
-          </nav>
-          <div className="mt-auto">
-            <div className="flex justify-center mt-4">
-              <select
-                value={i18n.language}
-                onChange={(e) => changeLanguage(e.target.value)}
-                className="bg-gray-700 text-white rounded-md py-2 px-4 focus:outline-none"
-              >
-                <option value="en">English</option>
-                <option value="es">Español</option>
-              </select>
-            </div>
-            <button
-              onClick={() => supabase.auth.signOut()}
-              className="block w-full text-left py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors mt-2"
-            >
-              <svg className="w-5 h-5 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-              {t('logout')}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Main Content */}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/profile" element={session ? <Profile /> : <Navigate to="/login" />} />
-        <Route path="/vehicles" element={session ? <Vehicles /> : <Navigate to="/login" />} />
-        <Route path="/drivers" element={session ? <Drivers /> : <Navigate to="/login" />} />
-        <Route path="/activities" element={session ? <Activities /> : <Navigate to="/login" />} />
-        <Route path="/revenue" element={session ? <Revenue /> : <Navigate to="/login" />} />
-        <Route path="/expenses" element={session ? <Expenses /> : <Navigate to="/login" />} />
-        <Route path="/dashboard" element={session ? <Dashboard /> : <Navigate to="/login" />} />
-        <Route path="/settings" element={session ? <Settings /> : <Navigate to="/login" />} />
-        <Route path="/admin" element={session ? <Admin /> : <Navigate to="/login" />} />
-      </Routes>
-    </div>
-  );
-}
-
-function Root() {
-  return (
-    <Router>
-      <App />
-    </Router>
-  );
-}
-
-export default Root
+    export default App

@@ -1,126 +1,272 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { supabase } from '../../supabaseClient'
-import { useTranslation } from 'react-i18next';
+import { useState } from 'react'
+    import { supabase } from '../supabaseClient'
+    import { useNavigate } from 'react-router-dom';
 
-function Home() {
-  const [session, setSession] = useState(null)
-  const navigate = useNavigate()
-  const { t } = useTranslation();
+    const Home = () => {
+      const [email, setEmail] = useState('')
+      const [password, setPassword] = useState('')
+      const [name, setName] = useState('')
+      const [phone, setPhone] = useState('')
+      const [organizationName, setOrganizationName] = useState('')
+      const [isDriver, setIsDriver] = useState(false)
+      const [loading, setLoading] = useState(false)
+      const [error, setError] = useState(null)
+      const [isSignup, setIsSignup] = useState(false)
+      const [confirmationSent, setConfirmationSent] = useState(false); // New state variable
 
-  useEffect(() => {
-    supabase.auth.getSession()
-      .then(({ data: { session } }) => {
-        setSession(session)
-      })
+      const navigate = useNavigate();
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-  }, [navigate])
+      const handleLogin = async (e) => {
+        e.preventDefault()
+        setLoading(true)
+        setError(null)
 
-  const handleLoginClick = () => {
-    navigate('/login')
-  }
+        try {
+          const { error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password,
+          })
 
-  const handleSignupClick = () => {
-    navigate('/signup')
-  }
+          if (error) {
+            setError(error.message)
+          }
+        } catch (err) {
+          setError(err.message)
+        } finally {
+          setLoading(false)
+        }
+      }
 
-  return (
-    <div className="page" style={{
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      textAlign: 'center',
-      color: 'black',
-    }}>
-      <div className="flex justify-end absolute top-4 right-4">
-        {!session ? (
-          <>
-            <button
-              onClick={handleLoginClick}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
-            >
-              {t('login')}
-            </button>
-            <button
-              onClick={handleSignupClick}
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-            >
-              {t('signupFree')}
-            </button>
-          </>
-        ) : null}
-      </div>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-semibold mb-8 text-black text-left">{t('home:simplifyYourCarRentalBusiness')}</h1>
-        <p className="text-xl mb-8 text-gray-800 text-left">{t('home:allInOnePlatform')}</p>
+      const handleSignup = async (e) => {
+        e.preventDefault()
+        setLoading(true)
+        setError(null)
 
-        <div className="flex flex-wrap items-center justify-center mb-8">
-          <div className="w-full md:w-1/2 p-4">
-            <img
-              src="https://ticghrxzdsdoaiwvahht.supabase.co/storage/v1/object/public/assets/Marketing/car-with-apps.png"
-              alt="Car with Apps"
-              className="rounded-lg shadow-md"
-              style={{ maxWidth: '50%', height: 'auto' }}
-            />
-          </div>
-          <div className="w-full md:w-1/2 p-4">
-            <p className="text-lg text-gray-700">{t('home:runningAFleet')}</p>
-          </div>
+        try {
+          // 1. Sign up the user
+          const { data: authResponse, error: authError } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+              data: {
+                name: name,
+                phone: phone,
+                is_driver: isDriver,
+              },
+              redirectTo: 'https://jerentcars.netlify.app/confirmation', // Redirect to confirmation page
+            },
+          })
+
+          if (authError) {
+            setError(authError.message)
+            return
+          }
+
+          setConfirmationSent(true); // Set confirmationSent to true
+
+          // 2. Call the create_org_and_user function
+          const { error: orgError } = await supabase.rpc('create_org_and_user', {
+            org_name: organizationName,
+            user_id: authResponse.user.id,
+            user_email: email,
+            user_name: name,
+            user_phone: phone,
+            user_is_driver: isDriver,
+          })
+
+          if (orgError) {
+            // Delete the auth user if function fails
+            await supabase.auth.admin.deleteUser(authResponse.user.id)
+            setError(orgError.message)
+            return
+          }
+
+          // 3. Redirect to confirmation page
+          navigate('/confirmation');
+
+        } catch (err) {
+          setError(err.message)
+        } finally {
+          setLoading(false)
+        }
+      }
+
+      return (
+        <div className="flex flex-col items-center justify-center h-full">
+          <h1 className="text-3xl font-semibold mb-4">
+            Welcome to JerentCars
+          </h1>
+          <p className="text-gray-600 mb-8">
+            Manage your car rentals with ease.
+          </p>
+
+          {confirmationSent ? (
+            <div className="text-green-500 mb-8">
+              Please check your email to confirm your account.
+            </div>
+          ) : (
+            <div className="w-full max-w-sm">
+              <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+                {!isSignup ? (
+                  <>
+                    <div className="mb-4">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2"
+                        htmlFor="email"
+                      >
+                        Email
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        id="email"
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </div>
+                    <div className="mb-6">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2"
+                        htmlFor="password"
+                      >
+                        Password
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                        id="password"
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="mb-4">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2"
+                        htmlFor="organizationName"
+                      >
+                        Organization Name
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        id="organizationName"
+                        type="text"
+                        placeholder="Organization Name"
+                        value={organizationName}
+                        onChange={(e) => setOrganizationName(e.target.value)}
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2"
+                        htmlFor="name"
+                      >
+                        Name
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        id="name"
+                        type="text"
+                        placeholder="Name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2"
+                        htmlFor="email"
+                        >
+                        Email
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        id="email"
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2"
+                        htmlFor="phone"
+                      >
+                        Phone Number
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        id="phone"
+                        type="tel"
+                        placeholder="Phone Number"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                      />
+                    </div>
+                    <div className="mb-6">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2"
+                        htmlFor="password"
+                      >
+                        Password
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                        id="password"
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
+                    <div className="mb-6">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2"
+                        htmlFor="isDriver"
+                      >
+                        Are you a driver?
+                      </label>
+                      <input
+                        className="mr-2 leading-tight"
+                        type="checkbox"
+                        id="isDriver"
+                        checked={isDriver}
+                        onChange={(e) => setIsDriver(e.target.checked)}
+                      />
+                    </div>
+                  </>
+                )}
+
+                <div className="flex items-center justify-between">
+                  <button
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    type="submit"
+                    onClick={isSignup ? handleSignup : handleLogin}
+                    disabled={loading}
+                  >
+                    {loading ? 'Loading...' : isSignup ? 'Sign Up' : 'Login'}
+                  </button>
+                  <button
+                    className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
+                    type="button"
+                    onClick={() => setIsSignup(!isSignup)}
+                  >
+                    {isSignup ? 'Already have an account? Login' : "Don't have an account? Sign Up"}
+                  </button>
+                </div>
+                {error && (
+                  <p className="text-red-500 text-xs italic mt-4">{error}</p>
+                )}
+              </form>
+            </div>
+          )}
         </div>
+      )
+    }
 
-        <div className="mb-8">
-          <h2 className="text-3xl font-semibold mt-4 mb-4 text-black text-left">{t('home:whyChooseUs')}</h2>
-          <div className="flex flex-wrap items-center justify-center mb-8">
-            <div className="w-full md:w-1/2 p-4">
-              <img
-                src="https://ticghrxzdsdoaiwvahht.supabase.co/storage/v1/object/public/assets/Marketing/CRM-homepage.png"
-                alt="CRM Homepage"
-                className="rounded-lg shadow-md"
-                style={{ maxWidth: '50%', height: 'auto' }}
-              />
-            </div>
-            <div className="w-full md:w-1/2 p-4">
-              <ul className="list-none pl-0">
-                <li className="mb-2"><strong className="text-blue-500">{t('home:seamlessDriverVehicleManagement')}</strong><br />{t('home:seamlessDriverAndVehicleManagement')}</li>
-                <li className="mb-2"><strong className="text-blue-500">{t('home:activityMaintenanceLogging')}</strong><br />{t('home:centralizedLoggingForVehicleUsage')}</li>
-                <li className="mb-2"><strong className="text-blue-500">{t('home:revenueTrackingInsights')}</strong><br />{t('home:effortlesslyMonitorEarnings')}</li>
-                <li className="mb-2"><strong className="text-blue-500">{t('home:secureUserFriendly')}</strong><br />{t('home:secureAccessAndAModernInterface')}</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div>
-          <h2 className="text-3xl font-semibold mt-4 mb-4 text-black text-left">{t('home:keyFeatures')}</h2>
-          <div className="flex flex-wrap items-center justify-center mb-8">
-            <div className="w-full md:w-1/2 p-4">
-              <img
-                src="https://ticghrxzdsdoaiwvahht.supabase.co/storage/v1/object/public/assets/Marketing/pixlr-image-generator-67bd40115b3ce46e8061e6d1.png"
-                alt="Key Features"
-                className="rounded-lg shadow-md"
-                style={{ maxWidth: '50%', height: 'auto' }}
-              />
-            </div>
-            <div className="w-full md:w-1/2 p-4">
-              <ul className="list-none pl-0">
-                <li className="mb-2"><strong className="text-blue-500">{t('home:adminDashboard')}</strong> – Get a comprehensive overview of your entire operation.</li>
-                <li className="mb-2"><strong className="text-blue-500">{t('home:vehicleManagement')}</strong> – Easily track vehicle details and maintenance.</li>
-                <li className="mb-2"><strong className="text-blue-500">{t('home:driverProfiles')}</strong> – Store essential documents like licenses and background checks securely.</li>
-                <li className="mb-2"><strong className="text-blue-500">{t('home:activityLogs')}</strong> – Monitor vehicle usage and incidents.</li>
-                <li className="mb-2"><strong className="text-blue-500">{t('home:revenueMonitoring')}</strong> – View transactions and ensure smooth lease payments.</li>
-                <li className="mb-2"><strong className="text-blue-500">{t('home:roleBasedAccess')}</strong> – Control user access for enhanced security.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <p className="text-lg mt-8 text-gray-700">{t('home:readyToStreamline')} <a href="/signup"  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">{t('signupFree')}</a></p>
-      </div>
-    </div>
-  )
-}
-
-export default Home
+    export default Home
