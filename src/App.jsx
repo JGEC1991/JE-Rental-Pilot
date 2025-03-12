@@ -260,17 +260,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           )
                         }
                       />
-                      <Route
-                        path="/admin"
-                        element={
-                          session ? (
-                            <Admin />
-                          ) : (
-                            <Navigate to="/" replace />
-                          )
-                        }
-                      />
-                      <Route path="/confirmation" element={<Confirmation />} />
+                      <Route path="/admin" element={<Confirmation />} />
                     </Routes>
                   </main>
                 </div>

@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react'
         activity_type: '',
         vehicle_id: '',
         driver_id: '',
+        status: 'Pending',
       })
       const [vehicles, setVehicles] = useState([])
       const [drivers, setDrivers] = useState([])
@@ -22,8 +23,9 @@ import { useState, useEffect } from 'react'
         { key: 'date', title: 'Date' },
         { key: 'description', title: 'Description' },
         { key: 'activity_type', title: 'Activity Type' },
-        { key: 'vehicle_id', title: 'Vehicle ID' },
-        { key: 'driver_id', title: 'Driver ID' },
+        { key: 'vehicle_name', title: 'Vehicle' },
+        { key: 'driver_name', title: 'Driver' },
+        { key: 'status', title: 'Status' },
       ]
 
       useEffect(() => {
@@ -34,14 +36,22 @@ import { useState, useEffect } from 'react'
           try {
             const { data, error } = await supabase
               .from('activities')
-              .select('*')
+              .select('*, vehicles(make, model, license_plate), drivers(name)')
+              .order('date', { ascending: false });
 
             if (error) {
               setError(error.message)
               return
             }
 
-            setActivities(data)
+            // Process the data to include driver and vehicle names
+            const processedActivities = data.map(activity => ({
+              ...activity,
+              vehicle_name: activity.vehicles ? `${activity.vehicles.make} ${activity.vehicles.model} (${activity.vehicles.license_plate})` : 'N/A',
+              driver_name: activity.drivers ? activity.drivers.name : 'N/A',
+            }));
+
+            setActivities(processedActivities)
           } catch (err) {
             setError(err.message)
           } finally {
@@ -106,13 +116,51 @@ import { useState, useEffect } from 'react'
         setError(null)
 
         try {
-          const { data, error } = await supabase
+          // Get the user's organization ID
+          const { data: authUser, error: authError } = await supabase.auth.getUser()
+
+          if (authError) {
+            setError(authError.message)
+            return
+          }
+
+          const userId = authUser.user.id
+
+          const { data: userData, error: orgError } = await supabase
+            .from('users')
+            .select('organization_id')
+            .eq('id', userId)
+            .single()
+
+          if (orgError) {
+            setError(orgError.message)
+            return
+          }
+
+          const organizationId = userData?.organization_id
+
+          if (!organizationId) {
+            setError('Unable to determine organization ID.')
+            return
+          }
+
+          console.log("Organization ID:", organizationId);
+
+          // Include the organization_id in the new activity data
+          const newActivityWithOrg = {
+            ...newActivity,
+            organization_id: organizationId,
+          }
+
+          console.log("New Activity with Org:", newActivityWithOrg);
+
+          const { data, error: insertError } = await supabase
             .from('activities')
-            .insert([newActivity])
+            .insert([newActivityWithOrg])
             .select()
 
-          if (error) {
-            setError(error.message)
+          if (insertError) {
+            setError(insertError.message)
             return
           }
 
@@ -123,12 +171,50 @@ import { useState, useEffect } from 'react'
             activity_type: '',
             vehicle_id: '',
             driver_id: '',
+            status: 'Pending',
           })
           setShowAddForm(false) // Hide the form
         } catch (err) {
           setError(err.message)
         } finally {
           setLoading(false)
+        }
+      }
+
+      const handleViewActivity = (activity) => {
+        setSelectedActivity(activity)
+        setShowViewForm(true)
+        setShowAddForm(false)
+      }
+
+      const handleEditActivity = (activity) => {
+        setSelectedActivity(activity)
+        setShowAddForm(true)
+        setShowViewForm(false)
+      }
+
+      const handleDeleteActivity = async (activity) => {
+        if (window.confirm(`Are you sure you want to delete this activity?`)) {
+          setLoading(true)
+          setError(null)
+
+          try {
+            const { error } = await supabase
+              .from('activities')
+              .delete()
+              .eq('id', activity.id)
+
+            if (error) {
+              setError(error.message)
+              return
+            }
+
+            setActivities(activities.filter((a) => a.id !== activity.id)) // Remove the activity from the list
+          } catch (err) {
+            setError(err.message)
+          } finally {
+            setLoading(false)
+          }
         }
       }
 
@@ -184,13 +270,21 @@ import { useState, useEffect } from 'react'
                   ))}
                 </select>
               </div>
+               <div className="mb-4">
+                <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">Status</label>
+                <select id="status" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={newActivity.status} onChange={handleInputChange}>
+                  <option value="Pending">Pending</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Past due">Past Due</option>
+                </select>
+              </div>
               <div className="flex items-center justify-end">
                 <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add</button>
               </div>
             </form>
           </Popout>
 
-          <Table data={activities} columns={columns} />
+          <Table data={activities} columns={columns} onView={handleViewActivity} onEdit={handleEditActivity} onDelete={handleDeleteActivity} />
         </div>
       )
     }
