@@ -93,7 +93,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                     <Link to="/" className="text-lg font-medium text-gray-900">
                       JerentCars
                     </Link>
-                    </div>
+                  </div>
                   <nav className="flex-1 px-2 py-4">
                     <ul className="space-y-1">
                       <li>
