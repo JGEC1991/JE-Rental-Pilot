@@ -34,7 +34,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
             if (session?.user?.id) {
               const { data: user, error } = await supabase
                 .from('users')
-                .select('organization_id')
+                .select('organization_id, name')
                 .eq('id', session.user.id)
                 .single()
 
@@ -62,11 +62,12 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                 } else {
                   setOrganizationName('Organization Not Found')
                 }
+                setUserName(user.name || '');
               } else {
-                setOrganizationName('No Organization')
+                setOrganizationName('')
               }
             } else {
-              setOrganizationName('Not Authenticated')
+              setOrganizationName('')
             }
           } catch (error) {
             console.error('Unexpected error:', error)
@@ -134,6 +135,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           to="/my-profile"
                           className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
                         >
+                          <span className="h-4 w-4 text-gray-400">M</span>
                           <span>My Profile</span>
                         </Link>
                       </li>
@@ -142,6 +144,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           to="/vehicles"
                           className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
                         >
+                          <span className="h-4 w-4 text-gray-400">V</span>
                           <span>Vehicles</span>
                         </Link>
                       </li>
@@ -150,6 +153,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           to="/drivers"
                           className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
                         >
+                          <span className="h-4 w-4 text-gray-400">D</span>
                           <span>Drivers</span>
                         </Link>
                       </li>
