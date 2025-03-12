@@ -3,14 +3,13 @@ import { supabase } from '../../supabaseClient';
 import Modal from '../components/Modal';
 import ActivityRecordCard from '../components/ActivityRecordCard';
 import { useTranslation } from 'react-i18next';
-import i18n from '../i18n';
 
 // Reusable Table Header Component
 function TableHeader({ children }) {
   const { t } = useTranslation();
   return (
     <th className="px-4 py-2 border-b-2 border-gray-300 bg-blue-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-      {t(children, { ns: 'activities' })}
+      {t(children)}
     </th>
   );
 }
@@ -28,7 +27,7 @@ function Activities() {
   const [activities, setActivities] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [vehicles, setVehicles] = useState([]);
-  const [attachments, setAttachments] = useState([]);
+  const [attachment, setAttachment] = useState(null); // Changed to single attachment
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [showActivityDetails, setShowActivityDetails] = useState(false);
@@ -50,7 +49,7 @@ function Activities() {
     activity_type: '',
     description: '',
     date: new Date().toISOString().split('T')[0],
-    attachments: []
+    attachments: null // Changed to single attachment
   });
   
   const [createExpense, setCreateExpense] = useState(false);
@@ -71,7 +70,7 @@ function Activities() {
     'Other'
   ]);
 
-  const { t } = useTranslation(['activities', 'translation']);
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchActivities();
@@ -128,25 +127,34 @@ function Activities() {
       ...prev,
       [name]: value
     }));
-
-    // Auto-fill vehicle and driver if activity is selected
-    if (name === 'activity_id' && value) {
-      const selectedActivity = activities.find(activity => activity.id.toString() === value);
-      if (selectedActivity) {
-        setNewActivity(prev => ({
-          ...prev,
-          vehicle_id: selectedActivity.vehicle_id,
-          driver_id: selectedActivity.driver_id,
-        }));
-        setExpenseCategory(selectedActivity.activity_type || '');
-        setExpenseDescription(`Expense for ${selectedActivity.activity_type}: ${selectedActivity.description || ''}`);
-      }
-    }
   };
 
   const handleAddActivity = async () => {
     try {
-      console.log("Adding activity with attachments:", attachments);
+      let attachmentUrl = null;
+
+      if (attachment) {
+        const fileName = `${Date.now()}-${attachment.name}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('activity-attachments')
+          .upload(fileName, attachment, {
+            cacheControl: '3600',
+            upsert: true,
+            contentType: attachment.type,
+          });
+
+        if (uploadError) {
+          console.error("Error uploading file:", uploadError);
+          alert(`Error uploading file: ${uploadError.message}`);
+          return;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('activity-attachments')
+          .getPublicUrl(uploadData.path);
+
+        attachmentUrl = publicUrlData.publicUrl;
+      }
       
       const { data: activityData, error: activityError } = await supabase
         .from('activities')
@@ -157,7 +165,7 @@ function Activities() {
             activity_type: newActivity.activity_type,
             description: newActivity.description,
             date: newActivity.date,
-            attachments: attachments.length > 0 ? attachments : null
+            attachments: attachmentUrl // Store single URL
           }
         ])
         .select()
@@ -188,10 +196,10 @@ function Activities() {
           alert(`Error adding expense: ${expenseError?.message || 'Unknown error'}`);
         } else {
           console.log("Expense added successfully!");
-          alert(t('activityAndExpenseAddedSuccessfully', { ns: 'translation' }));
+          alert(t('activityAndExpenseAddedSuccessfully'));
         }
       } else {
-        alert(t('activityAddedSuccessfully', { ns: 'translation' }));
+        alert(t('activityAddedSuccessfully'));
       }
       
       // Reset form and refresh data
@@ -201,7 +209,7 @@ function Activities() {
         activity_type: '',
         description: '',
         date: new Date().toISOString().split('T')[0],
-        attachments: []
+        attachments: null
       });
       setAttachments([]);
       setCreateExpense(false);
@@ -217,31 +225,9 @@ function Activities() {
     }
   };
 
-  const handleAttachmentUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    const uploadPromises = files.map(async (file) => {
-      const fileName = `${Date.now()}-${file.name}`;
-      const { data, error } = await supabase.storage
-        .from('activity-attachments')
-        .upload(fileName, file);
-      
-      if (error) {
-        console.error("Error uploading file:", error);
-        return null;
-      }
-      
-      // Get the public URL for the uploaded file
-      const { data: publicUrlData } = supabase.storage
-        .from('activity-attachments')
-        .getPublicUrl(fileName);
-      
-      return publicUrlData.publicUrl;
-    });
-    
-    const uploadedUrls = await Promise.all(uploadPromises);
-    const validUrls = uploadedUrls.filter((url) => url !== null);
-    console.log("Uploaded Attachment URLs:", validUrls); // Log the URLs
-    setAttachments([...attachments, ...validUrls]);
+  const handleAttachmentUpload = (e) => {
+    const file = e.target.files[0];
+    setAttachment(file);
   };
 
   const handleViewActivity = (activity) => {
@@ -331,9 +317,13 @@ function Activities() {
                     <TableData>{t(activity.activity_type?.toLowerCase() || 'other')}</TableData>
                     <TableData>{activity.description || 'N/A'}</TableData>
                     <TableData>
-                      {activity.attachments && activity.attachments.map((url, index) => (
-                        <img key={index} src={url} alt={`Attachment ${index + 1}`} style={{ width: '100px', margin: '5px' }} />
-                      ))}
+                      {activity.attachments ? (
+                        <a href={activity.attachments} target="_blank" rel="noopener noreferrer">
+                          View Attachment
+                        </a>
+                      ) : (
+                        'N/A'
+                      )}
                     </TableData>
                     <TableData>
                       <button onClick={() => handleEditActivity(activity)} className="text-blue-500 hover:text-blue-700 mr-2">{t('edit')}</button>
@@ -383,7 +373,7 @@ function Activities() {
               <>
                 <label htmlFor="expenseAmount" className="block text-gray-700 text-sm font-bold mb-2">{t('expenseAmount')}</label>
                 <input type="number" id="expenseAmount" name="expenseAmount" value={expenseAmount} onChange={(e) => setExpenseAmount(e.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" placeholder={t('enterExpenseAmount')} />
-                
+
                 <label htmlFor="expenseCategory" className="block text-gray-700 text-sm font-bold mb-2">{t('expenseCategory')}</label>
                 <select
                   id="expenseCategory"
@@ -432,4 +422,4 @@ function Activities() {
   );
 }
 
-export default Activities
+export default Activities;

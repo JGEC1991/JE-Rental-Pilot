@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../../supabaseClient'
 import Modal from '../components/Modal'
 import { useTranslation } from 'react-i18next'
-import i18n from '../i18n';
 
 // Reusable Table Header Component
 function TableHeader({ children }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
   return (
     <th className="px-4 py-2 border-b-2 border-gray-300 bg-blue-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-      {t(children, { ns: 'revenue' })}
+      {t(children)}
     </th>
   )
 }
@@ -20,7 +19,7 @@ function TableData({ children }) {
     <td className="px-4 py-3 border-b border-gray-200 bg-stone-50 text-sm text-gray-600">
       {children}
     </td>
-  );
+  )
 }
 
 function Revenue() {
@@ -46,7 +45,7 @@ function Revenue() {
     status: 'Pending',
   })
   const [proofOfPayment, setProofOfPayment] = useState(null);
-  const { t } = useTranslation(['revenue', 'translation'])
+  const { t } = useTranslation()
 
   useEffect(() => {
     fetchVehicles()
@@ -169,7 +168,7 @@ function Revenue() {
         alert(error.message);
       } else {
         console.log('Revenue added:', data);
-        alert(t('revenueAddedSuccessfully', { ns: 'translation' }));
+        alert(t('revenueAddedSuccessfully'));
         fetchRevenue();
         setNewRevenue({
           vehicle_id: '',
@@ -259,7 +258,7 @@ function Revenue() {
         alert(error.message);
       } else {
         console.log('Revenue updated:', data);
-        alert(t('revenueUpdatedSuccessfully', { ns: 'translation' }));
+        alert(t('revenueUpdatedSuccessfully'));
         fetchRevenue();
         setEditingRevenueId(null);
         setProofOfPayment(null);
@@ -271,7 +270,7 @@ function Revenue() {
   }
 
   const handleDelete = async (id) => {
-    if (window.confirm(t('confirmDeleteRevenue', { ns: 'translation' }))) {
+    if (window.confirm(t('confirmDeleteRevenue'))) {
       try {
         const { data, error } = await supabase
           .from('revenue')
@@ -307,21 +306,21 @@ function Revenue() {
               onClick={handleAddClick}
               className="text-white font-bold py-2 px-4 rounded"
             >
-              <img src="https://ticghrxzdsdoaiwvahht.supabase.co/storage/v1/object/public/assets/Navigation/plus.png" alt={t('addRevenue', { ns: 'translation' })} style={{ width: '20px', height: '20px' }} />
+              <img src="https://ticghrxzdsdoaiwvahht.supabase.co/storage/v1/object/public/assets/Navigation/plus.png" alt={t('addRevenue')} style={{ width: '20px', height: '20px' }} />
             </button>
           </div>
           <div className="bg-white shadow-md rounded-lg p-4 overflow-x-auto">
             <table className="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
               <thead>
                 <tr>
-                  <TableHeader>{'vehicle'}</TableHeader>
-                  <TableHeader>{'driver'}</TableHeader>
-                  <TableHeader>{'amount'}</TableHeader>
-                  <TableHeader>{'date'}</TableHeader>
-                  <TableHeader>{'description'}</TableHeader>
-                  <TableHeader>{'status'}</TableHeader>
-                  <TableHeader>{'proofOfPayment'}</TableHeader>
-                  <TableHeader>{'actions'}</TableHeader>
+                  <TableHeader>{t('vehicle')}</TableHeader>
+                  <TableHeader>{t('driver')}</TableHeader>
+                  <TableHeader>{t('amount')}</TableHeader>
+                  <TableHeader>{t('date')}</TableHeader>
+                  <TableHeader>{t('description')}</TableHeader>
+                  <TableHeader>{t('status')}</TableHeader>
+                  <TableHeader>{t('proofOfPayment')}</TableHeader>
+                  <TableHeader>{t('actions')}</TableHeader>
                 </tr>
               </thead>
               <tbody>
@@ -330,7 +329,7 @@ function Revenue() {
                     <TableData>
                       {editingRevenueId === item.id ? (
                         <select name="vehicle_id" value={editedRevenue.vehicle_id} onChange={handleEditedInputChange}>
-                          <option value="">{t('selectVehicle', { ns: 'translation' })}</option>
+                          <option value="">{t('selectVehicle')}</option>
                           {vehicles.map((vehicle) => (
                             <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model}</option>
                           ))}
@@ -342,7 +341,7 @@ function Revenue() {
                     <TableData>
                       {editingRevenueId === item.id ? (
                         <select name="driver_id" value={editedRevenue.driver_id} onChange={handleEditedInputChange}>
-                          <option value="">{t('selectDriver', { ns: 'translation' })}</option>
+                          <option value="">{t('selectDriver')}</option>
                           {drivers.map((driver) => (
                             <option key={driver.id} value={driver.id}>{driver.full_name}</option>
                           ))}
@@ -375,11 +374,11 @@ function Revenue() {
                     <TableData>
                       {editingRevenueId === item.id ? (
                         <select name="status" value={editedRevenue.status} onChange={handleEditedInputChange}>
-                          <option value="Completed">{t('completed', { ns: 'translation' })}</option>
-                          <option value="Pending">{t('pending', { ns: 'translation' })}</option>
-                          <option value="Past Due">{t('pastDue', { ns: 'translation' })}</option>
-                          <option value="Incomplete">{t('incomplete', { ns: 'translation' })}</option>
-                          <option value="Canceled">{t('canceled', { ns: 'translation' })}</option>
+                          <option value="Completed">{t('completed')}</option>
+                          <option value="Pending">{t('pending')}</option>
+                          <option value="Past Due">{t('pastDue')}</option>
+                          <option value="Incomplete">{t('incomplete')}</option>
+                          <option value="Canceled">{t('canceled')}</option>
                         </select>
                       ) : (
                         item.status
@@ -388,7 +387,7 @@ function Revenue() {
                     <TableData>
                       {item.proof_of_payment ? (
                         <a href={item.proof_of_payment} target="_blank" rel="noopener noreferrer">
-                          {t('viewProof', { ns: 'revenue' })}
+                          {t('viewProof')}
                         </a>
                       ) : (
                         'N/A'
@@ -397,13 +396,13 @@ function Revenue() {
                     <TableData>
                       {editingRevenueId === item.id ? (
                         <>
-                          <button onClick={() => handleSave(item.id)} className="text-green-500 hover:text-green-700 mr-2">{t('save', { ns: 'translation' })}</button>
-                          <button onClick={() => setEditingRevenueId(null)} className="text-gray-500 hover:text-gray-700">{t('cancel', { ns: 'translation' })}</button>
+                          <button onClick={() => handleSave(item.id)} className="text-green-500 hover:text-green-700 mr-2">{t('save')}</button>
+                          <button onClick={() => setEditingRevenueId(null)} className="text-gray-500 hover:text-gray-700">{t('cancel')}</button>
                         </>
                       ) : (
                         <>
-                          <button onClick={() => handleEdit(item)} className="text-blue-500 hover:text-blue-700 mr-2">{t('edit', { ns: 'translation' })}</button>
-                          <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700">{t('delete', { ns: 'translation' })}</button>
+                          <button onClick={() => handleEdit(item)} className="text-blue-500 hover:text-blue-700 mr-2">{t('edit')}</button>
+                          <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700">{t('delete')}</button>
                         </>
                       )}
                     </TableData>
@@ -413,36 +412,36 @@ function Revenue() {
             </table>
           </div>
           <Modal isOpen={showAddForm} onClose={handleCloseModal}>
-            <h2 className="text-2xl font-semibold mb-4">{t('addNewRevenue', { ns: 'revenue' })}</h2>
-            <label htmlFor="vehicle_id" className="block text-gray-700 text-sm font-bold mb-2">{t('vehicle', { ns: 'revenue' })}</label>
+            <h2 className="text-2xl font-semibold mb-4">{t('addNewRevenue')}</h2>
+            <label htmlFor="vehicle_id" className="block text-gray-700 text-sm font-bold mb-2">{t('vehicle')}</label>
             <select id="vehicle_id" name="vehicle_id" value={newRevenue.vehicle_id} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
-              <option value="">{t('selectVehicle', { ns: 'translation' })}</option>
+              <option value="">{t('selectVehicle')}</option>
               {vehicles.map((vehicle) => (
                 <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model}</option>
               ))}
             </select>
-            <label htmlFor="driver_id" className="block text-gray-700 text-sm font-bold mb-2">{t('driver', { ns: 'revenue' })}</label>
+            <label htmlFor="driver_id" className="block text-gray-700 text-sm font-bold mb-2">{t('driver')}</label>
             <select id="driver_id" name="driver_id" value={newRevenue.driver_id} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
-              <option value="">{t('selectDriver', { ns: 'translation' })}</option>
+              <option value="">{t('selectDriver')}</option>
               {drivers.map((driver) => (
                 <option key={driver.id} value={driver.id}>{driver.full_name}</option>
               ))}
             </select>
-            <label htmlFor="amount" className="block text-gray-700 text-sm font-bold mb-2">{t('amount', { ns: 'revenue' })}</label>
+            <label htmlFor="amount" className="block text-gray-700 text-sm font-bold mb-2">{t('amount')}</label>
             <input type="number" id="amount" name="amount" value={newRevenue.amount} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-            <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">{t('date', { ns: 'revenue' })}</label>
+            <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">{t('date')}</label>
             <input type="date" id="date" name="date" value={newRevenue.date} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-            <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">{t('description', { ns: 'revenue' })}</label>
+            <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">{t('description')}</label>
             <textarea id="description" name="description" value={newRevenue.description} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-            <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">{t('status', { ns: 'revenue' })}</label>
+            <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">{t('status')}</label>
             <select id="status" name="status" value={newRevenue.status} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
-              <option value="Completed">{t('completed', { ns: 'translation' })}</option>
-              <option value="Pending">{t('pending', { ns: 'translation' })}</option>
-              <option value="Past Due">{t('pastDue', { ns: 'translation' })}</option>
-              <option value="Incomplete">{t('incomplete', { ns: 'translation' })}</option>
-              <option value="Canceled">{t('canceled', { ns: 'translation' })}</option>
+              <option value="Completed">{t('completed')}</option>
+              <option value="Pending">{t('pending')}</option>
+              <option value="Past Due">{t('pastDue')}</option>
+              <option value="Incomplete">{t('incomplete')}</option>
+              <option value="Canceled">{t('canceled')}</option>
             </select>
-            <label htmlFor="proof_of_payment" className="block text-gray-700 text-sm font-bold mb-2">{t('proofOfPayment', { ns: 'revenue' })}</label>
+            <label htmlFor="proof_of_payment" className="block text-gray-700 text-sm font-bold mb-2">{t('proofOfPayment')}</label>
             <input
               type="file"
               id="proof_of_payment"
@@ -455,42 +454,42 @@ function Revenue() {
               onClick={handleAddRevenue}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
-              {t('addRevenue', { ns: 'translation' })}
+              {t('addRevenue')}
             </button>
           </Modal>
           <Modal isOpen={editingRevenueId !== null} onClose={handleCloseModal}>
-            <h2 className="text-2xl font-semibold mb-4">{t('updateRevenue', { ns: 'revenue' })}</h2>
+            <h2 className="text-2xl font-semibold mb-4">{t('updateRevenue')}</h2>
             {editingRevenueId !== null && (
               <>
-                <label htmlFor="vehicle_id" className="block text-gray-700 text-sm font-bold mb-2">{t('vehicle', { ns: 'revenue' })}</label>
+                <label htmlFor="vehicle_id" className="block text-gray-700 text-sm font-bold mb-2">{t('vehicle')}</label>
                 <select id="vehicle_id" name="vehicle_id" value={editedRevenue.vehicle_id} onChange={handleEditedInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
-                  <option value="">{t('selectVehicle', { ns: 'translation' })}</option>
+                  <option value="">{t('selectVehicle')}</option>
                   {vehicles.map((vehicle) => (
                     <option key={vehicle.id} value={vehicle.id}>{vehicle.make} {vehicle.model}</option>
                   ))}
                 </select>
-                <label htmlFor="driver_id" className="block text-gray-700 text-sm font-bold mb-2">{t('driver', { ns: 'revenue' })}</label>
+                <label htmlFor="driver_id" className="block text-gray-700 text-sm font-bold mb-2">{t('driver')}</label>
                 <select id="driver_id" name="driver_id" value={editedRevenue.driver_id} onChange={handleEditedInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
-                  <option value="">{t('selectDriver', { ns: 'translation' })}</option>
+                  <option value="">{t('selectDriver')}</option>
                   {drivers.map((driver) => (
                     <option key={driver.id} value={driver.id}>{driver.full_name}</option>
                   ))}
                 </select>
-                <label htmlFor="amount" className="block text-gray-700 text-sm font-bold mb-2">{t('amount', { ns: 'revenue' })}</label>
+                <label htmlFor="amount" className="block text-gray-700 text-sm font-bold mb-2">{t('amount')}</label>
                 <input type="number" id="amount" name="amount" value={editedRevenue.amount} onChange={handleEditedInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-                <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">{t('date', { ns: 'revenue' })}</label>
+                <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">{t('date')}</label>
                 <input type="date" id="date" name="date" value={editedRevenue.date} onChange={handleEditedInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-                <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">{t('description', { ns: 'revenue' })}</label>
+                <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">{t('description')}</label>
                 <textarea id="description" name="description" value={editedRevenue.description} onChange={handleEditedInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4" />
-                <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">{t('status', { ns: 'revenue' })}</label>
+                <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">{t('status')}</label>
                 <select id="status" name="status" value={editedRevenue.status} onChange={handleEditedInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
-                  <option value="Completed">{t('completed', { ns: 'translation' })}</option>
-                  <option value="Pending">{t('pending', { ns: 'translation' })}</option>
-                  <option value="Past Due">{t('pastDue', { ns: 'translation' })}</option>
-                  <option value="Incomplete">{t('incomplete', { ns: 'translation' })}</option>
-                  <option value="Canceled">{t('canceled', { ns: 'translation' })}</option>
+                  <option value="Completed">{t('completed')}</option>
+                  <option value="Pending">{t('pending')}</option>
+                  <option value="Past Due">{t('pastDue')}</option>
+                  <option value="Incomplete">{t('incomplete')}</option>
+                  <option value="Canceled">{t('canceled')}</option>
                 </select>
-                <label htmlFor="proof_of_payment" className="block text-gray-700 text-sm font-bold mb-2">{t('proofOfPayment', { ns: 'revenue' })}</label>
+                <label htmlFor="proof_of_payment" className="block text-gray-700 text-sm font-bold mb-2">{t('proofOfPayment')}</label>
                 <input
                   type="file"
                   id="proof_of_payment"
@@ -503,9 +502,9 @@ function Revenue() {
                   onClick={() => handleSave(item.id)}
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                 >
-                  {t('save', { ns: 'translation' })}
+                  {t('save')}
                 </button>
-                <button onClick={() => setEditingRevenueId(null)} className="text-gray-500 hover:text-gray-700">{t('cancel', { ns: 'translation' })}</button>
+                <button onClick={() => setEditingRevenueId(null)} className="text-gray-500 hover:text-gray-700">{t('cancel')}</button>
               </>
             )}
           </Modal>

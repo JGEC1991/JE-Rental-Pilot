@@ -2,14 +2,13 @@ import React, { useState } from 'react'
 import { supabase } from '../../supabaseClient'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import i18n from '../i18n';
 
 function Signup() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [invitationToken, setInvitationToken] = useState('')
   const navigate = useNavigate()
-  const { t } = useTranslation(['signup', 'translation'])
+  const { t } = useTranslation()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -52,9 +51,9 @@ function Signup() {
 
   return (
     <div className="page">
-      <h1 className="text-3xl font-semibold mb-4">{t('signup', { ns: 'translation' })}</h1>
+      <h1 className="text-3xl font-semibold mb-4">{t('signup')}</h1>
       <form onSubmit={handleSubmit} className="max-w-sm mx-auto">
-        <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">{t('email', { ns: 'translation' })}</label>
+        <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">{t('email')}</label>
         <input
           type="email"
           id="email"
@@ -63,7 +62,7 @@ function Signup() {
           onChange={(e) => setEmail(e.target.value)}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
-        <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">{t('password', { ns: 'translation' })}</label>
+        <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">{t('password')}</label>
         <input
           type="password"
           id="password"
@@ -72,7 +71,7 @@ function Signup() {
           onChange={(e) => setPassword(e.target.value)}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
-        <label htmlFor="invitationToken" className="block text-gray-700 text-sm font-bold mb-2">{t('invitationToken', { ns: 'translation' })}</label>
+        <label htmlFor="invitationToken" className="block text-gray-700 text-sm font-bold mb-2">{t('invitationToken')}</label>
         <input
           type="text"
           id="invitationToken"
@@ -85,7 +84,7 @@ function Signup() {
           type="submit"
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         >
-          {t('signup', { ns: 'translation' })}
+          {t('signup')}
         </button>
       </form>
     </div>

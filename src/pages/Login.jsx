@@ -8,7 +8,7 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const { t } = useTranslation(['login', 'translation']);
+  const { t } = useTranslation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,10 +50,10 @@ function Login() {
         {/* Tabs */}
         <div className="flex justify-around mb-6">
           <button className="py-2 px-4 text-blue-500 font-semibold focus:outline-none border-b-2 border-blue-500">
-            {t('login', { ns: 'translation' })}
+            {t('login')}
           </button>
           <Link to="/signup" className="py-2 px-4 text-gray-600 font-semibold focus:outline-none">
-            {t('signup', { ns: 'translation' })}
+            {t('signup')}
           </Link>
         </div>
 
@@ -61,7 +61,7 @@ function Login() {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
-              {t('email', { ns: 'translation' })}
+              {t('email')}
             </label>
             <input
               type="email"
@@ -74,7 +74,7 @@ function Login() {
           </div>
           <div className="mb-6">
             <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
-              {t('password', { ns: 'translation' })}
+              {t('password')}
             </label>
             <input
               type="password"
@@ -90,7 +90,7 @@ function Login() {
               type="submit"
               className="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
-              {t('login', { ns: 'translation' })}
+              {t('login')}
             </button>
           </div>
         </form>
@@ -108,9 +108,9 @@ function Login() {
 
       {/* Welcome Section */}
       <div className="w-full lg:w-1/2 bg-gray-800 text-white flex flex-col justify-center items-center p-12">
-        <h1 className="text-3xl font-bold mb-6">{t('simplifyYourCarRentalBusiness', { ns: 'home' })}</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('simplifyYourCarRentalBusiness')}</h1>
         <p className="text-lg text-center">
-          {t('allInOnePlatform', { ns: 'home' })}
+          {t('allInOnePlatform')}
         </p>
       </div>
     </div>
