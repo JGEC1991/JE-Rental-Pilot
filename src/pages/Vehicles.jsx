@@ -26,7 +26,7 @@ import { useState, useEffect } from 'react'
         observations: '',
       })
       const [uploading, setUploading] = useState(false);
-      const [activeTab, setActiveTab] = useState('information'); // Track active tab
+      const [activeTab, setActiveTab] = useState('information');
 
       const columns = [
         { key: 'make', title: 'Make' },
@@ -121,6 +121,20 @@ import { useState, useEffect } from 'react'
       const handleImageUpload = async (e, fieldName) => {
         const file = e.target.files[0];
         if (!file) return;
+
+        // Get file creation date (using lastModified for compatibility)
+        const fileCreationDate = new Date(file.lastModified);
+        const currentDate = new Date();
+
+        // Compare dates (ignoring time)
+        if (
+          fileCreationDate.getFullYear() !== currentDate.getFullYear() ||
+          fileCreationDate.getMonth() !== currentDate.getMonth() ||
+          fileCreationDate.getDate() !== currentDate.getDate()
+        ) {
+          setError(`The file is not from today. File creation date: ${fileCreationDate.toLocaleDateString()}`);
+          return;
+        }
 
         setUploading(true);
         setError(null);
