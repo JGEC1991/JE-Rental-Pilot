@@ -17,6 +17,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
       const [organizationName, setOrganizationName] = useState('Loading...')
       const [userName, setUserName] = useState('John Doe') // Placeholder
       const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+      const [emailConfirmed, setEmailConfirmed] = useState(false);
 
       useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -77,6 +78,14 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
 
         fetchOrganizationName()
       }, [session])
+
+      useEffect(() => {
+        if (session?.user?.email_confirmed_at) {
+          setEmailConfirmed(true);
+        } else {
+          setEmailConfirmed(false);
+        }
+      }, [session]);
 
       return (
         <>
@@ -260,7 +269,21 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                           )
                         }
                       />
-                      <Route path="/admin" element={<Confirmation />} />
+                      <Route
+                        path="/admin"
+                        element={
+                          session ? (
+                            emailConfirmed ? (
+                              <Admin />
+                            ) : (
+                              <Navigate to="/confirmation" replace />
+                            )
+                          ) : (
+                            <Navigate to="/" replace />
+                          )
+                        }
+                      />
+                      <Route path="/confirmation" element={<Confirmation />} />
                     </Routes>
                   </main>
                 </div>

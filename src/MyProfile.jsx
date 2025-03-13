@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
     import { supabase } from '../supabaseClient'
+    import { useNavigate } from 'react-router-dom';
+    import { useTranslation } from 'react-i18next';
 
     const MyProfile = () => {
       const [loading, setLoading] = useState(true)
@@ -11,6 +13,8 @@ import { useState, useEffect } from 'react'
       const [email, setEmail] = useState(null);
       const [role, setRole] = useState(null);
       const [isOwner, setIsOwner] = useState(false);
+      const navigate = useNavigate();
+      const { t } = useTranslation(['profile', 'translation']);
 
       useEffect(() => {
         const fetchProfile = async () => {
@@ -72,13 +76,29 @@ import { useState, useEffect } from 'react'
             return
           }
 
-          alert('Profile updated successfully!')
+          alert(t('updateProfileSuccessfully', { ns: 'translation' }));
         } catch (err) {
           setError(err.message)
         } finally {
           setLoading(false)
         }
       }
+
+      const handleLogout = async () => {
+        try {
+          const { error } = await supabase.auth.signOut();
+          if (error) {
+            console.error('Logout error:', error.message);
+            alert(error.message);
+          } else {
+            console.log('Logged out');
+            navigate('/');
+          }
+        } catch (error) {
+          console.error('Logout error:', error.message);
+          alert(error.message);
+        }
+      };
 
       if (loading) {
         return <div className="flex items-center justify-center h-full">Loading...</div>
@@ -147,6 +167,13 @@ import { useState, useEffect } from 'react'
                 disabled={loading}
               >
                 {loading ? 'Updating...' : 'Update Profile'}
+              </button>
+              <button
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                type="button"
+                onClick={handleLogout}
+              >
+                {t('logout', { ns: 'translation' })}
               </button>
             </div>
           </form>
