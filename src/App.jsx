@@ -111,7 +111,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                       <li>
                         <Link
                           to="/my-profile"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white transition duration-200 text-gray-300"
                         >
                           <span>{t('myProfile', { ns: 'app' })}</span>
                         </Link>
@@ -119,7 +119,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                       <li>
                         <Link
                           to="/vehicles"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white transition duration-200 text-gray-300"
                         >
                           <span>{t('vehicles', { ns: 'app' })}</span>
                         </Link>
@@ -127,7 +127,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                       <li>
                         <Link
                           to="/drivers"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white transition duration-200 text-gray-300"
                         >
                           <span>{t('drivers', { ns: 'app' })}</span>
                         </Link>
@@ -135,7 +135,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                       <li>
                         <Link
                           to="/activities"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white transition duration-200 text-gray-300"
                         >
                           <span>{t('activities', { ns: 'app' })}</span>
                         </Link>
@@ -143,7 +143,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                       <li>
                         <Link
                           to="/revenue"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white transition duration-200 text-gray-300"
                         >
                           <span>{t('revenue', { ns: 'app' })}</span>
                         </Link>
@@ -151,7 +151,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                       <li>
                         <Link
                           to="/expenses"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white transition duration-200 text-gray-300"
                         >
                           <span>{t('expenses', { ns: 'app' })}</span>
                         </Link>
@@ -159,7 +159,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                       <li>
                         <Link
                           to="/dashboard"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white transition duration-200 text-gray-300"
                         >
                           <span>{t('dashboard', { ns: 'app' })}</span>
                         </Link>
@@ -167,7 +167,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                       <li>
                         <Link
                           to="/admin"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white transition duration-200 text-gray-300"
                         >
                           <span>{t('admin', { ns: 'app' })}</span>
                         </Link>

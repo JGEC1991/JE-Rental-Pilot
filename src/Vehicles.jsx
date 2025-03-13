@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
     import Table from '../components/Table'
     import Popout from '../components/Popout'
     import { useTranslation } from 'react-i18next';
+    import { Button } from "@material-tailwind/react";
 
     const Vehicles = () => {
       const [loading, setLoading] = useState(true)
@@ -78,9 +79,9 @@ import { useState, useEffect } from 'react'
             status: selectedVehicle.status || 'available',
             front_image_url: selectedVehicle.front_image_url || '',
             rear_image_url: selectedVehicle.rear_image_url || '',
-            right_image_url: selectedVehicle.right_image_url || '',
-            left_image_url: selectedVehicle.left_image_url || '',
-            dashboard_image_url: selectedVehicle.dashboard_image_url || '',
+            right_image_url: '',
+            left_image_url: '',
+            dashboard_image_url: '',
             observations: selectedVehicle.observations || '',
           })
         }
@@ -307,12 +308,9 @@ import { useState, useEffect } from 'react'
       return (
         <div className="container mx-auto p-6">
           <div className="flex justify-between items-center mb-4">
-            <button
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline text-sm"
-              onClick={handleAddVehicleClick}
-            >
+            <Button color="green" onClick={handleAddVehicleClick}>
               {t('addNewVehicle', { ns: 'vehicles' })}
-            </button>
+            </Button>
           </div>
 
           <Popout isOpen={showAddForm} onClose={handleCloseAddForm}>
