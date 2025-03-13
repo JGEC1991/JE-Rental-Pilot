@@ -3,6 +3,8 @@ import { supabase } from '../supabaseClient'
 import Table from '../components/Table'
 import Popout from '../components/Popout'
 import ExpenseRecordCard from '../components/ExpenseRecordCard'
+import { useTranslation } from 'react-i18next';
+import { Button } from "@material-tailwind/react";
 
 const Expenses = () => {
   const [loading, setLoading] = useState(true)
@@ -25,15 +27,16 @@ const Expenses = () => {
   const [drivers, setDrivers] = useState([])
   const [vehicles, setVehicles] = useState([])
   const [attachmentFile, setAttachmentFile] = useState(null);
+  const { t } = useTranslation(['expenses', 'translation']);
 
   const columns = [
-    { key: 'date', title: 'Date' },
-    { key: 'amount', title: 'Amount' },
-    { key: 'description', title: 'Description' },
-    { key: 'status', title: 'Status' },
-    { key: 'activity_type', title: 'Activity' },
-    { key: 'driver_name', title: 'Driver' },
-    { key: 'vehicle_name', title: 'Vehicle' },
+    { key: 'date', title: t('date', { ns: 'expenses' }) },
+    { key: 'amount', title: t('amount', { ns: 'expenses' }) },
+    { key: 'description', title: t('description', { ns: 'expenses' }) },
+    { key: 'status', title: t('status', { ns: 'expenses' }) },
+    { key: 'activity_type', title: t('relatedActivity', { ns: 'expenses' }) },
+    { key: 'driver_name', title: t('driver', { ns: 'expenses' }) },
+    { key: 'vehicle_name', title: t('vehicle', { ns: 'expenses' }) },
   ]
 
   useEffect(() => {
@@ -64,6 +67,7 @@ const Expenses = () => {
           vehicle_name: item.vehicles ? `${item.vehicles.make} ${item.vehicles.model} (${item.vehicles.license_plate})` : 'N/A',
         }));
 
+        console.log("Retrieved Expenses Data:", processedExpenses);
         setExpenses(processedExpenses)
       } catch (err) {
         setError(err.message)
@@ -235,10 +239,22 @@ const Expenses = () => {
         organization_id: organizationId,
       }
 
-      const { data, error } = await supabase
-        .from('expenses')
-        .insert([newExpenseWithOrg])
-        .select()
+      let data, error;
+
+      if (selectedExpense) {
+        // Update existing expense
+        ({ data, error } = await supabase
+          .from('expenses')
+          .update(newExpenseWithOrg)
+          .eq('id', selectedExpense.id)
+          .select());
+      } else {
+        // Insert new expense
+        ({ data, error } = await supabase
+          .from('expenses')
+          .insert([newExpenseWithOrg])
+          .select());
+      }
 
       if (error) {
         setError(error.message)
@@ -337,40 +353,39 @@ const Expenses = () => {
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-4">
-        <button
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded focus:outline-none focus:shadow-outline text-sm"
+        <Button
+          color="green"
           onClick={handleAddExpenseClick}
         >
-          Add Expense
-        </button>
+          {t('addNewExpense', { ns: 'expenses' })}
+        </Button>
       </div>
 
       <Popout isOpen={showAddForm} onClose={handleCloseAddForm}>
-        <h2 className="text-xl font-semibold mb-4">{selectedExpense ? 'Edit Expense' : 'Add New Expense'}</h2>
+        <h2 className="text-xl font-semibold mb-4">{selectedExpense ? t('updateExpense', { ns: 'expenses' }) : t('addNewExpense', { ns: 'expenses' })}</h2>
         <form onSubmit={handleAddExpenseSubmit} className="max-w-lg">
           <div className="mb-4">
-            <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">Date</label>
+            <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">{t('date', { ns: 'expenses' })}</label>
             <input type="date" id="date" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={newExpense.date} onChange={handleInputChange} />
           </div>
           <div className="mb-4">
-            <label htmlFor="amount" className="block text-gray-700 text-sm font-bold mb-2">Amount</label>
-            <input type="number" id="amount" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={newExpense.amount} onChange={handleInputChange} />
+            <label htmlFor="amount" className="block text-gray-700 text-sm font-bold mb-2">{t('amount', { ns: 'expenses' })}</label>
+            <input type="number" id="amount" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={newExpense.amount} onChange={handleInputChange} placeholder={t('enterExpenseAmount', { ns: 'expenses' })} />
           </div>
           <div className="mb-4">
-            <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">Description</label>
-            <textarea id="description" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={newExpense.description} onChange={handleInputChange} />
+            <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">{t('description', { ns: 'expenses' })}</label>
+            <textarea id="description" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={newExpense.description} onChange={handleInputChange} placeholder={t('enterDescription', { ns: 'expenses' })} />
           </div>
           <div className="mb-4">
-            <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">Status</label>
+            <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">{t('status', { ns: 'expenses' })}</label>
             <select id="status" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={newExpense.status} onChange={handleInputChange}>
-              <option value="Pending">Pending</option>
-              <option value="Paid">Paid</option>
-              <option value="Pastdue">Past Due</option>
-              <option value="Canceled">Canceled</option>
+              <option value="Pending">{t('pending', { ns: 'expenses' })}</option>
+              <option value="Paid">{t('paid', { ns: 'expenses' })}</option>
+              <option value="Canceled">{t('canceled', { ns: 'expenses' })}</option>
             </select>
           </div>
           <div className="mb-4">
-            <label htmlFor="activity_id" className="block text-gray-700 text-sm font-bold mb-2">Activity</label>
+            <label htmlFor="activity_id" className="block text-gray-700 text-sm font-bold mb-2">{t('relatedActivity', { ns: 'expenses' })}</label>
             <select id="activity_id" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={newExpense.activity_id} onChange={handleInputChange}>
               <option value="">Select Activity</option>
               {activities.map((activity) => (
@@ -379,7 +394,7 @@ const Expenses = () => {
             </select>
           </div>
           <div className="mb-4">
-            <label htmlFor="driver_id" className="block text-gray-700 text-sm font-bold mb-2">Driver</label>
+            <label htmlFor="driver_id" className="block text-gray-700 text-sm font-bold mb-2">{t('driver', { ns: 'expenses' })}</label>
             <select id="driver_id" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={newExpense.driver_id} onChange={handleInputChange}>
               <option value="">Select Driver</option>
               {drivers.map((driver) => (
@@ -388,7 +403,7 @@ const Expenses = () => {
             </select>
           </div>
           <div className="mb-4">
-            <label htmlFor="vehicle_id" className="block text-gray-700 text-sm font-bold mb-2">Vehicle</label>
+            <label htmlFor="vehicle_id" className="block text-gray-700 text-sm font-bold mb-2">{t('vehicle', { ns: 'expenses' })}</label>
             <select id="vehicle_id" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={newExpense.vehicle_id} onChange={handleInputChange}>
               <option value="">Select Vehicle</option>
               {vehicles.map((vehicle) => (
@@ -408,9 +423,9 @@ const Expenses = () => {
             {newExpense.attachment_file && <a href={newExpense.attachment_file} target="_blank" rel="noopener noreferrer">View Uploaded Proof</a>}
           </div>
           <div className="flex items-center justify-end">
-            <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-              {selectedExpense ? 'Update' : 'Add'}
-            </button>
+            <Button color="blue" type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+              {selectedExpense ? t('updateExpense', { ns: 'expenses' }) : t('addExpense', { ns: 'expenses' })}
+            </Button>
           </div>
         </form>
       </Popout>
@@ -419,13 +434,17 @@ const Expenses = () => {
         {selectedExpense && <ExpenseRecordCard expense={selectedExpense} />}
       </Popout>
 
-      <Table
-        data={expenses}
-        columns={columns}
-        onView={handleViewExpense}
-        onEdit={handleEditExpense}
-        onDelete={handleDeleteExpense}
-      />
+      {expenses.length > 0 ? (
+        <Table
+          data={expenses}
+          columns={columns}
+          onView={handleViewExpense}
+          onEdit={handleEditExpense}
+          onDelete={handleDeleteExpense}
+        />
+      ) : (
+        <p>{t('noExpenseRecordsFound', { ns: 'expenses' })}</p>
+      )}
     </div>
   )
 }
