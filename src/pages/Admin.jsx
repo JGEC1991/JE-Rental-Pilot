@@ -1,186 +1,186 @@
-import { useState, useEffect } from 'react'
-    import { supabase } from '../supabaseClient'
-    import { Navigate } from 'react-router-dom'
-    import { useTranslation } from 'react-i18next';
+import { useState, useEffect, useCallback } from 'react'
+import { supabase } from '../supabaseClient'
+import { Navigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next';
 
-    const Admin = () => {
-      const [loading, setLoading] = useState(true)
-      const [error, setError] = useState(null)
-      const [users, setUsers] = useState([])
-      const [isOwner, setIsOwner] = useState(false)
-      const [newEmail, setNewEmail] = useState('');
-      const [newRole, setNewRole] = useState('user');
-      const { t } = useTranslation('admin');
+const Admin = () => {
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [users, setUsers] = useState([])
+  const [isOwner, setIsOwner] = useState(false)
+  const [newEmail, setNewEmail] = useState('');
+  const [newRole, setNewRole] = useState('user');
+  const { t } = useTranslation('admin');
 
-      useEffect(() => {
-        const fetchUsers = async () => {
-          setLoading(true)
-          setError(null)
+  const fetchUsers = useCallback(async () => {
+    setLoading(true)
+    setError(null)
 
-          try {
-            const { data: authUser, error: authError } = await supabase.auth.getUser();
+    try {
+      const { data: authUser, error: authError } = await supabase.auth.getUser();
 
-            if (authError) {
-              setError(authError.message);
-              return;
-            }
+      if (authError) {
+        setError(authError.message);
+        return;
+      }
 
-            const userId = authUser.user.id;
+      const userId = authUser.user.id;
 
-            const { data: userData, error: userError } = await supabase
-              .from('users')
-              .select('organization_id, is_owner')
-              .eq('id', userId)
-              .single();
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('organization_id, is_owner')
+        .eq('id', userId)
+        .single();
 
-            if (userError) {
-              setError(userError.message);
-              return;
-            }
+      if (userError) {
+        setError(userError.message);
+        return;
+      }
 
-            setIsOwner(userData?.is_owner || false);
+      setIsOwner(userData?.is_owner || false);
 
-            if (!userData?.is_owner) {
-              // Redirect non-owners
-              return;
-            }
+      if (!userData?.is_owner) {
+        // Redirect non-owners
+        return;
+      }
 
-            const { data, error: usersError } = await supabase
-              .from('users')
-              .select('id, name, email, role')
-              .eq('organization_id', userData.organization_id)
+      const { data, error: usersError } = await supabase
+        .from('users')
+        .select('id, name, email, role')
+        .eq('organization_id', userData.organization_id)
 
-            if (usersError) {
-              setError(usersError.message)
-              return
-            }
+      if (usersError) {
+        setError(usersError.message)
+        return
+      }
 
-            setUsers(data)
-          } catch (err) {
-            setError(err.message)
-          } finally {
-            setLoading(false)
-          }
+      setUsers(data)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUsers()
+  }, [fetchUsers])
+
+  const handleAddUser = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // 1. Get the user's organization ID
+      const { data: authUser, error: userError } = await supabase.auth.getUser();
+      if (userError) {
+        setError(userError.message);
+        return;
+      }
+      const userId = authUser.user.id;
+
+      const { data: userData, error: orgError } = await supabase
+        .from('users')
+        .select('organization_id')
+        .eq('id', userId)
+        .single();
+
+      if (orgError) {
+        setError(orgError.message);
+        return;
+      }
+
+      const organizationId = userData?.organization_id;
+
+      // 2. Generate a random password
+      const randomPassword = Math.random().toString(36).slice(-8);
+
+      // 3. Create the user in auth.users
+      const { data: authResponse, error: authError } = await supabase.auth.signUp({
+        email: newEmail,
+        password: randomPassword,
+        options: {
+          data: {
+            role: newRole,
+          },
+        },
+      });
+
+      if (authError) {
+        setError(authError.message);
+        return;
+      }
+
+      // 4. Update the user record in public.users
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({
+          organization_id: organizationId,
+          role: newRole,
+          name: newEmail, // Set the name to the email for simplicity
+          email: newEmail,
+        })
+        .eq('id', authResponse.user.id);
+
+      if (updateError) {
+        setError(updateError.message);
+        // Optionally delete the auth user if the update fails
+        await supabase.auth.admin.deleteUser(authResponse.user.id);
+        return;
+      }
+
+      // 5. Refresh the user list
+      await fetchUsers();
+      setNewEmail('');
+      setNewRole('user');
+      alert(`User added successfully! Temporary password is: ${randomPassword}. Please communicate this to the user securely.`);
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      try {
+        // Delete the user from auth.users
+        const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+
+        if (authError) {
+          setError(authError.message);
+          return;
         }
 
-        fetchUsers()
-      }, [])
+        // Delete the user from the public.users table
+        const { error: userError } = await supabase
+          .from('users')
+          .delete()
+          .eq('id', userId);
 
-      const handleAddUser = async () => {
-        try {
-          setLoading(true);
-          setError(null);
-
-          // 1. Get the user's organization ID
-          const { data: authUser, error: userError } = await supabase.auth.getUser();
-          if (userError) {
-            setError(userError.message);
-            return;
-          }
-          const userId = authUser.user.id;
-
-          const { data: userData, error: orgError } = await supabase
-            .from('users')
-            .select('organization_id')
-            .eq('id', userId)
-            .single();
-
-          if (orgError) {
-            setError(orgError.message);
-            return;
-          }
-
-          const organizationId = userData?.organization_id;
-
-          // 2. Generate a random password
-          const randomPassword = Math.random().toString(36).slice(-8);
-
-          // 3. Create the user in auth.users
-          const { data: authResponse, error: authError } = await supabase.auth.signUp({
-            email: newEmail,
-            password: randomPassword,
-            options: {
-              data: {
-                role: newRole,
-              },
-            },
-          });
-
-          if (authError) {
-            setError(authError.message);
-            return;
-          }
-
-          // 4. Update the user record in public.users
-          const { error: updateError } = await supabase
-            .from('users')
-            .update({
-              organization_id: organizationId,
-              role: newRole,
-              name: newEmail, // Set the name to the email for simplicity
-              email: newEmail,
-            })
-            .eq('id', authResponse.user.id);
-
-          if (updateError) {
-            setError(updateError.message);
-            // Optionally delete the auth user if the update fails
-            await supabase.auth.admin.deleteUser(authResponse.user.id);
-            return;
-          }
-
-          // 5. Refresh the user list
-          fetchUsers();
-          setNewEmail('');
-          setNewRole('user');
-          alert(`User added successfully! Temporary password is: ${randomPassword}. Please communicate this to the user securely.`);
-
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
+        if (userError) {
+          setError(userError.message);
+          return;
         }
-      };
 
-      const handleDeleteUser = async (userId) => {
-        if (window.confirm('Are you sure you want to delete this user?')) {
-          try {
-            // Delete the user from auth.users
-            const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+        // Refresh the user list
+        await fetchUsers();
+        alert('User deleted successfully!');
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
 
-            if (authError) {
-              setError(authError.message);
-              return;
-            }
-
-            // Delete the user from the public.users table
-            const { error: userError } = await supabase
-              .from('users')
-              .delete()
-              .eq('id', userId);
-
-            if (userError) {
-              setError(userError.message);
-              return;
-            }
-
-            // Refresh the user list
-            fetchUsers();
-            alert('User deleted successfully!');
-          } catch (err) {
-            setError(err.message);
-          } finally {
-            setLoading(false);
-          }
-        }
-      };
-
-      const handleRoleChange = async (userId, newRole) => {
-        try {
-          const { error } = await supabase
-            .from('users')
-            .update({ role: newRole })
-            .eq('id', userId);
+  const handleRoleChange = async (userId, newRole) => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ role: newRole })
+        .eq('id', userId);
 
           if (error) {
             setError(error.message);
@@ -188,7 +188,7 @@ import { useState, useEffect } from 'react'
           }
 
           // Refresh the user list
-          fetchUsers();
+          await fetchUsers();
           alert('User role updated successfully!');
         } catch (err) {
           setError(err.message);
