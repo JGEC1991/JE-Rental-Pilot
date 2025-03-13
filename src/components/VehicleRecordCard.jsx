@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../supabaseClient';
 import { useTranslation } from 'react-i18next';
 
@@ -22,6 +22,7 @@ function VehicleRecordCard({ vehicle, isEditMode = false }) {
 
   // Modal state for image zoom
   const [zoomedImage, setZoomedImage] = useState(null);
+  const modalRef = useRef(null);
   const { t } = useTranslation('vehicleRecordCard');
 
   const handleUpload = async (photo, folder, setPhotoState, fieldName) => {
