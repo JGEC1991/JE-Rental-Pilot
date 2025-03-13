@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import LanguageSelector from './LanguageSelector';
 
 const Sidebar = () => {
   const location = useLocation();
@@ -69,6 +70,7 @@ const Sidebar = () => {
       </nav>
       
       <div className="absolute bottom-0 w-full p-4 border-t border-gray-700">
+        <LanguageSelector />
         <button
           onClick={handleLogout}
           className={`flex items-center text-gray-300 hover:text-white transition-colors duration-200
