@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import Table from '../components/Table'
 import Popout from '../components/Popout'
-import ActivityRecordCard from '../components/ActivityRecordCard'
+import RevenueRecordCard from '../components/RevenueRecordCard'
 
 const Revenue = () => {
   const [loading, setLoading] = useState(true)
@@ -280,15 +280,15 @@ const Revenue = () => {
   }
 
   const handleViewRevenue = (revenue) => {
-    setSelectedRevenue(revenue)
-    setShowViewForm(true)
-    setShowAddForm(false)
-  }
+    setSelectedRevenue(revenue);
+    setShowViewForm(true);
+    setShowAddForm(false);
+  };
 
   const handleEditRevenue = (revenue) => {
-    setSelectedRevenue(revenue)
-    setShowAddForm(true)
-    setShowViewForm(false)
+    setSelectedRevenue(revenue);
+    setShowAddForm(true);
+    setShowViewForm(false);
     setNewRevenue({
       date: revenue.date || '',
       amount: revenue.amount || '',
@@ -300,7 +300,7 @@ const Revenue = () => {
       proof_of_payment_url: revenue.proof_of_payment_url || '',
     });
     setProofOfPayment(null);
-  }
+  };
 
   const handleDeleteRevenue = async (revenue) => {
     if (window.confirm(`Are you sure you want to delete this revenue record?`)) {
@@ -417,7 +417,7 @@ const Revenue = () => {
       </Popout>
 
       <Popout isOpen={showViewForm} onClose={handleCloseViewForm}>
-        {selectedRevenue && <ActivityRecordCard activity={selectedRevenue} />}
+        {selectedRevenue && <RevenueRecordCard revenue={selectedRevenue} />}
       </Popout>
 
       <Table
