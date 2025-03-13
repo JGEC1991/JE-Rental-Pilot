@@ -17,6 +17,7 @@ const LanguageSelector = () => {
       className="bg-gray-100 text-gray-700 rounded-md py-2 px-4 focus:outline-none"
     >
       <option value="en">English</option>
+      <option value="es">Español</option>
     </select>
   );
 };

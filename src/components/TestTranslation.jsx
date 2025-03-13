@@ -1,14 +1,14 @@
 import React from 'react';
-    import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
-    const TestTranslation = () => {
-      const { t } = useTranslation('test');
+const TestTranslation = () => {
+  const { t } = useTranslation('translation');
 
-      return (
-        <div>
-          <h1>{t('greeting')}</h1>
-        </div>
-      );
-    };
+  return (
+    <div>
+      <h1>{t('greeting')}</h1>
+    </div>
+  );
+};
 
-    export default TestTranslation;
+export default TestTranslation;

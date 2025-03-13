@@ -259,12 +259,11 @@ const Revenue = () => {
       }
 
       setRevenue(prevRevenue => {
-        if (selectedRevenue) {
-          // Update existing revenue
+        if (Array.isArray(prevRevenue)) {
           return prevRevenue.map(item => (item.id === selectedRevenue.id ? data[0] : item));
         } else {
-          // Insert new revenue
-          return [...prevRevenue, data[0]];
+          console.error('prevRevenue is not an array:', prevRevenue);
+          return [];
         }
       });
       setNewRevenue({ // Reset the form
@@ -325,13 +324,25 @@ const Revenue = () => {
           return
         }
 
-        setRevenue(revenue.filter((r) => r.id !== revenue.id)) // Remove the revenue from the list
+        setRevenue(prevRevenue => {
+          if (Array.isArray(prevRevenue)) {
+            return prevRevenue.filter((r) => r.id !== revenue.id)
+          } else {
+            console.error('prevRevenue is not an array:', prevRevenue);
+            return [];
+          }
+        }) // Remove the revenue from the list
       } catch (err) {
         setError(err.message)
       } finally {
         setLoading(false)
       }
     }
+  }
+
+  const handleCloseViewForm = () => {
+    setShowViewForm(false)
+    setSelectedRevenue(null)
   }
 
   if (loading) {
@@ -354,7 +365,7 @@ const Revenue = () => {
       </div>
 
       <Popout isOpen={showAddForm} onClose={handleCloseAddForm}>
-        <h2 className="text-xl font-semibold mb-4">{selectedRevenue ? 'Edit Revenue' : 'Add New Revenue'}</h2>
+        <h2 className="text-xl font-semibold mb-4">Add New Revenue</h2>
         <form onSubmit={handleAddRevenueSubmit} className="max-w-lg">
           <div className="mb-4">
             <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">Date</label>
@@ -413,7 +424,6 @@ const Revenue = () => {
               onChange={handleProofOfPaymentUpload}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
-            {newRevenue.proof_of_payment_url && <a href={newRevenue.proof_of_payment_url} target="_blank" rel="noopener noreferrer">View Uploaded Proof</a>}
           </div>
           <div className="flex items-center justify-end">
             <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">

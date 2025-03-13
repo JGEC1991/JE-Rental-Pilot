@@ -37,7 +37,6 @@ const Activities = () => {
 
   const columns = [
     { key: 'date', title: 'Date' },
-    { key: 'amount', title: 'Amount' },
     { key: 'description', title: 'Description' },
     { key: 'activity_type', title: 'Activity Type' },
     { key: 'vehicle_name', title: 'Vehicle' },
@@ -303,11 +302,7 @@ const Activities = () => {
           .eq('id', activity.id)
 
         if (error) {
-          if (error.code === '23503') {
-            setError("Activity can't be deleted since it's being used with another record.");
-          } else {
-            setError(error.message);
-          }
+          setError(error.message)
           return
         }
 
