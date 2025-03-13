@@ -241,10 +241,22 @@ const Revenue = () => {
         organization_id: organizationId,
       }
 
-      const { data, error } = await supabase
-        .from('revenue')
-        .insert([newRevenueWithOrg])
-        .select()
+      let data, error;
+
+      if (selectedRevenue) {
+        // Update existing revenue
+        ({ data, error } = await supabase
+          .from('revenue')
+          .update(newRevenueWithOrg)
+          .eq('id', selectedRevenue.id)
+          .select());
+      } else {
+        // Insert new revenue
+        ({ data, error } = await supabase
+          .from('revenue')
+          .insert([newRevenueWithOrg])
+          .select());
+      }
 
       if (error) {
         setError(error.message)
