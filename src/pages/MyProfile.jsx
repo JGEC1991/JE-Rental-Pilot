@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import i18n from '../i18n';
 
 const MyProfile = () => {
   const [loading, setLoading] = useState(true)
@@ -15,7 +13,6 @@ const MyProfile = () => {
   const [role, setRole] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
   const navigate = useNavigate();
-  const { t } = useTranslation(['profile', 'translation']);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -51,8 +48,6 @@ const MyProfile = () => {
         setRole(user.role || 'user');
         setIsOwner(user.is_owner || false);
 
-        console.log('Current language:', i18n.language);
-
       } catch (err) {
         setError(err.message)
       } finally {
@@ -79,7 +74,7 @@ const MyProfile = () => {
         return
       }
 
-      alert(t('updateProfileSuccessfully', { ns: 'profile' }));
+      alert('Profile updated successfully!');
     } catch (err) {
       setError(err.message)
     } finally {
@@ -104,7 +99,7 @@ const MyProfile = () => {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-full">{t('loading', { ns: 'translation' })}...</div>
+    return <div className="flex items-center justify-center h-full">Loading...</div>
   }
 
   if (error) {
@@ -116,7 +111,7 @@ const MyProfile = () => {
       <form onSubmit={handleSubmit} className="max-w-lg">
         <div className="mb-4">
           <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
-            {t('name', { ns: 'profile' })}
+            Name
           </label>
           <input
             type="text"
@@ -128,7 +123,7 @@ const MyProfile = () => {
         </div>
         <div className="mb-4">
           <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
-            {t('email', { ns: 'profile' })}
+            Email
           </label>
           <input
             type="email"
@@ -140,7 +135,7 @@ const MyProfile = () => {
         </div>
         <div className="mb-4">
           <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2">
-            {t('phone', { ns: 'profile' })}
+            Phone
           </label>
           <input
             type="tel"
@@ -152,7 +147,7 @@ const MyProfile = () => {
         </div>
         <div className="mb-6">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="isDriver">
-            {t('areYouADriver', { ns: 'profile' })}
+            Are you a driver?
           </label>
           <input
             className="mr-2 leading-tight"
@@ -169,14 +164,14 @@ const MyProfile = () => {
             type="submit"
             disabled={loading}
           >
-            {loading ? 'Updating...' : t('updateProfile', { ns: 'profile' })}
+            {loading ? 'Updating...' : 'Update Profile'}
           </button>
           <button
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="button"
             onClick={handleLogout}
           >
-            {t('logout', { ns: 'translation' })}
+            Logout
           </button>
         </div>
       </form>

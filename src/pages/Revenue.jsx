@@ -152,11 +152,6 @@ const Revenue = () => {
     setProofOfPayment(null);
   }
 
-  const handleCloseViewForm = () => {
-    setShowViewForm(false)
-    setSelectedRevenue(null)
-  }
-
   const handleInputChange = (e) => {
     setNewRevenue({ ...newRevenue, [e.target.id]: e.target.value })
   }

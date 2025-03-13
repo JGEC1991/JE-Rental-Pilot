@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import Table from '../components/Table'
 import Popout from '../components/Popout'
+import DriverRecordCard from '../components/DriverRecordCard'
 
 const Drivers = () => {
   const [loading, setLoading] = useState(true)

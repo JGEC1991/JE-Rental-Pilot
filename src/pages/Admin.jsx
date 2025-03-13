@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import { Navigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next';
 
 const Admin = () => {
   const [loading, setLoading] = useState(true)
@@ -10,7 +9,6 @@ const Admin = () => {
   const [isOwner, setIsOwner] = useState(false)
   const [newEmail, setNewEmail] = useState('');
   const [newRole, setNewRole] = useState('user');
-  const { t } = useTranslation('admin');
 
   const fetchUsers = useCallback(async () => {
     setLoading(true)
@@ -26,14 +24,14 @@ const Admin = () => {
 
       const userId = authUser.user.id;
 
-      const { data: userData, error: userError } = await supabase
+      const { data: userData, error: orgError } = await supabase
         .from('users')
         .select('organization_id, is_owner')
         .eq('id', userId)
         .single();
 
-      if (userError) {
-        setError(userError.message);
+      if (orgError) {
+        setError(orgError.message);
         return;
       }
 
@@ -211,15 +209,15 @@ const Admin = () => {
 
       return (
         <div className="container mx-auto p-6">
-          <h1 className="text-3xl font-semibold mb-4">{t('adminPanel', { ns: 'admin' })}</h1>
+          <h1 className="text-3xl font-semibold mb-4">Admin Panel</h1>
 
           {/* Add User Form */}
           <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">{t('generateInvitationToken', { ns: 'admin' })}</h2>
+            <h2 className="text-xl font-semibold mb-2">Generate Invitation Token</h2>
             <div className="flex space-x-4">
               <input
                 type="email"
-                placeholder={t('enterEmail', { ns: 'admin' })}
+                placeholder="Enter email"
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
@@ -236,7 +234,7 @@ const Admin = () => {
                 onClick={handleAddUser}
                 className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               >
-                {t('generateInvitation', { ns: 'admin' })}
+                Generate Invitation
               </button>
             </div>
           </div>

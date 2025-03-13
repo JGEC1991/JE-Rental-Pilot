@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseClient';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import i18n from '../i18n';
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -11,7 +9,6 @@ function Profile() {
   const [phone, setPhone] = useState('');
   const [profilePhoto, setProfilePhoto] = useState(null); // State for the selected profile photo
   const navigate = useNavigate();
-  const { t } = useTranslation(['profile', 'translation']);
 
   useEffect(() => {
     fetchUser();
@@ -95,7 +92,7 @@ function Profile() {
         alert(error.message);
       } else {
         console.log('Profile updated:', data);
-        alert(t('updateProfileSuccessfully', { ns: 'translation' }));
+        alert('Profile updated successfully!');
         fetchUser(); // Refresh user data
         setEditing(false);
       }
@@ -117,10 +114,10 @@ function Profile() {
           onClick={handleLogout}
           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
         >
-          {t('logout', { ns: 'translation' })}
+          Logout
         </button>
       </div>
-      <h1 className="text-3xl font-semibold mb-4">{t('profile', { ns: 'profile' })}</h1>
+      <h1 className="text-3xl font-semibold mb-4">Profile</h1>
 
       {user && (
         <div className="max-w-md mx-auto bg-white shadow-xl rounded-lg overflow-hidden md:max-w-2xl">
@@ -136,7 +133,7 @@ function Profile() {
                         ) : user.user_metadata?.profile_photo ? (
                           <img className="w-full h-full object-cover" src={user.user_metadata.profile_photo} alt="Profile" />
                         ) : (
-                          <span>{t('uploadPhoto', { ns: 'profile' })}</span>
+                          <span>Upload Photo</span>
                         )}
                       </div>
                     </label>
@@ -160,16 +157,16 @@ function Profile() {
 
             <div className="w-full md:w-2/3 p-4">
               <h3 className="text-xl font-semibold mb-2 text-gray-800">
-                {t('accountDetails', { ns: 'profile' })}
+                Account Details
               </h3>
               <div className="mb-2">
-                <strong className="text-gray-700">{t('id', { ns: 'profile' })}:</strong> {user.id}
+                <strong className="text-gray-700">ID:</strong> {user.id}
               </div>
               <div className="mb-2">
-                <strong className="text-gray-700">{t('email', { ns: 'profile' })}:</strong> {user.email}
+                <strong className="text-gray-700">Email:</strong> {user.email}
               </div>
               <div className="mb-2">
-                <strong className="text-gray-700">{t('phone', { ns: 'profile' })}:</strong>
+                <strong className="text-gray-700">Phone:</strong>
                 {editing ? (
                   <input
                     type="text"
@@ -182,13 +179,13 @@ function Profile() {
                 )}
               </div>
               <div className="mb-2">
-                <strong className="text-gray-700">{t('driversLicensePhoto')}:</strong> {user.user_metadata?.drivers_license_photo}
+                <strong className="text-gray-700">Drivers License Photo:</strong> {user.user_metadata?.drivers_license_photo}
               </div>
               <div className="mb-2">
-                <strong className="text-gray-700">{t('policeRecordsPhoto')}:</strong> {user.user_metadata?.police_records_photo}
+                <strong className="text-gray-700">Police Records Photo:</strong> {user.user_metadata?.police_records_photo}
               </div>
               <div className="mb-2">
-                <strong className="text-gray-700">{t('criminalRecordsPhoto')}:</strong> {user.user_metadata?.criminal_records_photo}
+                <strong className="text-gray-700">Criminal Records Photo:</strong> {user.user_metadata?.criminal_records_photo}
               </div>
               <div className="mb-2">
                 <strong className="text-gray-700">Role:</strong> {user.role}
@@ -201,13 +198,13 @@ function Profile() {
                       onClick={handleSaveClick}
                       className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
                     >
-                      {t('save', { ns: 'profile' })}
+                      Save
                     </button>
                     <button
                       onClick={handleCancelClick}
                       className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
                     >
-                      {t('cancel', { ns: 'profile' })}
+                      Cancel
                     </button>
                   </>
                 ) : (
@@ -215,7 +212,7 @@ function Profile() {
                     onClick={handleEditClick}
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                   >
-                    {t('editProfile', { ns: 'profile' })}
+                    Edit Profile
                   </button>
                 )}
               </div>

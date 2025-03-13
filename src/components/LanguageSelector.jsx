@@ -1,25 +1,24 @@
 import React from 'react';
-    import { useTranslation } from 'react-i18next';
-    import i18n from '../i18n';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
-    const LanguageSelector = () => {
-      const { t } = useTranslation();
+const LanguageSelector = () => {
+  const { t } = useTranslation();
 
-      const changeLanguage = (lng) => {
-        i18n.changeLanguage(lng);
-        localStorage.setItem('i18nextLng', lng);
-      };
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+    localStorage.setItem('i18nextLng', lng);
+  };
 
-      return (
-        <select
-          value={i18n.language}
-          onChange={(e) => changeLanguage(e.target.value)}
-          className="bg-gray-100 text-gray-700 rounded-md py-2 px-4 focus:outline-none"
-        >
-          <option value="en">{t('english', {ns: 'translation'})}</option>
-          <option value="es">{t('spanish', {ns: 'translation'})}</option>
-        </select>
-      );
-    };
+  return (
+    <select
+      value={i18n.language}
+      onChange={(e) => changeLanguage(e.target.value)}
+      className="bg-gray-100 text-gray-700 rounded-md py-2 px-4 focus:outline-none"
+    >
+      <option value="en">English</option>
+    </select>
+  );
+};
 
-    export default LanguageSelector;
+export default LanguageSelector;
