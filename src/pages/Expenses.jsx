@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import Table from '../components/Table'
 import Popout from '../components/Popout'
-import ActivityRecordCard from '../components/ActivityRecordCard'
+import ExpenseRecordCard from '../components/ExpenseRecordCard'
 
 const Expenses = () => {
   const [loading, setLoading] = useState(true)
@@ -19,10 +19,12 @@ const Expenses = () => {
     activity_id: '',
     driver_id: '',
     vehicle_id: '',
+    attachment_file: '',
   })
   const [activities, setActivities] = useState([])
   const [drivers, setDrivers] = useState([])
   const [vehicles, setVehicles] = useState([])
+  const [attachmentFile, setAttachmentFile] = useState(null);
 
   const columns = [
     { key: 'date', title: 'Date' },
@@ -138,22 +140,60 @@ const Expenses = () => {
       activity_id: '',
       driver_id: '',
       vehicle_id: '',
+      attachment_file: '',
     })
+    setAttachmentFile(null);
   }
 
   const handleCloseAddForm = () => {
     setShowAddForm(false)
     setSelectedExpense(null)
-  }
-
-  const handleCloseViewForm = () => {
-    setShowViewForm(false)
-    setSelectedExpense(null)
+    setAttachmentFile(null);
   }
 
   const handleInputChange = (e) => {
     setNewExpense({ ...newExpense, [e.target.id]: e.target.value })
   }
+
+  const handleProofOfPaymentUpload = async (e) => {
+    const file = e.target.files[0];
+    setAttachmentFile(file);
+
+    if (!file) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-proof_of_payment.${fileExt}`;
+      const filePath = `expenses/${newExpense.date.substring(0, 4)}/${newExpense.date.substring(5, 7)}/proof_of_payment/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('jerentcars-storage')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        setError(uploadError.message);
+        return;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('jerentcars-storage')
+        .getPublicUrl(filePath)
+
+      const publicUrl = urlData.publicUrl;
+
+      setNewExpense({ ...newExpense, attachment_file: publicUrl });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddExpenseSubmit = async (e) => {
     e.preventDefault()
@@ -206,7 +246,13 @@ const Expenses = () => {
       }
 
       setExpenses(prevExpenses => {
-        return [...prevExpenses, data[0]];
+        if (selectedExpense) {
+          // Update existing expense
+          return prevExpenses.map(item => (item.id === selectedExpense.id ? data[0] : item));
+        } else {
+          // Insert new expense
+          return [...prevExpenses, data[0]];
+        }
       });
       setNewExpense({ // Reset the form
         date: '',
@@ -216,7 +262,9 @@ const Expenses = () => {
         activity_id: '',
         driver_id: '',
         vehicle_id: '',
-      })
+        attachment_file: '',
+      });
+      setAttachmentFile(null);
       setShowAddForm(false) // Hide the form
     } catch (err) {
       setError(err.message)
@@ -243,7 +291,9 @@ const Expenses = () => {
       activity_id: expense.activity_id || '',
       driver_id: expense.driver_id || '',
       vehicle_id: expense.vehicle_id || '',
+      attachment_file: expense.attachment_file || '',
     });
+    setAttachmentFile(null);
   }
 
   const handleDeleteExpense = async (expense) => {
@@ -269,6 +319,11 @@ const Expenses = () => {
         setLoading(false)
       }
     }
+  }
+
+  const handleCloseViewForm = () => {
+    setShowViewForm(false)
+    setSelectedExpense(null)
   }
 
   if (loading) {
@@ -341,6 +396,17 @@ const Expenses = () => {
               ))}
             </select>
           </div>
+           <div className="mb-4">
+            <label htmlFor="attachment_file" className="block text-gray-700 text-sm font-bold mb-2">Attachment</label>
+            <input
+              type="file"
+              id="attachment_file"
+              accept="image/*, application/pdf"
+              onChange={handleProofOfPaymentUpload}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+            {newExpense.attachment_file && <a href={newExpense.attachment_file} target="_blank" rel="noopener noreferrer">View Uploaded Proof</a>}
+          </div>
           <div className="flex items-center justify-end">
             <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
               {selectedExpense ? 'Update' : 'Add'}
@@ -350,7 +416,7 @@ const Expenses = () => {
       </Popout>
 
       <Popout isOpen={showViewForm} onClose={handleCloseViewForm}>
-        {selectedExpense && <ActivityRecordCard activity={selectedExpense} />}
+        {selectedExpense && <ExpenseRecordCard expense={selectedExpense} />}
       </Popout>
 
       <Table
