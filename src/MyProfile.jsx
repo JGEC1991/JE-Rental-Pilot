@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
     import { supabase } from '../supabaseClient'
     import { useNavigate } from 'react-router-dom';
     import { useTranslation } from 'react-i18next';
+    import i18n from '../i18n';
 
     const MyProfile = () => {
       const [loading, setLoading] = useState(true)
@@ -76,7 +77,7 @@ import { useState, useEffect } from 'react'
             return
           }
 
-          alert(t('updateProfileSuccessfully', { ns: 'translation' }));
+          alert(t('updateProfileSuccessfully', { ns: 'profile' }));
         } catch (err) {
           setError(err.message)
         } finally {
@@ -101,19 +102,21 @@ import { useState, useEffect } from 'react'
       };
 
       if (loading) {
-        return <div className="flex items-center justify-center h-full">Loading...</div>
+        return <div className="flex items-center justify-center h-full">{t('loading', { ns: 'translation' })}...</div>
       }
 
       if (error) {
         return <div className="flex items-center justify-center h-full text-red-500">Error: {error}</div>
       }
 
+      console.log('Current language:', i18next.language);
+
       return (
         <div className="container mx-auto p-6">
           <form onSubmit={handleSubmit} className="max-w-lg">
             <div className="mb-4">
               <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
-                Name
+                {t('name', { ns: 'profile' })}
               </label>
               <input
                 type="text"
@@ -125,7 +128,7 @@ import { useState, useEffect } from 'react'
             </div>
             <div className="mb-4">
               <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
-                Email
+                {t('email', { ns: 'profile' })}
               </label>
               <input
                 type="email"
@@ -137,7 +140,7 @@ import { useState, useEffect } from 'react'
             </div>
             <div className="mb-4">
               <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2">
-                Phone Number
+                {t('phone', { ns: 'profile' })}
               </label>
               <input
                 type="tel"
@@ -149,7 +152,7 @@ import { useState, useEffect } from 'react'
             </div>
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="isDriver">
-                Are you a driver?
+                {t('areYouADriver', { ns: 'profile' })}
               </label>
               <input
                 className="mr-2 leading-tight"
@@ -166,7 +169,7 @@ import { useState, useEffect } from 'react'
                 type="submit"
                 disabled={loading}
               >
-                {loading ? 'Updating...' : 'Update Profile'}
+                {loading ? 'Updating...' : t('updateProfile', { ns: 'profile' })}
               </button>
               <button
                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

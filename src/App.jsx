@@ -11,6 +11,8 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
     import Confirmation from './pages/Confirmation' // Import the Confirmation component
     import { useState, useEffect } from 'react'
     import { supabase } from './supabaseClient'
+    import LanguageSelector from './components/LanguageSelector'
+    import { useTranslation } from 'react-i18next';
 
     function App() {
       const [session, setSession] = useState(null)
@@ -18,6 +20,7 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
       const [userName, setUserName] = useState('John Doe') // Placeholder
       const [isSidebarOpen, setIsSidebarOpen] = useState(true)
       const [emailConfirmed, setEmailConfirmed] = useState(false);
+      const { t } = useTranslation(['translation', 'app']);
 
       useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -94,12 +97,12 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
               <div className="flex h-screen bg-gray-50">
                 {/* Left Panel Navigation */}
                 <div
-                  className={`bg-white border-r border-gray-100 w-64 flex flex-col transition-transform duration-300 ease-in-out ${
+                  className={`bg-gray-800 text-white border-r border-gray-700 w-64 flex flex-col transition-transform duration-300 ease-in-out ${
                     isSidebarOpen ? 'translate-x-0' : '-translate-x-64'
                   }`}
                 >
                   <div className="flex items-center justify-between h-16 px-4">
-                    <Link to="/" className="text-lg font-medium text-gray-900">
+                    <Link to="/" className="text-lg font-medium text-white">
                       JerentCars
                     </Link>
                   </div>
@@ -108,69 +111,72 @@ import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom'
                       <li>
                         <Link
                           to="/my-profile"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
                         >
-                          <span>My Profile</span>
+                          <span>{t('myProfile', { ns: 'app' })}</span>
                         </Link>
                       </li>
                       <li>
                         <Link
                           to="/vehicles"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
                         >
-                          <span>Vehicles</span>
+                          <span>{t('vehicles', { ns: 'app' })}</span>
                         </Link>
                       </li>
                       <li>
                         <Link
                           to="/drivers"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
                         >
-                          <span>Drivers</span>
+                          <span>{t('drivers', { ns: 'app' })}</span>
                         </Link>
                       </li>
                       <li>
                         <Link
                           to="/activities"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
                         >
-                          <span>Activities</span>
+                          <span>{t('activities', { ns: 'app' })}</span>
                         </Link>
                       </li>
                       <li>
                         <Link
                           to="/revenue"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
                         >
-                          <span>Revenue</span>
+                          <span>{t('revenue', { ns: 'app' })}</span>
                         </Link>
                       </li>
                       <li>
                         <Link
                           to="/expenses"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
                         >
-                          <span>Expenses</span>
+                          <span>{t('expenses', { ns: 'app' })}</span>
                         </Link>
                       </li>
                       <li>
                         <Link
                           to="/dashboard"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
                         >
-                          <span>Dashboard</span>
+                          <span>{t('dashboard', { ns: 'app' })}</span>
                         </Link>
                       </li>
                       <li>
                         <Link
                           to="/admin"
-                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-200 text-gray-700"
+                          className="flex items-center space-x-3 py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200 text-gray-300"
                         >
-                          <span>Admin</span>
+                          <span>{t('admin', { ns: 'app' })}</span>
                         </Link>
                       </li>
                     </ul>
                   </nav>
+                  <div className="p-4 border-t border-gray-700">
+                    <LanguageSelector />
+                  </div>
                 </div>
 
                 {/* Main Content */}
