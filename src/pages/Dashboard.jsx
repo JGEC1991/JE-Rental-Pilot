@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true)
@@ -8,6 +9,9 @@ const Dashboard = () => {
   const [revenueExpenses, setRevenueExpenses] = useState({})
   const [revenueByStatus, setRevenueByStatus] = useState({})
   const [activitiesByType, setActivitiesByType] = useState({})
+  const [revenueData, setRevenueData] = useState([]);
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -73,6 +77,13 @@ const Dashboard = () => {
         }, {})
         setActivitiesByType(activityTypeCounts)
 
+        // Prepare data for the Revenue Chart
+        const revenueChartData = revenueData.map(item => ({
+          name: item.status,
+          amount: item.amount,
+        }));
+        setRevenueData(revenueChartData);
+
       } catch (err) {
         setError(err.message)
       } finally {
@@ -93,15 +104,36 @@ const Dashboard = () => {
 
   const balance = revenueExpenses.revenue - revenueExpenses.expenses
 
+  const pieChartData = Object.entries(vehicleStatuses).map(([name, value]) => ({
+    name,
+    value,
+  }));
+
   return (
     <div className="container mx-auto p-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {/* Vehicle Statuses */}
         <div className="bg-white shadow rounded-lg p-4">
           <h2 className="text-lg font-semibold mb-2">Vehicle Statuses</h2>
-          <p>Available: {vehicleStatuses.available || 0}</p>
-          <p>Rented: {vehicleStatuses.rented || 0}</p>
-          <p>Maintenance: {vehicleStatuses.maintenance || 0}</p>
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie
+                dataKey="value"
+                isAnimationActive={false}
+                data={pieChartData}
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                fill="#8884d8"
+                label
+              >
+                {pieChartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
 
         {/* Revenue vs Expenses */}
@@ -130,13 +162,19 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Placeholder Chart */}
+      {/* Revenue Chart */}
       <div className="bg-white shadow rounded-lg p-4">
         <h2 className="text-lg font-semibold mb-2">Revenue Chart</h2>
-        <svg width="100%" height="200">
-          <line x1="0" y1="100" x2="100%" y2="100" stroke="blue" strokeWidth="2" />
-          <line x1="0" y1="150" x2="100%" y2="50" stroke="red" strokeWidth="2" />
-        </svg>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={revenueData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="amount" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   )
