@@ -1,0 +1,103 @@
+Overall Purpose:
+
+The application is a car rental management system, designed to manage vehicles, drivers, activities, revenue, and expenses. It uses Supabase for backend services (authentication and database). The application is being converted to Spanish-only.
+
+Key Components and their Functions:
+
+App.jsx:
+
+Serves as the main entry point of the application.
+Manages user authentication state using supabase.auth.
+Fetches the organization name and user name upon login.
+Renders the main layout, including the Sidebar and the main content area.
+Defines the routes for different pages (/, /vehicles, /drivers, /activities, /revenue, /expenses, /dashboard, /admin, /confirmation).
+Conditionally renders different components based on the authentication state.
+Sidebar.jsx:
+
+Provides navigation links to different sections of the application.
+Handles user logout functionality using supabase.auth.signOut().
+Allows the user to collapse or expand the sidebar.
+Home.jsx:
+
+Handles user login and signup.
+Uses supabase.auth.signInWithPassword() for login.
+Uses supabase.auth.signUp() for signup, including calling a Supabase function (create_org_and_user) to create the organization and user record.
+Redirects to a confirmation page after signup.
+Vehicles.jsx:
+
+Displays a list of vehicles in a table.
+Fetches vehicle data from Supabase using supabase.from('vehicles').select('*').
+Allows adding, editing, and deleting vehicle records.
+Uses a Popout component to display forms for adding/editing vehicles.
+Uses a VehicleTable component to display the vehicle data in a table format.
+Handles image uploads for vehicle photos using Supabase storage.
+VehicleTable.jsx:
+
+Displays the vehicle data in a table format.
+Receives vehicle data and column definitions as props.
+Renders the table headers and rows.
+Provides buttons for viewing, editing, and deleting vehicle records.
+Drivers.jsx:
+
+Displays a list of drivers in a table.
+Fetches driver data from Supabase using supabase.from('drivers').select('*').
+Allows adding, editing, and deleting driver records.
+Uses a Popout component to display forms for adding/editing drivers.
+Activities.jsx:
+
+Displays a list of activities in a table.
+Fetches activity data from Supabase using supabase.from('activities').select('*').
+Allows adding, editing, and deleting activity records.
+Uses a Popout component to display forms for adding/editing activities.
+Revenue.jsx:
+
+Displays a list of revenue records in a table.
+Fetches revenue data from Supabase using supabase.from('revenue').select('*').
+Allows adding, editing, and deleting revenue records.
+Uses a Popout component to display forms for adding/editing revenue.
+Expenses.jsx:
+
+Displays a list of expense records in a table.
+Fetches expense data from Supabase using supabase.from('expenses').select('*').
+Allows adding, editing, and deleting expense records.
+Uses a Popout component to display forms for adding/editing expenses.
+Confirmation.jsx:
+
+Displays a confirmation message after a user signs up.
+MyProfile.jsx:
+
+Allows users to view and update their profile information.
+Fetches user profile data from Supabase.
+Handles user logout.
+Admin.jsx:
+
+Allows administrators to manage users (add, delete, and modify roles).
+Fetches user data from Supabase.
+Uses supabase.auth.admin to manage user accounts.
+Popout.jsx:
+
+A reusable component for displaying modal-like popout forms.
+RecordCard.jsx:
+
+A reusable component for displaying and editing record details.
+VehicleRecordCard.jsx:
+
+Displays detailed information about a specific vehicle.
+Allows editing vehicle details and uploading images.
+ExpenseRecordCard.jsx:
+
+Displays detailed information about a specific expense record.
+RevenueRecordCard.jsx:
+
+Displays detailed information about a specific revenue record.
+Data Flow:
+
+The App component manages the overall application state and routing.
+Data is fetched from Supabase using the supabaseClient library.
+Components like Vehicles, Drivers, Activities, Revenue, and Expenses fetch data and display it in tables.
+The Popout component is used to display forms for adding and editing records.
+Form data is submitted to Supabase to update the database.
+Authentication:
+
+Supabase Auth is used for user authentication (login, signup, logout).
+The App component listens for authentication state changes and updates the UI accordingly.
