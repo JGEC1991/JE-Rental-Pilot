@@ -74,7 +74,8 @@
         "ws": "^8.18.0",
         "zod": "^3.23.8",
         "zod-validation-error": "^3.4.0",
-        "react-router-dom": "^6.0.0"
+        "react-router-dom": "^6.0.0",
+        "@material-tailwind/react": "^2.0.0"
       },
       "devDependencies": {
         "@replit/vite-plugin-cartographer": "^0.0.11",

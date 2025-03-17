@@ -33,7 +33,7 @@ import { defineConfig } from "vite";
         outDir: path.resolve(__dirname, "dist/public"),
         emptyOutDir: true,
         rollupOptions: {
-          external: ["react-router-dom"],
+          external: ["react-router-dom", "@material-tailwind/react"],
         },
       },
     });
