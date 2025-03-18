@@ -4,12 +4,9 @@ import themePlugin from "@replit/vite-plugin-shadcn-theme-json";
 import path, { dirname } from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { fileURLToPath } from "url";
-import { dependencies } from './package.json';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-const externalDependencies = Object.keys(dependencies || {});
 
 export default defineConfig({
   plugins: [
@@ -36,7 +33,7 @@ export default defineConfig({
     outDir: path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,
     rollupOptions: {
-      external: externalDependencies,
+      external: ["wouter"],
     },
   },
 });
